@@ -1,0 +1,18 @@
+:host {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  width: 100%;   // Устанавливаем ширину 100%
+  height: 100%;  // Устанавливаем высоту 100%
+}
+
+#planetCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+svg {
+  display: none; // Скрываем SVG
+}

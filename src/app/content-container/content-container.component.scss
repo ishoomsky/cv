@@ -1,0 +1,14 @@
+.content-container {
+  background-color: rgba(0, 0, 255, 0.1); // Синий фон с прозрачностью
+  color: #ffffff; // Цвет текста
+  border-radius: 8px; // Закругленные углы
+  padding: 20px; // Отступы внутри контейнера
+  max-width: 800px; // Максимальная ширина
+  height: 60vh; // Высота 60% от высоты экрана
+  margin: 20px auto; // Центрирование контейнера
+  backdrop-filter: blur(4px); // Размытие фона
+  display: flex; // Используем Flexbox для центровки контента
+  flex-direction: column; // Вертикальная ориентация
+  justify-content: center; // Центрирование по вертикали
+  align-items: center; // Центрирование по горизонтали
+}
