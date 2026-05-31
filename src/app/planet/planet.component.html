@@ -5,116 +5,164 @@
     <clipPath id="circleClip">
       <circle cx="150" cy="150" r="100" />
     </clipPath>
-    <radialGradient id="oceanGrad" cx="36%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#2e8fcc" />
-      <stop offset="50%" stop-color="#0e4880" />
-      <stop offset="100%" stop-color="#041a3a" />
+    <!-- Deep dark ocean -->
+    <radialGradient id="oceanGrad" cx="32%" cy="26%" r="80%">
+      <stop offset="0%" stop-color="#14496e" />
+      <stop offset="40%" stop-color="#071e3d" />
+      <stop offset="100%" stop-color="#010810" />
     </radialGradient>
-    <radialGradient id="shading" cx="30%" cy="26%" r="70%">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.0)" />
-      <stop offset="40%" stop-color="rgba(0,0,0,0)" />
-      <stop offset="100%" stop-color="rgba(0,0,30,0.72)" />
+    <!-- Sunlight warm tint from upper-left -->
+    <radialGradient id="sunlight" cx="24%" cy="20%" r="58%">
+      <stop offset="0%" stop-color="rgba(255,240,200,0.22)" />
+      <stop offset="60%" stop-color="rgba(255,180,80,0.04)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0)" />
     </radialGradient>
-    <radialGradient id="highlight" cx="30%" cy="26%" r="50%">
-      <stop offset="0%" stop-color="rgba(255,255,255,0.22)" />
+    <!-- Night-side terminator -->
+    <radialGradient id="nightSide" cx="70%" cy="68%" r="52%">
+      <stop offset="0%" stop-color="rgba(0,0,10,0.90)" />
+      <stop offset="65%" stop-color="rgba(0,0,10,0.50)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+    </radialGradient>
+    <!-- Sphere edge darkening -->
+    <radialGradient id="shading" cx="50%" cy="50%" r="50%">
+      <stop offset="62%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="100%" stop-color="rgba(0,0,20,0.80)" />
+    </radialGradient>
+    <!-- Specular highlight -->
+    <radialGradient id="highlight" cx="27%" cy="23%" r="40%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.18)" />
       <stop offset="100%" stop-color="rgba(255,255,255,0)" />
     </radialGradient>
+    <!-- Atmosphere inner rim -->
     <radialGradient id="atmRim" cx="50%" cy="50%" r="50%">
-      <stop offset="86%" stop-color="rgba(0,0,0,0)" />
-      <stop offset="100%" stop-color="rgba(80,180,255,0.18)" />
+      <stop offset="83%" stop-color="rgba(0,0,0,0)" />
+      <stop offset="94%" stop-color="rgba(60,160,255,0.30)" />
+      <stop offset="100%" stop-color="rgba(30,100,220,0.0)" />
     </radialGradient>
+    <!-- City lights glow -->
+    <filter id="cityGlow">
+      <feGaussianBlur stdDeviation="1.8" result="blur" />
+      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
     <filter id="landBlur">
-      <feGaussianBlur stdDeviation="0.6" />
+      <feGaussianBlur stdDeviation="0.5" />
     </filter>
   </defs>
 
   <g clip-path="url(#circleClip)">
-    <!-- Ocean base -->
+    <!-- Ocean -->
     <rect x="50" y="50" width="200" height="200" fill="url(#oceanGrad)" />
 
-    <!-- Landmasses with slight blur for organic look -->
+    <!-- Continents — dark, subtle -->
     <g filter="url(#landBlur)">
       <!-- North America -->
       <path d="M72 86 C78 78 90 74 104 80 C114 85 120 96 122 112
                C124 126 118 136 110 138 C98 140 86 132 78 120
-               C70 108 68 96 72 86 Z" fill="#4a7c3f" />
-      <!-- Alaska bump -->
-      <path d="M66 88 C70 82 76 80 80 85 C78 92 70 94 66 88 Z" fill="#4a7c3f" />
-      <!-- Florida peninsula -->
-      <path d="M106 138 C110 140 114 148 112 154 C109 158 104 156 102 150 C100 144 103 139 106 138 Z" fill="#5a8845" />
+               C70 108 68 96 72 86 Z" fill="#1a3820" />
+      <path d="M66 88 C70 82 76 80 80 85 C78 92 70 94 66 88 Z" fill="#1a3820" />
+      <path d="M106 138 C110 140 114 148 112 154 C109 158 104 156 102 150
+               C100 144 103 139 106 138 Z" fill="#1a3820" />
       <!-- Greenland -->
-      <path d="M112 60 C122 54 136 56 140 66 C142 74 136 82 124 82 C112 82 106 72 112 60 Z" fill="#d8eaf2" />
+      <path d="M112 60 C122 54 136 56 140 66 C142 74 136 82 124 82
+               C112 82 106 72 112 60 Z" fill="#2a3840" />
       <!-- South America -->
       <path d="M96 142 C104 135 118 134 126 146 C132 156 130 172 124 184
-               C118 194 108 196 98 190 C88 183 84 168 84 154 C84 148 90 146 96 142 Z" fill="#5c8a45" />
-
+               C118 194 108 196 98 190 C88 183 84 168 84 154
+               C84 148 90 146 96 142 Z" fill="#163218" />
       <!-- Europe -->
       <path d="M148 76 C156 70 170 70 175 80 C179 88 174 98 164 100
-               C154 102 144 95 144 86 C144 82 146 78 148 76 Z" fill="#6a8c50" />
-      <!-- Scandinavian bump -->
-      <path d="M164 68 C170 62 178 64 180 72 C178 78 172 80 166 76 Z" fill="#6a8c50" />
-      <!-- British Isles -->
-      <path d="M142 74 C146 70 150 72 150 76 C150 80 146 82 142 80 C140 78 140 76 142 74 Z" fill="#6a8c50" />
-
+               C154 102 144 95 144 86 C144 82 146 78 148 76 Z" fill="#1e3822" />
+      <path d="M164 68 C170 62 178 64 180 72 C178 78 172 80 166 76 Z" fill="#1e3822" />
+      <path d="M142 74 C146 70 150 72 150 76 C150 80 146 82 142 80
+               C140 78 140 76 142 74 Z" fill="#1e3822" />
       <!-- Africa -->
       <path d="M148 96 C162 92 178 94 184 108 C188 118 188 134 184 150
                C180 164 172 174 160 178 C148 180 138 172 134 158
-               C130 144 132 124 136 110 C138 102 144 98 148 96 Z" fill="#8c7c3e" />
-      <!-- Madagascar -->
+               C130 144 132 124 136 110 C138 102 144 98 148 96 Z" fill="#28301a" />
       <path d="M192 152 C196 148 202 150 204 158 C204 164 200 168 196 166
-               C192 164 190 158 192 152 Z" fill="#8c7c3e" />
-
+               C192 164 190 158 192 152 Z" fill="#28301a" />
       <!-- Asia -->
       <path d="M172 66 C190 60 220 62 240 76 C248 84 246 100 238 112
                C228 124 210 130 192 126 C176 122 164 112 162 98
-               C160 84 166 70 172 66 Z" fill="#6c8652" />
-      <!-- Southeast Asia peninsula -->
+               C160 84 166 70 172 66 Z" fill="#1a3420" />
       <path d="M228 120 C236 116 244 120 246 130 C246 140 240 148 232 148
-               C224 148 220 140 222 132 C222 126 226 122 228 120 Z" fill="#6c8652" />
-      <!-- Indian subcontinent -->
+               C224 148 220 140 222 132 C222 126 226 122 228 120 Z" fill="#1a3420" />
       <path d="M190 122 C200 118 212 122 216 132 C220 144 216 158 208 164
-               C200 168 190 164 186 154 C182 144 184 130 190 122 Z" fill="#7c8e4a" />
-
-      <!-- Japan -->
-      <path d="M240 84 C244 80 250 82 252 88 C252 94 248 98 244 96 C240 94 238 88 240 84 Z" fill="#6c8652" />
-
+               C200 168 190 164 186 154 C182 144 184 130 190 122 Z" fill="#1a3420" />
+      <path d="M240 84 C244 80 250 82 252 88 C252 94 248 98 244 96
+               C240 94 238 88 240 84 Z" fill="#1a3420" />
       <!-- Australia -->
       <path d="M210 160 C224 154 238 156 244 166 C248 174 246 186 236 192
-               C226 196 212 192 206 182 C202 172 204 164 210 160 Z" fill="#9e8a4a" />
+               C226 196 212 192 206 182 C202 172 204 164 210 160 Z" fill="#282e16" />
     </g>
 
     <!-- Ice caps -->
-    <path d="M88 56 Q150 46 212 56 C218 62 214 70 206 72 Q150 62 94 72 C86 70 82 62 88 56 Z"
-          fill="#e8f4fc" opacity="0.9" />
-    <path d="M72 232 Q150 220 228 232 L234 250 L66 250 Z"
-          fill="#e8f4fc" opacity="0.88" />
+    <path d="M90 56 Q150 46 210 56 C216 62 212 70 204 72 Q150 62 96 72 C88 70 84 62 90 56 Z"
+          fill="#c0d4e0" opacity="0.65" />
+    <path d="M74 232 Q150 222 226 232 L232 250 L68 250 Z" fill="#c0d4e0" opacity="0.60" />
 
-    <!-- Clouds - wispy and semi-transparent -->
-    <g opacity="0.45">
-      <ellipse cx="106" cy="100" rx="18" ry="5" fill="white" />
-      <ellipse cx="118" cy="98" rx="14" ry="4" fill="white" />
-      <ellipse cx="98" cy="103" rx="10" ry="3" fill="white" />
+    <!-- Day-side sunlight overlay -->
+    <rect x="50" y="50" width="200" height="200" fill="url(#sunlight)" />
 
-      <ellipse cx="198" cy="142" rx="16" ry="4" fill="white" />
-      <ellipse cx="212" cy="140" rx="11" ry="3" fill="white" />
+    <!-- Night-side terminator -->
+    <rect x="50" y="50" width="200" height="200" fill="url(#nightSide)" />
 
-      <ellipse cx="138" cy="174" rx="18" ry="4" fill="white" />
-      <ellipse cx="152" cy="172" rx="12" ry="3" fill="white" />
+    <!-- City lights (glow visible on night side) -->
+    <g filter="url(#cityGlow)">
+      <!-- W. Europe: London, Paris, Berlin -->
+      <circle cx="150" cy="80" r="1.1" fill="#ffe088" opacity="0.95" />
+      <circle cx="154" cy="83" r="1.0" fill="#ffe088" opacity="0.90" />
+      <circle cx="159" cy="81" r="1.0" fill="#ffe088" opacity="0.88" />
+      <circle cx="147" cy="85" r="0.8" fill="#ffe088" opacity="0.82" />
+      <circle cx="156" cy="88" r="0.8" fill="#ffe088" opacity="0.78" />
+      <!-- E. Europe / Russia -->
+      <circle cx="170" cy="78" r="0.9" fill="#ffe088" opacity="0.80" />
+      <circle cx="178" cy="80" r="0.8" fill="#ffe088" opacity="0.75" />
+      <circle cx="186" cy="82" r="0.8" fill="#ffe088" opacity="0.70" />
+      <!-- East Asia: Tokyo, Seoul, Shanghai, Beijing -->
+      <circle cx="237" cy="87" r="1.3" fill="#ffcc66" opacity="0.95" />
+      <circle cx="233" cy="91" r="1.1" fill="#ffcc66" opacity="0.90" />
+      <circle cx="229" cy="88" r="1.0" fill="#ffcc66" opacity="0.88" />
+      <circle cx="235" cy="95" r="1.1" fill="#ffcc66" opacity="0.88" />
+      <circle cx="224" cy="85" r="0.9" fill="#ffcc66" opacity="0.80" />
+      <circle cx="221" cy="92" r="0.8" fill="#ffcc66" opacity="0.76" />
+      <!-- India: Mumbai, Delhi, Bangalore -->
+      <circle cx="200" cy="130" r="1.0" fill="#ffe088" opacity="0.85" />
+      <circle cx="196" cy="124" r="0.9" fill="#ffe088" opacity="0.80" />
+      <circle cx="202" cy="138" r="0.8" fill="#ffe088" opacity="0.76" />
+      <!-- Southeast Asia -->
+      <circle cx="232" cy="136" r="0.9" fill="#ffcc66" opacity="0.82" />
+      <circle cx="228" cy="141" r="0.8" fill="#ffcc66" opacity="0.74" />
+      <!-- Middle East -->
+      <circle cx="188" cy="104" r="0.9" fill="#ffe088" opacity="0.78" />
+      <circle cx="193" cy="109" r="0.8" fill="#ffe088" opacity="0.72" />
+      <!-- US East Coast -->
+      <circle cx="102" cy="107" r="1.1" fill="#ffe088" opacity="0.82" />
+      <circle cx="98" cy="111" r="0.9" fill="#ffe088" opacity="0.78" />
+      <circle cx="106" cy="103" r="0.8" fill="#ffe088" opacity="0.74" />
+      <circle cx="94" cy="115" r="0.8" fill="#ffe088" opacity="0.68" />
+      <!-- US West Coast -->
+      <circle cx="76" cy="108" r="0.8" fill="#ffe088" opacity="0.72" />
+      <circle cx="74" cy="104" r="0.7" fill="#ffe088" opacity="0.66" />
+      <!-- Brazil -->
+      <circle cx="106" cy="162" r="0.9" fill="#ffe088" opacity="0.72" />
+      <circle cx="112" cy="156" r="0.8" fill="#ffe088" opacity="0.66" />
+    </g>
 
-      <ellipse cx="76" cy="150" rx="13" ry="3" fill="white" />
-
-      <ellipse cx="228" cy="90" rx="10" ry="3" fill="white" />
-      <ellipse cx="162" cy="116" rx="11" ry="3" fill="white" />
-
-      <ellipse cx="174" cy="92" rx="9" ry="3" fill="white" />
-      <ellipse cx="122" cy="128" rx="10" ry="3" fill="white" />
+    <!-- Clouds — very faint wisps -->
+    <g opacity="0.14">
+      <ellipse cx="104" cy="100" rx="14" ry="3" fill="white" />
+      <ellipse cx="196" cy="140" rx="12" ry="3" fill="white" />
+      <ellipse cx="138" cy="173" rx="13" ry="3" fill="white" />
+      <ellipse cx="226" cy="90" rx="9" ry="2" fill="white" />
+      <ellipse cx="76" cy="150" rx="10" ry="2" fill="white" />
     </g>
   </g>
 
-  <!-- 3D dark-side shading -->
+  <!-- Sphere rim darkening -->
   <circle cx="150" cy="150" r="100" fill="url(#shading)" clip-path="url(#circleClip)" />
   <!-- Specular highlight -->
   <circle cx="150" cy="150" r="100" fill="url(#highlight)" clip-path="url(#circleClip)" />
-  <!-- Atmosphere rim glow -->
+  <!-- Atmosphere inner rim -->
   <circle cx="150" cy="150" r="100" fill="url(#atmRim)" clip-path="url(#circleClip)" />
 </svg>

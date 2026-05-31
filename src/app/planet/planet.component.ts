@@ -71,15 +71,15 @@ export class PlanetComponent implements AfterViewInit {
   }
 
   drawAtmosphere(x: number, y: number, radius: number) {
-    const gradient = this.ctx.createRadialGradient(x, y, radius * 0.82, x, y, radius * 1.45);
-    gradient.addColorStop(0, 'rgba(100, 200, 255, 0.75)');
-    gradient.addColorStop(0.25, 'rgba(70, 160, 240, 0.4)');
-    gradient.addColorStop(0.6, 'rgba(40, 100, 200, 0.15)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
+    // Outer diffuse halo
+    const outer = this.ctx.createRadialGradient(x, y, radius * 0.88, x, y, radius * 1.55);
+    outer.addColorStop(0, 'rgba(80, 180, 255, 0.90)');
+    outer.addColorStop(0.18, 'rgba(60, 150, 240, 0.55)');
+    outer.addColorStop(0.45, 'rgba(30, 100, 210, 0.20)');
+    outer.addColorStop(1, 'rgba(0, 0, 0, 0)');
     this.ctx.beginPath();
-    this.ctx.fillStyle = gradient;
-    this.ctx.arc(x, y, radius * 1.45, 0, Math.PI * 2);
+    this.ctx.fillStyle = outer;
+    this.ctx.arc(x, y, radius * 1.55, 0, Math.PI * 2);
     this.ctx.fill();
   }
 }
