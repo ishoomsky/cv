@@ -10,76 +10,76 @@ export class PlanetComponent implements AfterViewInit {
   private canvas!: HTMLCanvasElement;
   private ctx!: CanvasRenderingContext2D;
   private angle: number = 0;
+  private planetImage: HTMLImageElement | null = null;
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
-
     this.resizeCanvas();
-    this.animatePlanet();
+    this.loadPlanetImage(() => this.animatePlanet());
   }
 
   @HostListener('window:resize')
   resizeCanvas() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
+    this.loadPlanetImage();
+  }
+
+  private loadPlanetImage(callback?: () => void) {
+    const svgElement = document.getElementById('earthSVG') as unknown as SVGSVGElement;
+    if (!svgElement) return;
+
+    svgElement.setAttribute('width', '600');
+    svgElement.setAttribute('height', '600');
+    svgElement.setAttribute('viewBox', '0 0 300 300');
+
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const url = URL.createObjectURL(new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' }));
+
+    const img = new Image();
+    img.onload = () => {
+      this.planetImage = img;
+      URL.revokeObjectURL(url);
+      callback?.();
+    };
+    img.src = url;
   }
 
   animatePlanet() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    const planetRadius = this.canvas.width * 0.35; // Увеличиваем радиус (было 0.15)
-    // Смещаем планету немного вниз и вправо, чтобы она не перекрывала весь центр
+    const planetRadius = this.canvas.width * 0.35;
     const planetX = this.canvas.width * 0.6;
     const planetY = this.canvas.height * 0.65;
-
-    const movement = Math.sin(this.angle) * 3; // Двигаем медленнее
+    const movement = Math.sin(this.angle) * 3;
     this.angle += 0.01;
 
-    // Слегка увеличим радиус атмосферы пропорционально новой планете
-    this.drawAtmosphere(planetX + movement, planetY, planetRadius + 40);
-    this.drawPlanet(planetX + movement, planetY, planetRadius);
+    this.drawAtmosphere(planetX + movement, planetY, planetRadius);
+
+    if (this.planetImage) {
+      this.ctx.drawImage(
+        this.planetImage,
+        planetX + movement - planetRadius,
+        planetY - planetRadius,
+        planetRadius * 2,
+        planetRadius * 2
+      );
+    }
 
     requestAnimationFrame(() => this.animatePlanet());
   }
 
   drawAtmosphere(x: number, y: number, radius: number) {
-    // Atmosphere is an outer glow. Draw exactly from planet edge to atmosphere edge
-    const planetRadius = radius - 40; // reverse what we added
-    const gradient = this.ctx.createRadialGradient(x, y, planetRadius * 0.95, x, y, radius);
-
-    // Core atmosphere edge (opaque)
-    gradient.addColorStop(0, 'rgba(230, 180, 130, 0.4)');
-    // Atmosphere fades out
+    const gradient = this.ctx.createRadialGradient(x, y, radius * 0.82, x, y, radius * 1.45);
+    gradient.addColorStop(0, 'rgba(100, 200, 255, 0.75)');
+    gradient.addColorStop(0.25, 'rgba(70, 160, 240, 0.4)');
+    gradient.addColorStop(0.6, 'rgba(40, 100, 200, 0.15)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     this.ctx.beginPath();
     this.ctx.fillStyle = gradient;
-    this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+    this.ctx.arc(x, y, radius * 1.45, 0, Math.PI * 2);
     this.ctx.fill();
-  }
-
-  drawPlanet(x: number, y: number, radius: number) {
-    const svgElement = document.getElementById('jupiterSVG') as unknown as SVGSVGElement;
-    if (!svgElement) return;
-
-    // To prevent blurring when drawing SVG to Canvas, we need to temporarily set the SVG's 
-    // internal width/height attributes to match the target canvas pixel size
-    const diameter = radius * 2;
-    svgElement.setAttribute('width', diameter.toString());
-    svgElement.setAttribute('height', diameter.toString());
-    svgElement.setAttribute('viewBox', '0 0 300 300');
-
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(svgBlob);
-
-    const svgImage = new Image();
-    svgImage.src = url;
-
-    svgImage.onload = () => {
-      this.ctx.drawImage(svgImage, x - radius, y - radius, radius * 2, radius * 2);
-      URL.revokeObjectURL(url); // Освобождаем URL после использования
-    };
   }
 }
