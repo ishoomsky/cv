@@ -25,6 +25,8 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private earthGroup = new THREE.Group();
 
   private frameId = 0;
+  private loaderHidden = false;
+  private loaderTimeout = 0;
   private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
 
   ngAfterViewInit() {
@@ -32,11 +34,38 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.initThree();
     this.buildEarth();
     this.animate();
+    // Safety net: never let a failed/slow asset trap the user on the loader.
+    this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
   }
 
   ngOnDestroy() {
     cancelAnimationFrame(this.frameId);
+    clearTimeout(this.loaderTimeout);
     this.renderer?.dispose();
+  }
+
+  // ── Intro loader ──────────────────────────────────────────────────────────
+
+  private updateLoader(progress: number) {
+    const pct = Math.round(Math.min(1, progress) * 100);
+    const fill = document.getElementById('ldr-fill');
+    const label = document.getElementById('ldr-pct');
+    if (fill) fill.style.width = pct + '%';
+    if (label) label.textContent = pct + '%';
+  }
+
+  private hideLoader() {
+    if (this.loaderHidden) return;
+    this.loaderHidden = true;
+    clearTimeout(this.loaderTimeout);
+    const el = document.getElementById('app-loader');
+    if (!el) return;
+    this.updateLoader(1);
+    // Let the first Earth frame paint, then fade the loader out and remove it.
+    requestAnimationFrame(() => {
+      el.classList.add('hidden');
+      el.addEventListener('transitionend', () => el.remove(), { once: true });
+    });
   }
 
   // ── Scene setup ───────────────────────────────────────────────────────────
@@ -67,7 +96,13 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   // ── Earth, clouds, atmosphere ─────────────────────────────────────────────
 
   private buildEarth() {
-    const loader = new THREE.TextureLoader();
+    // Drive the intro loader from real texture-download progress.
+    const manager = new THREE.LoadingManager();
+    manager.onProgress = (_url, loaded, total) => this.updateLoader(loaded / total);
+    manager.onLoad  = () => this.hideLoader();
+    manager.onError = () => this.hideLoader(); // never leave the loader stuck
+
+    const loader = new THREE.TextureLoader(manager);
     const day      = loader.load(TEX + 'earth_atmos_2048.jpg');
     const night    = loader.load(TEX + 'earth_lights_2048.png');
     const specular = loader.load(TEX + 'earth_specular_2048.jpg');

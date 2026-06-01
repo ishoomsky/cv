@@ -9,8 +9,114 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+  <!-- Critical loader styles: inlined so the loader is painted before the JS
+       bundle and texture assets finish downloading. -->
+  <style>
+    #app-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 42%, #04142d 0%, #00040c 70%);
+      transition: opacity 0.7s ease;
+      font-family: 'Orbitron', 'Share Tech Mono', monospace;
+    }
+    #app-loader.hidden { opacity: 0; pointer-events: none; }
+
+    .ldr-box {
+      position: relative;
+      padding: 40px 48px;
+      min-width: 300px;
+      text-align: center;
+    }
+    .ldr-corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+    }
+    .ldr-corner.tl { top: 0; left: 0;  border-top: 2px solid #00d4ff; border-left: 2px solid #00d4ff; }
+    .ldr-corner.tr { top: 0; right: 0; border-top: 2px solid #00d4ff; border-right: 2px solid #00d4ff; }
+    .ldr-corner.bl { bottom: 0; left: 0;  border-bottom: 2px solid #00d4ff; border-left: 2px solid #00d4ff; }
+    .ldr-corner.br { bottom: 0; right: 0; border-bottom: 2px solid #00d4ff; border-right: 2px solid #00d4ff; }
+
+    /* Orbit ring with an orbiting node */
+    .ldr-orbit {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 26px;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      border-top-color: #00d4ff;
+      border-radius: 50%;
+      position: relative;
+      animation: ldr-spin 1.4s linear infinite;
+    }
+    .ldr-orbit::after {
+      content: '';
+      position: absolute;
+      top: -4px; left: 50%;
+      width: 6px; height: 6px;
+      margin-left: -3px;
+      border-radius: 50%;
+      background: #00d4ff;
+      box-shadow: 0 0 10px 2px rgba(0, 212, 255, 0.8);
+    }
+    @keyframes ldr-spin { to { transform: rotate(360deg); } }
+
+    .ldr-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #d0eeff;
+      text-shadow: 0 0 18px rgba(0, 212, 255, 0.4);
+    }
+    .ldr-sub {
+      margin-top: 8px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(0, 212, 255, 0.55);
+    }
+    .ldr-bar {
+      margin: 20px auto 0;
+      width: 220px;
+      height: 3px;
+      background: rgba(0, 160, 220, 0.15);
+      overflow: hidden;
+    }
+    .ldr-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: #00d4ff;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.9);
+      transition: width 0.3s ease;
+    }
+    .ldr-pct {
+      margin-top: 10px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: #8ec8e8;
+    }
+  </style>
 </head>
 <body>
   <app-root></app-root>
+
+  <div id="app-loader">
+    <div class="ldr-box">
+      <span class="ldr-corner tl"></span>
+      <span class="ldr-corner tr"></span>
+      <span class="ldr-corner bl"></span>
+      <span class="ldr-corner br"></span>
+      <div class="ldr-orbit"></div>
+      <div class="ldr-title">INITIALIZING</div>
+      <div class="ldr-sub">ESTABLISHING ORBIT</div>
+      <div class="ldr-bar"><div class="ldr-bar-fill" id="ldr-fill"></div></div>
+      <div class="ldr-pct" id="ldr-pct">0%</div>
+    </div>
+  </div>
 </body>
 </html>

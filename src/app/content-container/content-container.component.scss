@@ -61,21 +61,21 @@ $text-bright: #d0eeff;
   pointer-events: all;
   position: relative;
   margin-left: clamp(32px, 4vw, 80px);
-  width: 300px;
+  width: 420px;
   background: $bg;
   border: 1px solid $border;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  padding: 28px 26px 24px;
+  padding: 40px 36px 34px;
   overflow: hidden;
   animation: panel-in 0.7s cubic-bezier(.22,1,.36,1) both;
 
-  @include corners(16px);
+  @include corners(22px);
 
   .scanline {
     position: absolute;
     left: 0; right: 0;
-    height: 80px;
+    height: 112px;
     background: linear-gradient(to bottom,
       transparent,
       rgba(0, 212, 255, 0.05) 50%,
@@ -88,30 +88,30 @@ $text-bright: #d0eeff;
 // ── Header ─────────────────────────────────────────────────────────────────
 
 .header {
-  margin-bottom: 18px;
+  margin-bottom: 26px;
 
   .tag {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
+    font-size: 13px;
+    letter-spacing: 3px;
     color: $cyan-dim;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
 
   .name {
-    margin: 0 0 5px;
-    font-size: 24px;
+    margin: 0 0 7px;
+    font-size: 34px;
     font-weight: 900;
-    letter-spacing: 5px;
+    letter-spacing: 7px;
     color: $text-bright;
-    text-shadow: 0 0 24px rgba(0, 212, 255, 0.35);
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
 
     .dot { color: $cyan; }
   }
 
   .role {
-    font-size: 9px;
-    letter-spacing: 4px;
+    font-size: 13px;
+    letter-spacing: 6px;
     color: $text;
     opacity: 0.75;
   }
@@ -122,54 +122,54 @@ $text-bright: #d0eeff;
 .divider {
   height: 1px;
   background: linear-gradient(to right, $border 60%, transparent);
-  margin: 16px 0;
+  margin: 22px 0;
 }
 
 // ── Section ────────────────────────────────────────────────────────────────
 
-.section { margin-bottom: 4px; }
+.section { margin-bottom: 6px; }
 
 .section-label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 3px;
+  font-size: 13px;
+  letter-spacing: 4px;
   color: $cyan;
-  margin-bottom: 12px;
+  margin-bottom: 17px;
 
-  .diamond { margin-right: 6px; }
+  .diamond { margin-right: 9px; }
 }
 
 // ── Nav items ──────────────────────────────────────────────────────────────
 
-nav { display: flex; flex-direction: column; gap: 5px; }
+nav { display: flex; flex-direction: column; gap: 7px; }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  gap: 14px;
+  padding: 12px 17px;
   background: transparent;
   border: 1px solid rgba(0,160,220,.18);
   color: $text;
   font-family: 'Orbitron', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
+  font-size: 13px;
+  letter-spacing: 3px;
   cursor: pointer;
   text-decoration: none;
   transition: background .15s, border-color .15s, color .15s;
 
   .num {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
+    font-size: 15px;
     color: $cyan-dim;
-    min-width: 18px;
+    min-width: 25px;
     transition: color .15s;
   }
 
   .label { flex: 1; text-align: left; }
 
   .arr {
-    font-size: 9px;
+    font-size: 13px;
     color: transparent;
     transition: color .15s, transform .15s;
   }
@@ -179,7 +179,7 @@ nav { display: flex; flex-direction: column; gap: 5px; }
     border-color: rgba(0,212,255,.45);
     color: $text-bright;
     .num { color: $cyan; }
-    .arr { color: $cyan; transform: translateX(3px); }
+    .arr { color: $cyan; transform: translateX(4px); }
   }
 
   &.featured {
@@ -195,23 +195,23 @@ nav { display: flex; flex-direction: column; gap: 5px; }
 .readout {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin-bottom: 7px;
+  gap: 11px;
+  margin-bottom: 10px;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
+  font-size: 14px;
 
   .key {
-    font-size: 8px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    letter-spacing: 3px;
     color: $cyan-dim;
-    min-width: 68px;
+    min-width: 95px;
   }
 
   .sep { color: rgba(0,212,255,.25); }
 
   .val {
     color: $text;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
   }
 
   .online {
