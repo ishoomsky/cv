@@ -1,3 +1,65 @@
-<div class="content-container">
-  <ng-content></ng-content>
+<div class="hud">
+  <div class="panel">
+    <span class="corner tl"></span>
+    <span class="corner tr"></span>
+    <span class="corner bl"></span>
+    <span class="corner br"></span>
+    <div class="scanline"></div>
+
+    <div class="header">
+      <div class="tag">// IDENTITY CONFIRMED</div>
+      <h1 class="name">IVAN<span class="dot">.</span>SHUMSKI</h1>
+      <div class="role">SOFTWARE ENGINEER</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label"><span class="diamond">◈</span> NAVIGATION</div>
+      <nav>
+        <button class="nav-item featured" (click)="openCv()">
+          <span class="num">01</span>
+          <span class="label">CURRICULUM VITAE</span>
+          <span class="arr">▶</span>
+        </button>
+        <a class="nav-item" href="https://www.linkedin.com/in/ivan-shumski/" target="_blank" rel="noopener">
+          <span class="num">02</span>
+          <span class="label">LINKEDIN</span>
+          <span class="arr">▶</span>
+        </a>
+        <a class="nav-item" href="mailto:ishoomsky@gmail.com">
+          <span class="num">03</span>
+          <span class="label">SEND MESSAGE</span>
+          <span class="arr">▶</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label"><span class="diamond">◈</span> SYSTEM STATUS</div>
+      <div class="readout"><span class="key">LOCATION</span><span class="sep">∷</span><span class="val">TALLINN, EE</span></div>
+      <div class="readout"><span class="key">STACK</span><span class="sep">∷</span><span class="val">TS · ANGULAR · NODE</span></div>
+      <div class="readout"><span class="key">STATUS</span><span class="sep">∷</span><span class="val online">AVAILABLE</span></div>
+    </div>
+  </div>
 </div>
+
+@if (cvOpen) {
+  <div class="backdrop" (click)="closeCv()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <div class="modal-head">
+        <span class="modal-title">◈ CURRICULUM VITAE // IVAN.SHUMSKI</span>
+        <button class="close-btn" (click)="closeCv()">✕ CLOSE</button>
+      </div>
+      <div class="modal-body">
+        <iframe [src]="cvUrl" title="CV Ivan Shumski"></iframe>
+      </div>
+    </div>
+  </div>
+}

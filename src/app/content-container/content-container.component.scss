@@ -1,14 +1,295 @@
-.content-container {
-  background-color: rgba(0, 0, 255, 0.1); // Синий фон с прозрачностью
-  color: #ffffff; // Цвет текста
-  border-radius: 8px; // Закругленные углы
-  padding: 20px; // Отступы внутри контейнера
-  max-width: 800px; // Максимальная ширина
-  height: 60vh; // Высота 60% от высоты экрана
-  margin: 20px auto; // Центрирование контейнера
-  backdrop-filter: blur(4px); // Размытие фона
-  display: flex; // Используем Flexbox для центровки контента
-  flex-direction: column; // Вертикальная ориентация
-  justify-content: center; // Центрирование по вертикали
-  align-items: center; // Центрирование по горизонтали
+$cyan: #00d4ff;
+$cyan-dim: rgba(0, 212, 255, 0.45);
+$bg: rgba(1, 10, 22, 0.84);
+$border: rgba(0, 170, 230, 0.40);
+$text: #8ec8e8;
+$text-bright: #d0eeff;
+
+@mixin corners($s: 16px, $c: $cyan) {
+  .corner {
+    position: absolute;
+    width: $s;
+    height: $s;
+    pointer-events: none;
+    &.tl { top: -1px; left: -1px;   border-top: 2px solid $c; border-left: 2px solid $c; }
+    &.tr { top: -1px; right: -1px;  border-top: 2px solid $c; border-right: 2px solid $c; }
+    &.bl { bottom: -1px; left: -1px;  border-bottom: 2px solid $c; border-left: 2px solid $c; }
+    &.br { bottom: -1px; right: -1px; border-bottom: 2px solid $c; border-right: 2px solid $c; }
+  }
+}
+
+@keyframes scan {
+  0%   { top: -10%; opacity: 0.7; }
+  100% { top: 110%; opacity: 0; }
+}
+
+@keyframes online-pulse {
+  0%, 100% { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,.7); }
+  50%       { color: #80ffcc; text-shadow: 0 0 16px rgba(0,255,136,1); }
+}
+
+@keyframes arr-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+// ── HUD wrapper ────────────────────────────────────────────────────────────
+
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  font-family: 'Orbitron', monospace;
+}
+
+// ── Main panel ─────────────────────────────────────────────────────────────
+
+.panel {
+  pointer-events: all;
+  position: relative;
+  margin-left: clamp(32px, 4vw, 80px);
+  width: 300px;
+  background: $bg;
+  border: 1px solid $border;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 28px 26px 24px;
+  overflow: hidden;
+  animation: panel-in 0.7s cubic-bezier(.22,1,.36,1) both;
+
+  @include corners(16px);
+
+  .scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom,
+      transparent,
+      rgba(0, 212, 255, 0.05) 50%,
+      transparent);
+    animation: scan 5s linear infinite;
+    pointer-events: none;
+  }
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────
+
+.header {
+  margin-bottom: 18px;
+
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: $cyan-dim;
+    margin-bottom: 10px;
+  }
+
+  .name {
+    margin: 0 0 5px;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 5px;
+    color: $text-bright;
+    text-shadow: 0 0 24px rgba(0, 212, 255, 0.35);
+
+    .dot { color: $cyan; }
+  }
+
+  .role {
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: $text;
+    opacity: 0.75;
+  }
+}
+
+// ── Divider ────────────────────────────────────────────────────────────────
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, $border 60%, transparent);
+  margin: 16px 0;
+}
+
+// ── Section ────────────────────────────────────────────────────────────────
+
+.section { margin-bottom: 4px; }
+
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: $cyan;
+  margin-bottom: 12px;
+
+  .diamond { margin-right: 6px; }
+}
+
+// ── Nav items ──────────────────────────────────────────────────────────────
+
+nav { display: flex; flex-direction: column; gap: 5px; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(0,160,220,.18);
+  color: $text;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .15s, border-color .15s, color .15s;
+
+  .num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: $cyan-dim;
+    min-width: 18px;
+    transition: color .15s;
+  }
+
+  .label { flex: 1; text-align: left; }
+
+  .arr {
+    font-size: 9px;
+    color: transparent;
+    transition: color .15s, transform .15s;
+  }
+
+  &:hover {
+    background: rgba(0,160,220,.10);
+    border-color: rgba(0,212,255,.45);
+    color: $text-bright;
+    .num { color: $cyan; }
+    .arr { color: $cyan; transform: translateX(3px); }
+  }
+
+  &.featured {
+    border-color: rgba(0,212,255,.35);
+    color: $text-bright;
+    .num { color: $cyan; }
+    .arr { color: $cyan; animation: arr-pulse 1.6s ease-in-out infinite; }
+  }
+}
+
+// ── Readouts ───────────────────────────────────────────────────────────────
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+
+  .key {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: $cyan-dim;
+    min-width: 68px;
+  }
+
+  .sep { color: rgba(0,212,255,.25); }
+
+  .val {
+    color: $text;
+    letter-spacing: 1px;
+  }
+
+  .online {
+    color: #00ff88;
+    animation: online-pulse 2.2s ease-in-out infinite;
+    font-weight: bold;
+  }
+}
+
+// ── CV Backdrop & Modal ────────────────────────────────────────────────────
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 4, 14, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.modal {
+  position: relative;
+  width: min(880px, 94vw);
+  height: min(92vh, 860px);
+  background: rgba(1, 10, 22, 0.97);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  animation: modal-in 0.22s ease-out;
+
+  @include corners(22px, $cyan);
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.18);
+
+    .modal-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: $cyan;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: 1px solid rgba(0,212,255,.28);
+      color: $text;
+      font-family: 'Orbitron', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      padding: 7px 16px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+
+      &:hover {
+        background: rgba(0,212,255,.12);
+        border-color: $cyan;
+        color: $text-bright;
+      }
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow: hidden;
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  }
 }
