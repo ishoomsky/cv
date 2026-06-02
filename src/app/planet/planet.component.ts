@@ -1,7 +1,8 @@
 import { Component, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import * as THREE from 'three';
 
-const TEX = '/textures/planet/';
+// Relative so it resolves against <base href> on both dev (/) and Pages (/cv/).
+const TEX = 'textures/planet/';
 
 // Longitude (°E) to anchor toward the camera. Israel sits at ~35°E.
 // SphereGeometry maps longitude λ so that rotating the globe by (270° − λ)
