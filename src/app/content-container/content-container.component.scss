@@ -289,20 +289,27 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     padding: 14px 24px;
     border-bottom: 1px solid rgba(0, 212, 255, 0.18);
     flex: 0 0 auto;
 
     .modal-title {
+      flex: 1;
+      min-width: 0;                 // allow it to shrink below content size
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;      // never wrap → buttons stay put
       font-family: 'Share Tech Mono', monospace;
       font-size: 11px;
       letter-spacing: 3px;
       color: $cyan;
     }
 
-    .head-actions { display: flex; gap: 10px; }
+    .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
 
     .hbtn {
+      white-space: nowrap;
       background: transparent;
       border: 1px solid rgba(0,212,255,.28);
       color: $text;
