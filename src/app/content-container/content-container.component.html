@@ -7,9 +7,9 @@
     <div class="scanline"></div>
 
     <div class="header">
-      <div class="tag">// IDENTITY CONFIRMED</div>
-      <h1 class="name">IVAN<span class="dot">.</span>SHUMSKI</h1>
-      <div class="role">FRONTEND DEVELOPER</div>
+      <div class="tag">{{ cv.profile.identityTag }}</div>
+      <h1 class="name">{{ cv.profile.firstName }}<span class="dot">.</span>{{ cv.profile.lastName }}</h1>
+      <div class="role">{{ cv.profile.panelRole }}</div>
     </div>
 
     <div class="divider"></div>
@@ -17,39 +17,39 @@
     <div class="section">
       <div class="section-label"><span class="diamond">◈</span> NAVIGATION</div>
       <nav>
-        <button class="nav-item featured" (click)="openCv()">
-          <span class="num">01</span>
-          <span class="label">CV</span>
-          <span class="arr">▶</span>
-        </button>
-        <a class="nav-item" href="https://www.linkedin.com/in/ivanshumski/" target="_blank" rel="noopener">
-          <span class="num">02</span>
-          <span class="label">LINKEDIN</span>
-          <span class="arr">▶</span>
-        </a>
-        <a class="nav-item" href="mailto:ishoomsky@gmail.com">
-          <span class="num">03</span>
-          <span class="label">SEND EMAIL</span>
-          <span class="arr">▶</span>
-        </a>
+        @for (item of cv.nav; track item.label; let i = $index) {
+          @if (item.action === 'cv') {
+            <button class="nav-item featured" (click)="openCv()">
+              <span class="num">0{{ i + 1 }}</span>
+              <span class="label">{{ item.label }}</span>
+              <span class="arr">▶</span>
+            </button>
+          } @else {
+            <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
+              <span class="num">0{{ i + 1 }}</span>
+              <span class="label">{{ item.label }}</span>
+              <span class="arr">▶</span>
+            </a>
+          }
+        }
       </nav>
     </div>
 
     <div class="divider"></div>
 
     <div class="section">
-      <div class="section-label"><span class="diamond">◈</span> SYSTEM STATUS</div>
-      <div class="readout"><span class="key">LOCATION</span><span class="sep">∷</span><span class="val">HAIFA, IL</span></div>
+      <div class="section-label"><span class="diamond">◈</span>STATUS</div>
+      <div class="readout"><span class="key">LOCATION</span><span class="sep">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
       <div class="readout stack">
         <span class="key">STACK</span><span class="sep">∷</span>
         <span class="marquee">
           <span class="marquee-track">
-            <span class="chunk">ANGULAR&nbsp;·&nbsp;TS&nbsp;·&nbsp;NODE&nbsp;·&nbsp;AI&nbsp;TOOLS&nbsp;·&nbsp;RXJS&nbsp;·&nbsp;NESTJS&nbsp;·&nbsp;GCP&nbsp;·&nbsp;</span>
-            <span class="chunk" aria-hidden="true">ANGULAR&nbsp;·&nbsp;TS&nbsp;·&nbsp;NODE&nbsp;·&nbsp;AI&nbsp;TOOLS&nbsp;·&nbsp;RXJS&nbsp;·&nbsp;NESTJS&nbsp;·&nbsp;GCP&nbsp;·&nbsp;</span>
+            <span class="chunk">{{ ticker }}</span>
+            <span class="chunk" aria-hidden="true">{{ ticker }}</span>
           </span>
         </span>
       </div>
-      <div class="readout"><span class="key">STATUS</span><span class="sep">∷</span><span class="val online">#OPENTOWORK</span></div>
+      <div class="readout"><span class="key">STATUS</span><span class="sep">∷</span><span class="val online">{{ cv.status }}</span></div>
     </div>
   </div>
 </div>
@@ -63,9 +63,9 @@
       <span class="corner br"></span>
 
       <div class="modal-head">
-        <span class="modal-title">◈ PERSONNEL DOSSIER // IVAN.SHUMSKI</span>
+        <span class="modal-title">{{ cv.profile.dossierTitle }}</span>
         <div class="head-actions">
-          <a class="hbtn" [href]="pdfUrl" target="_blank" rel="noopener">⤓ PDF</a>
+          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener">⤓ PDF</a>
           <button class="hbtn close-btn" (click)="closeCv()">✕ CLOSE</button>
         </div>
       </div>
@@ -73,15 +73,15 @@
       <div class="modal-body">
         <!-- Hero -->
         <header class="cv-hero">
-          <h1 class="cv-name">IVAN SHUMSKI</h1>
-          <div class="cv-role">SENIOR FRONTEND DEVELOPER</div>
+          <h1 class="cv-name">{{ cv.profile.fullName }}</h1>
+          <div class="cv-role">{{ cv.profile.resumeRole }}</div>
           <div class="cv-contacts">
-            <span>HAIFA, IL</span><i></i>
-            <a href="mailto:ishoomsky@gmail.com">ishoomsky&#64;gmail.com</a><i></i>
-            <a href="https://www.linkedin.com/in/ivanshumski/" target="_blank" rel="noopener">linkedin/ivanshumski</a><i></i>
-            <a href="https://github.com/ishoomsky" target="_blank" rel="noopener">github/ishoomsky</a>
+            <span>{{ cv.contacts.location }}</span><i></i>
+            <a [href]="'mailto:' + cv.contacts.email">{{ cv.contacts.email }}</a><i></i>
+            <a [href]="cv.contacts.linkedin.url" target="_blank" rel="noopener">{{ cv.contacts.linkedin.label }}</a><i></i>
+            <a [href]="cv.contacts.github.url" target="_blank" rel="noopener">{{ cv.contacts.github.label }}</a>
           </div>
-          <p class="cv-summary">{{ summary }}</p>
+          <p class="cv-summary">{{ cv.summary }}</p>
         </header>
 
         <div class="cv-grid">
@@ -89,27 +89,21 @@
           <div class="cv-col">
             <section class="cv-block">
               <div class="block-h"><span class="diamond">◈</span> SKILL MATRIX</div>
-              @for (g of skills; track g.label) {
+              @for (g of cv.skills; track g.label) {
                 <div class="skill-group">
                   <div class="skill-cat">{{ g.label }}</div>
-                  @for (s of g.items; track s.name) {
-                    <div class="skill">
-                      <div class="skill-row">
-                        <span class="skill-name">{{ s.name }}</span>
-                        <span class="skill-pct">{{ s.level }}</span>
-                      </div>
-                      <div class="bar">
-                        <div class="bar-fill" [style.width]="animate ? s.level + '%' : '0%'"></div>
-                      </div>
-                    </div>
-                  }
+                  <div class="skill-tags">
+                    @for (s of g.items; track s) {
+                      <span class="skill-chip">{{ s }}</span>
+                    }
+                  </div>
                 </div>
               }
             </section>
 
             <section class="cv-block">
               <div class="block-h"><span class="diamond">◈</span> EDUCATION</div>
-              @for (e of education; track e.title) {
+              @for (e of cv.education; track e.title) {
                 <div class="edu">
                   <div class="edu-top"><span class="edu-title">{{ e.title }}</span><span class="edu-year">{{ e.year }}</span></div>
                   <div class="edu-org">{{ e.org }}</div>
@@ -120,7 +114,7 @@
             <section class="cv-block">
               <div class="block-h"><span class="diamond">◈</span> LANGUAGES</div>
               <div class="lang-row">
-                @for (l of languages; track l) {
+                @for (l of cv.languages; track l) {
                   <span class="lang-chip">{{ l }}</span>
                 }
               </div>
@@ -132,7 +126,7 @@
             <section class="cv-block">
               <div class="block-h"><span class="diamond">◈</span> EXPERIENCE TIMELINE</div>
               <div class="timeline">
-                @for (j of experience; track j.company; let i = $index) {
+                @for (j of cv.experience; track j.company; let i = $index) {
                   <div class="tl-item" [class.open]="openJob === i">
                     <button class="tl-head" (click)="toggleJob(i)">
                       <span class="tl-node"></span>
@@ -155,7 +149,7 @@
 
             <section class="cv-block">
               <div class="block-h"><span class="diamond">◈</span> PROJECTS</div>
-              @for (pr of projects; track pr.name) {
+              @for (pr of cv.projects; track pr.name) {
                 <div class="project">
                   <div class="pr-top">
                     <span class="pr-name">{{ pr.name }}</span>

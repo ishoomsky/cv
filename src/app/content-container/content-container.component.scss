@@ -409,36 +409,30 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   .diamond { margin-right: 7px; }
 }
 
-// Skill bars
+// Skills — plain listing of chips, grouped by category
 .skill-group { margin-bottom: 16px; }
 .skill-cat {
   font-family: 'Share Tech Mono', monospace;
   font-size: 10.5px;
   letter-spacing: 2px;
   color: $cyan-dim;
-  margin-bottom: 9px;
+  margin-bottom: 10px;
 }
-.skill { margin-bottom: 10px; }
-.skill-row {
-  display: flex;
-  justify-content: space-between;
+.skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.skill-chip {
   font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
+  font-size: 12.5px;
+  letter-spacing: .5px;
   color: $text;
-  margin-bottom: 5px;
+  background: rgba(0,160,220,.08);
+  border: 1px solid rgba(0,212,255,.22);
+  padding: 6px 12px;
+  transition: background .15s, border-color .15s, color .15s;
 }
-.skill-pct { color: $cyan; }
-.bar {
-  height: 6px;
-  background: rgba(0,160,220,.12);
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(to right, rgba(0,212,255,.5), $cyan);
-  box-shadow: 0 0 8px rgba(0,212,255,.7);
-  transition: width 1.1s cubic-bezier(.2,.8,.2,1);
+.skill-chip:hover {
+  background: rgba(0,212,255,.14);
+  border-color: rgba(0,212,255,.5);
+  color: $text-bright;
 }
 
 // Education
