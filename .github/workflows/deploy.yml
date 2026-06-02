@@ -38,6 +38,8 @@ jobs:
           touch dist/cv/browser/.nojekyll
 
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true   # auto-enable Pages (no manual Settings step)
 
       - uses: actions/upload-pages-artifact@v3
         with:
