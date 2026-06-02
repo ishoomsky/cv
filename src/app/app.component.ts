@@ -3,12 +3,13 @@ import { RouterOutlet } from '@angular/router';
 import { PlanetComponent } from "./planet/planet.component";
 import { StarFieldComponent } from "./star-field/star-field.component";
 import { NebulaComponent } from "./nebula/nebula.component";
+import { AsteroidsComponent } from "./asteroids/asteroids.component";
 import { ContentContainerComponent } from "./content-container/content-container.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, PlanetComponent, StarFieldComponent, NebulaComponent, ContentContainerComponent],
+  imports: [RouterOutlet, PlanetComponent, StarFieldComponent, NebulaComponent, AsteroidsComponent, ContentContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

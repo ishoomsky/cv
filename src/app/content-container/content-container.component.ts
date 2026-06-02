@@ -1,5 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+
+interface Skill { name: string; level: number; }
+interface SkillGroup { label: string; items: Skill[]; }
+interface Job { role: string; company: string; period: string; points: string[]; }
+interface Project { name: string; tagline: string; flow: string[]; points: string[]; }
 
 @Component({
   selector: 'app-content-container',
@@ -9,12 +13,91 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrl: './content-container.component.scss'
 })
 export class ContentContainerComponent {
-  private san = inject(DomSanitizer);
-
   cvOpen = false;
-  readonly cvUrl: SafeResourceUrl =
-    this.san.bypassSecurityTrustResourceUrl('/assets/CV-Ivan-Shumski.pdf');
+  animate = false;       // drives the skill-bar fill animation
+  openJob = 0;           // expanded role in the experience timeline
 
-  openCv()  { this.cvOpen = true;  }
-  closeCv() { this.cvOpen = false; }
+  readonly pdfUrl = '/assets/CV-Ivan-Shumski.pdf';
+
+  readonly summary =
+    'Frontend Developer with 6+ years building high-performance, reactive web apps ' +
+    'with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, ' +
+    'rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling ' +
+    '(Claude Code, GitHub Copilot) to move faster without trading off quality — and has shipped ' +
+    'full products with it end to end.';
+
+  // Proficiency levels are an indicative visualization of the PDF's stack.
+  readonly skills: SkillGroup[] = [
+    { label: 'FRONTEND', items: [
+      { name: 'Angular · Signals · RxJS', level: 95 },
+      { name: 'TypeScript', level: 95 },
+      { name: 'React · React Native', level: 85 },
+      { name: 'Vue.js', level: 72 },
+    ]},
+    { label: 'BACKEND & DATA', items: [
+      { name: 'Node.js · NestJS · Express', level: 85 },
+      { name: 'PostgreSQL · MongoDB', level: 78 },
+      { name: 'RESTful APIs', level: 90 },
+    ]},
+    { label: 'AI & CLOUD', items: [
+      { name: 'AI-assisted dev · Claude Code', level: 92 },
+      { name: 'Gemini API', level: 80 },
+      { name: 'Google Cloud Platform', level: 75 },
+    ]},
+  ];
+
+  readonly experience: Job[] = [
+    { role: 'Frontend Developer', company: 'Baba Entertainment', period: '2024 — PRESENT', points: [
+      'Architected reactive, high-performance features for a high-traffic social-casino platform, significantly reducing unnecessary re-renders by migrating to Angular Signals, OnPush change detection, and RxJS-driven state.',
+      'Owned business-critical UI and core user-facing features of a live production application, delivering reliably under tight sprint deadlines.',
+      'Used AI-assisted coding tools (GitHub Copilot, Claude Code) daily to accelerate feature delivery and reduce repetitive boilerplate.',
+      'Built end-to-end mobile responsiveness and a reusable frontend styling system for consistent high-fidelity UX across all device breakpoints.',
+    ]},
+    { role: 'Frontend Developer', company: 'Neotech Development', period: '2022 — 2023', points: [
+      'Built responsive, user-facing interfaces for web and mobile gaming services using Angular and Vue.js, integrating RESTful APIs across 20+ features.',
+      'Collaborated in an Agile / Scrum team and conducted regular design and code reviews.',
+    ]},
+    { role: 'Frontend Developer', company: 'IBA Group', period: '2020 — 2022', points: [
+      'Developed and maintained UIs for an IBM enterprise product, ensuring reliable functionality and a polished user experience.',
+      'Partnered with UX/UI designers and backend engineers to architect client/server APIs and translate designs into production interfaces.',
+    ]},
+    { role: 'Frontend Developer', company: 'Vysnova Publishing House', period: '2018 — 2020', points: [
+      'Delivered cross-platform solutions with React, React Native, and TypeScript; maintained Node.js / Express / MongoDB backends and integrated Google Cloud Services.',
+    ]},
+  ];
+
+  readonly projects: Project[] = [
+    { name: 'BUDGET TRACKER', tagline: 'Full-Stack Personal Finance App',
+      flow: ['Angular', 'NestJS', 'PostgreSQL', 'GCP'], points: [
+      'Designed and built a full-stack budget-tracking app end to end — Angular frontend, NestJS backend, deployed on Google Cloud Platform.',
+      'Delivered the entire codebase through an AI-driven workflow with Claude Code — agentic, spec-driven development to plan architecture, generate features, and iteratively refactor.',
+    ]},
+    { name: 'HEBREW VOCABULARY APP', tagline: 'AI-Powered Dictionary',
+      flow: ['React Native', 'NestJS', 'Gemini API', 'Firebase'], points: [
+      'Built a cross-platform mobile Hebrew-dictionary app end to end — React Native client, NestJS backend, deployed on GCP / Firebase.',
+      'Integrated the Google Gemini API to dynamically generate vocabulary content, including definitions and usage examples.',
+    ]},
+  ];
+
+  readonly education = [
+    { title: 'B.A., Web Design & Computer Graphics', org: 'Belarusian State University, Minsk', year: '2017' },
+    { title: 'JavaScript Development Courses', org: 'IT Academy, Minsk', year: '2020' },
+  ];
+
+  readonly languages = ['ENGLISH', 'HEBREW', 'RUSSIAN'];
+
+  openCv() {
+    this.cvOpen = true;
+    // Let the modal mount, then trigger the bar-fill animation.
+    setTimeout(() => (this.animate = true), 80);
+  }
+
+  closeCv() {
+    this.cvOpen = false;
+    this.animate = false;
+  }
+
+  toggleJob(i: number) {
+    this.openJob = this.openJob === i ? -1 : i;
+  }
 }
