@@ -42,7 +42,7 @@
     {
       "role": "Frontend Developer",
       "company": "Baba Entertainment",
-      "period": "2024 — PRESENT",
+      "period": "2024 — 2026",
       "points": [
         "Architected reactive, high-performance features for a high-traffic social-casino platform, significantly reducing unnecessary re-renders by migrating to Angular Signals, OnPush change detection, and RxJS-driven state.",
         "Owned business-critical UI and core user-facing features of a live production application, delivering reliably under tight sprint deadlines.",
