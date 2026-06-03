@@ -61,10 +61,10 @@ export class ContentContainerComponent implements OnDestroy {
 
   private syncFromUrl() {
     const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
-    this.cvOpen = path === '/cv';
+    this.cvOpen = path === '/resume';
   }
 
-  openCv()  { this.router.navigate(['/cv']); }
+  openCv()  { this.router.navigate(['/resume']); }
   closeCv() { this.router.navigate(['/']); }
 
   toggleJob(i: number) {
