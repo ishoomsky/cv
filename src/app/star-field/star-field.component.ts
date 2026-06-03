@@ -37,6 +37,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private frameId = 0;
   private start = performance.now();
   private nextMeteor = 1.5; // seconds until the first meteor
+  private lastW = -1;       // last width — recreate stars only when it changes
 
   // Depth layers: [count, driftSpeed]. Far layers barely move (parallax).
   private readonly layers: { count: number; speed: number }[] = [
@@ -62,9 +63,15 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   resizeCanvas() {
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.createStars();
+    const w = window.innerWidth, h = window.innerHeight;
+    this.canvas.width = w;
+    this.canvas.height = h;
+    // Only repopulate on a real width change (orientation/desktop resize).
+    // Mobile URL-bar show/hide changes height only — skip to avoid flicker.
+    if (w !== this.lastW) {
+      this.lastW = w;
+      this.createStars();
+    }
   }
 
   private createStars() {

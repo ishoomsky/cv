@@ -12,6 +12,7 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
   private offscreen!: HTMLCanvasElement; // pre-rendered blurred nebula
   private frameId = 0;
   private start = performance.now();
+  private lastW = -1;   // last width — re-bake the nebula only when it changes
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('nebulaCanvas') as HTMLCanvasElement;
@@ -29,7 +30,12 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
   resizeCanvas() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    this.prerender();
+    // Re-bake blobs only on a real width change; the drift draw already
+    // oversizes the baked image, so a height-only change still covers.
+    if (this.canvas.width !== this.lastW) {
+      this.lastW = this.canvas.width;
+      this.prerender();
+    }
   }
 
   // Bake the expensive blurred blobs once into an offscreen canvas.
