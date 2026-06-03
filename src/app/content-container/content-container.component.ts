@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
 import cvData from '../data/cv-data.json';
 
 interface SkillGroup { label: string; items: string[]; }
@@ -32,7 +34,7 @@ interface CvData {
   templateUrl: './content-container.component.html',
   styleUrl: './content-container.component.scss'
 })
-export class ContentContainerComponent {
+export class ContentContainerComponent implements OnDestroy {
   // Single source of truth — all page content lives in cv-data.json.
   readonly cv = cvData as unknown as CvData;
 
@@ -42,13 +44,28 @@ export class ContentContainerComponent {
   cvOpen = false;
   openJob = 0;           // expanded role in the experience timeline
 
-  openCv() {
-    this.cvOpen = true;
+  private router = inject(Router);
+  private sub: Subscription;
+
+  constructor() {
+    // The popup is derived from the route: /cv → open, anything else → closed.
+    this.syncFromUrl();
+    this.sub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => this.syncFromUrl());
   }
 
-  closeCv() {
-    this.cvOpen = false;
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
+
+  private syncFromUrl() {
+    const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
+    this.cvOpen = path === '/cv';
+  }
+
+  openCv()  { this.router.navigate(['/cv']); }
+  closeCv() { this.router.navigate(['/']); }
 
   toggleJob(i: number) {
     this.openJob = this.openJob === i ? -1 : i;
