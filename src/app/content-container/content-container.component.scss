@@ -271,12 +271,21 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   align-items: center;
   justify-content: center;
   pointer-events: all;
+  // Keep the modal clear of the notch / home indicator and screen edges.
+  box-sizing: border-box;
+  padding:
+    max(env(safe-area-inset-top), 12px)
+    max(env(safe-area-inset-right), 10px)
+    max(env(safe-area-inset-bottom), 12px)
+    max(env(safe-area-inset-left), 10px);
 }
 
 .modal {
   position: relative;
   width: min(1040px, 95vw);
-  height: min(92vh, 900px);
+  height: min(900px, 92dvh);
+  // Never exceed the safe area → the popup can't run off the top edge.
+  max-height: 100%;
   background: rgba(1, 10, 22, 0.97);
   border: 1px solid rgba(0, 212, 255, 0.5);
   display: flex;
