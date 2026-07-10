@@ -91,14 +91,6 @@
 .header {
   margin-bottom: 26px;
 
-  .tag {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    letter-spacing: 3px;
-    color: t.$cyan-dim;
-    margin-bottom: 14px;
-  }
-
   .name {
     margin: 0 0 7px;
     font-size: 34px;
@@ -272,7 +264,6 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   .panel { padding: 26px 22px 22px; }
   .header { margin-bottom: 20px; }
   .header .name { font-size: 26px; letter-spacing: 4px; }
-  .header .tag { font-size: 11px; }
   .header .role { font-size: 11px; letter-spacing: 4px; }
   .section-label { font-size: 11px; }
   .nav-item { font-size: 11px; padding: 11px 14px; letter-spacing: 2px; }

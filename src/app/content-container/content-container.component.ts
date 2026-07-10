@@ -12,7 +12,7 @@ interface Link { label: string; url: string; }
 interface CvData {
   profile: {
     firstName: string; lastName: string; fullName: string;
-    identityTag: string; panelRole: string; resumeRole: string; dossierTitle: string;
+    panelRole: string; resumeRole: string; dossierTitle: string;
   };
   contacts: { location: string; email: string; phone: string; linkedin: Link; github: Link; };
   status: string;
