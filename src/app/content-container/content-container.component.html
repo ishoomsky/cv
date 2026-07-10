@@ -80,8 +80,8 @@
 
       <div class="modal-body" (scroll)="onModalScroll($event)">
         <div class="dossier">
-          <!-- Rail: at-a-glance identity, contacts, skills, languages, education -->
-          <aside class="rail">
+          <!-- 1. Identity + contacts -->
+          <header class="cv-identity">
             <div class="rail-id">
               <h1 class="rail-name">{{ cv.profile.fullName }}</h1>
               <div class="rail-role">{{ cv.profile.resumeRole }}</div>
@@ -105,94 +105,97 @@
                 {{ cv.contacts.github.label }}
               </a>
             </div>
+          </header>
 
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SKILLS</div>
-              @for (g of cv.skills; track g.label) {
-                <div class="skill-group">
-                  <div class="skill-cat">{{ g.label }}</div>
-                  <div class="skill-tags">
-                    @for (s of g.items; track s) {
-                      <span class="skill-chip">{{ s }}</span>
-                    }
-                  </div>
+          <!-- 2. Summary -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SUMMARY</div>
+            <p class="cv-summary">{{ cv.summary }}</p>
+          </section>
+
+          <!-- 3. Skills -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SKILLS</div>
+            @for (g of cv.skills; track g.label) {
+              <div class="skill-group">
+                <div class="skill-cat">{{ g.label }}</div>
+                <div class="skill-tags">
+                  @for (s of g.items; track s) {
+                    <span class="skill-chip">{{ s }}</span>
+                  }
                 </div>
-              }
-            </section>
-
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> LANGUAGES</div>
-              <div class="lang-row">
-                @for (l of cv.languages; track l) {
-                  <span class="lang-chip">{{ l }}</span>
-                }
               </div>
-            </section>
+            }
+          </section>
 
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EDUCATION</div>
-              @for (e of cv.education; track e.title) {
-                <div class="edu">
-                  <div class="edu-top"><span class="edu-title">{{ e.title }}</span><span class="edu-year">{{ e.year }}</span></div>
-                  <div class="edu-org">{{ e.org }}</div>
+          <!-- 4. Experience timeline -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EXPERIENCE TIMELINE</div>
+            <div class="timeline">
+              @for (j of cv.experience; track j.company; let i = $index) {
+                <div class="tl-item" [class.open]="openJob === i">
+                  <button class="tl-head" (click)="toggleJob(i)" [attr.aria-expanded]="openJob === i">
+                    <span class="tl-node"></span>
+                    <span class="tl-meta">
+                      <span class="tl-company">{{ j.company }}</span>
+                      <span class="tl-role">{{ j.role }}</span>
+                    </span>
+                    <span class="tl-period">{{ j.period }}</span>
+                    <span class="tl-chev" aria-hidden="true">▾</span>
+                  </button>
+                  @if (openJob === i) {
+                    <ul class="tl-points">
+                      @for (p of j.points; track p) { <li>{{ p }}</li> }
+                    </ul>
+                  }
                 </div>
               }
-            </section>
-          </aside>
+            </div>
+          </section>
 
-          <!-- Narrative: summary → experience → projects -->
-          <main class="narrative">
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SUMMARY</div>
-              <p class="cv-summary">{{ cv.summary }}</p>
-            </section>
-
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EXPERIENCE TIMELINE</div>
-              <div class="timeline">
-                @for (j of cv.experience; track j.company; let i = $index) {
-                  <div class="tl-item" [class.open]="openJob === i">
-                    <button class="tl-head" (click)="toggleJob(i)" [attr.aria-expanded]="openJob === i">
-                      <span class="tl-node"></span>
-                      <span class="tl-meta">
-                        <span class="tl-company">{{ j.company }}</span>
-                        <span class="tl-role">{{ j.role }}</span>
-                      </span>
-                      <span class="tl-period">{{ j.period }}</span>
-                      <span class="tl-chev" aria-hidden="true">▾</span>
-                    </button>
-                    @if (openJob === i) {
-                      <ul class="tl-points">
-                        @for (p of j.points; track p) { <li>{{ p }}</li> }
-                      </ul>
-                    }
-                  </div>
-                }
+          <!-- 5. Personal projects -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> PROJECTS</div>
+            @for (pr of cv.projects; track pr.name) {
+              <div class="project">
+                <div class="pr-top">
+                  <span class="pr-name">{{ pr.name }}</span>
+                  <span class="pr-tag">{{ pr.tagline }}</span>
+                </div>
+                <!-- interactive architecture flow -->
+                <div class="flow">
+                  @for (node of pr.flow; track node; let last = $last) {
+                    <span class="flow-node">{{ node }}</span>
+                    @if (!last) { <span class="flow-link" aria-hidden="true">→</span> }
+                  }
+                </div>
+                <ul class="pr-points">
+                  @for (p of pr.points; track p) { <li>{{ p }}</li> }
+                </ul>
               </div>
-            </section>
+            }
+          </section>
 
-            <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> PROJECTS</div>
-              @for (pr of cv.projects; track pr.name) {
-                <div class="project">
-                  <div class="pr-top">
-                    <span class="pr-name">{{ pr.name }}</span>
-                    <span class="pr-tag">{{ pr.tagline }}</span>
-                  </div>
-                  <!-- interactive architecture flow -->
-                  <div class="flow">
-                    @for (node of pr.flow; track node; let last = $last) {
-                      <span class="flow-node">{{ node }}</span>
-                      @if (!last) { <span class="flow-link" aria-hidden="true">→</span> }
-                    }
-                  </div>
-                  <ul class="pr-points">
-                    @for (p of pr.points; track p) { <li>{{ p }}</li> }
-                  </ul>
-                </div>
+          <!-- 6. Education -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EDUCATION</div>
+            @for (e of cv.education; track e.title) {
+              <div class="edu">
+                <div class="edu-top"><span class="edu-title">{{ e.title }}</span><span class="edu-year">{{ e.year }}</span></div>
+                <div class="edu-org">{{ e.org }}</div>
+              </div>
+            }
+          </section>
+
+          <!-- 7. Languages -->
+          <section class="cv-block">
+            <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> LANGUAGES</div>
+            <div class="lang-row">
+              @for (l of cv.languages; track l) {
+                <span class="lang-chip">{{ l }}</span>
               }
-            </section>
-          </main>
+            </div>
+          </section>
         </div>
       </div>
     </div>

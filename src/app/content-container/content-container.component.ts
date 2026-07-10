@@ -88,9 +88,14 @@ export class ContentContainerComponent implements OnDestroy {
     if (this.cvOpen !== wasOpen) this.modalScrolled = false;
   }
 
-  // Esc closes the dossier — expected keyboard behaviour for a modal dialog.
+  // Esc closes the dossier on mobile/tablet, where it's still a true popup.
+  // On desktop (see the `desktop` mixin in _design-tokens.scss — keep this
+  // breakpoint in sync with it) the dossier is a persistent side panel: it
+  // only closes via the close button or an actual route change.
   @HostListener('document:keydown.escape')
-  onEscape() { if (this.cvOpen) this.closeCv(); }
+  onEscape() {
+    if (this.cvOpen && !window.matchMedia('(min-width: 1200px)').matches) this.closeCv();
+  }
 
   openCv()  { this.opener = document.activeElement as HTMLElement; this.router.navigate(['/resume']); }
   closeCv() { this.router.navigate(['/']); }
