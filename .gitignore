@@ -40,3 +40,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Python bytecode (UI/UX Pro Max skill scripts)
+__pycache__/
+*.pyc
