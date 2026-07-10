@@ -37,21 +37,22 @@
       </nav>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="section">
-      <div class="section-label"><span class="diamond" aria-hidden="true">◈</span>STATUS</div>
-      <div class="readout"><span class="key">LOCATION</span><span class="sep" aria-hidden="true">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
-      <div class="readout stack">
-        <span class="key">STACK</span><span class="sep" aria-hidden="true">∷</span>
-        <span class="marquee">
-          <span class="marquee-track">
-            <span class="chunk">{{ ticker }}</span>
-            <span class="chunk" aria-hidden="true">{{ ticker }}</span>
+    <div class="status-block">
+      <div class="divider"></div>
+      <div class="section">
+        <div class="section-label"><span class="diamond" aria-hidden="true">◈</span>STATUS</div>
+        <div class="readout"><span class="key">LOCATION</span><span class="sep" aria-hidden="true">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
+        <div class="readout stack">
+          <span class="key">STACK</span><span class="sep" aria-hidden="true">∷</span>
+          <span class="marquee">
+            <span class="marquee-track">
+              <span class="chunk">{{ ticker }}</span>
+              <span class="chunk" aria-hidden="true">{{ ticker }}</span>
+            </span>
           </span>
-        </span>
+        </div>
+        <div class="readout"><span class="key">STATUS</span><span class="sep" aria-hidden="true">∷</span><span class="val online">{{ cv.status }}</span></div>
       </div>
-      <div class="readout"><span class="key">STATUS</span><span class="sep" aria-hidden="true">∷</span><span class="val online">{{ cv.status }}</span></div>
     </div>
   </div>
 </div>

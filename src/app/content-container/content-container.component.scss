@@ -48,6 +48,13 @@
   display: flex;
   align-items: center;
   font-family: var(--font-display);
+
+  // Desktop panel is a fixed-height box anchored to the top gutter (see
+  // .panel), not vertically centered — dead-centering a tall, mostly-empty
+  // box reads as unanchored/accidental rather than composed.
+  @include t.desktop {
+    align-items: flex-start;
+  }
 }
 
 // ── Main panel ─────────────────────────────────────────────────────────────
@@ -55,8 +62,8 @@
 .panel {
   pointer-events: all;
   position: relative;
-  margin-left: clamp(16px, 4vw, 80px);
-  width: min(420px, calc(100vw - 32px));
+  margin-left: t.$hud-gutter;
+  width: min(t.$hud-panel-width, calc(100vw - 32px));
   box-sizing: border-box;
   // Denser glass fill with a faint top-to-bottom gradient for depth, plus an
   // inset highlight along the top edge to sell a layered-glass surface.
@@ -83,6 +90,26 @@
       transparent);
     animation: scan 5s linear infinite;
     pointer-events: none;
+  }
+
+  // Desktop: fixed-height panel anchored near the top instead of the dead-
+  // centered look of a content-sized box — the header/nav stay pinned to the
+  // top edge and .status-block (see below) is pushed to the bottom edge via
+  // margin-top: auto, so the taller box still reads as intentionally composed
+  // rather than a small content blob floating in a big empty frame.
+  @include t.desktop {
+    height: 80vh;
+    margin-top: t.$hud-gutter;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Groups the STATUS divider + section so they can be pushed to the bottom of
+// the panel as one unit on desktop (see .panel above).
+.status-block {
+  @include t.desktop {
+    margin-top: auto;
   }
 }
 
@@ -292,6 +319,17 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     max(env(safe-area-inset-right), 10px)
     max(env(safe-area-inset-bottom), 12px)
     max(env(safe-area-inset-left), 10px);
+
+  // Desktop: the dossier sits beside the nav panel as a peer, not on top of
+  // it, so there's nothing to dim — .modal below positions itself with fixed
+  // inset instead of being centered by this flex box.
+  @include t.desktop {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: block;
+    padding: 0;
+  }
 }
 
 .modal {
@@ -308,6 +346,19 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   animation: modal-in 0.22s ease-out;
 
   @include corners(22px, t.$cyan);
+
+  // Desktop: pinned to the right, filling the space next to the nav panel.
+  // Right gutter matches the panel's left gutter (t.$hud-gutter) and the top/
+  // height match the panel's own 80vh so the two boxes line up edge to edge.
+  @include t.desktop {
+    position: fixed;
+    top: t.$hud-gutter;
+    left: calc(#{t.$hud-gutter} + #{t.$hud-panel-width} + #{t.$hud-inner-gap});
+    right: t.$hud-gutter;
+    width: auto;
+    height: 80vh;
+    max-height: none;
+  }
 
   .modal-head {
     position: relative;
