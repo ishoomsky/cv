@@ -50,7 +50,6 @@ export class ContentContainerComponent implements OnDestroy {
   readonly ticker = this.cv.stackTicker.join('  ·  ') + '  ·  ';
 
   cvOpen = false;
-  openJob = 0;           // expanded role in the experience timeline
   // Sticky sub-header (name/role) fades in once the dossier body scrolls
   // past the rail identity block.
   modalScrolled = false;
@@ -112,9 +111,5 @@ export class ContentContainerComponent implements OnDestroy {
   private restoreFocus() {
     this.opener?.focus();
     this.opener = null;
-  }
-
-  toggleJob(i: number) {
-    this.openJob = this.openJob === i ? -1 : i;
   }
 }

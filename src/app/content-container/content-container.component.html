@@ -132,22 +132,19 @@
           <section class="cv-block">
             <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EXPERIENCE TIMELINE</div>
             <div class="timeline">
-              @for (j of cv.experience; track j.company; let i = $index) {
-                <div class="tl-item" [class.open]="openJob === i">
-                  <button class="tl-head" (click)="toggleJob(i)" [attr.aria-expanded]="openJob === i">
+              @for (j of cv.experience; track j.company) {
+                <div class="tl-item open">
+                  <div class="tl-head">
                     <span class="tl-node"></span>
                     <span class="tl-meta">
                       <span class="tl-company">{{ j.company }}</span>
                       <span class="tl-role">{{ j.role }}</span>
                     </span>
                     <span class="tl-period">{{ j.period }}</span>
-                    <span class="tl-chev" aria-hidden="true">▾</span>
-                  </button>
-                  @if (openJob === i) {
-                    <ul class="tl-points">
-                      @for (p of j.points; track p) { <li>{{ p }}</li> }
-                    </ul>
-                  }
+                  </div>
+                  <ul class="tl-points">
+                    @for (p of j.points; track p) { <li>{{ p }}</li> }
+                  </ul>
                 </div>
               }
             </div>
