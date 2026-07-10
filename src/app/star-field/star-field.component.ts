@@ -51,6 +51,9 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   ];
 
   private readonly palette = ['255,255,255', '255,255,255', '186,214,255', '255,226,184'];
+  // Rare "signal" stars in the panel's two accent hues — sparse (~3.5% of the
+  // field) so the starfield still reads as white/blue, not tinted.
+  private readonly accentPalette = ['0,212,255', '34,197,94'];
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('starCanvas') as HTMLCanvasElement;
@@ -98,7 +101,9 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
           twPhase: Math.random() * Math.PI * 2,
           twSpeed: Math.random() * 1.8 + 0.5,
           speed: layer.speed + Math.random() * 0.05,
-          color: this.palette[Math.floor(Math.random() * this.palette.length)],
+          color: Math.random() < 0.035
+            ? this.accentPalette[Math.floor(Math.random() * this.accentPalette.length)]
+            : this.palette[Math.floor(Math.random() * this.palette.length)],
           glow: size > 1.9 && Math.random() < 0.5,
         });
       }

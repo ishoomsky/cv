@@ -44,11 +44,15 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
     this.offscreen.width = w;
     this.offscreen.height = h;
     const c = this.offscreen.getContext('2d')!;
+    // 5 colours, 5 blobs per bake → each shows up roughly once. The CTA
+    // green sits at a lower alpha so it reads as a sparse accent, not a
+    // second dominant hue competing with the panel's cyan chrome.
     const colors = [
-      'rgba(50, 150, 255, 0.6)',
-      'rgba(200, 50, 255, 0.5)',
-      'rgba(255, 100, 100, 0.5)',
-      'rgba(80, 90, 255, 0.45)',
+      'rgba(50, 150, 255, 0.55)',
+      'rgba(0, 212, 255, 0.4)',
+      'rgba(160, 60, 255, 0.5)',
+      'rgba(80, 90, 255, 0.42)',
+      'rgba(34, 197, 94, 0.3)',
     ];
 
     c.clearRect(0, 0, w, h);

@@ -33,10 +33,11 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
 
   // Floating tech debris carries the CV's actual stack.
   private readonly iconDefs = [
-    { src: 'icons/typescript.svg', brand: '#3178C6' },
-    { src: 'icons/angular.svg',    brand: '#DD0031' },
-    { src: 'icons/nodedotjs.svg',  brand: '#5FA04E' },
-    { src: 'icons/anthropic.svg',  brand: '#D97757' },
+    { src: 'icons/typescript.svg',     brand: '#3178C6' },
+    { src: 'icons/angular.svg',        brand: '#DD0031' },
+    { src: 'icons/nodedotjs.svg',      brand: '#5FA04E' },
+    { src: 'icons/anthropic.svg',      brand: '#D97757' },
+    { src: 'icons/linkedin-brand.svg', brand: '#0A66C2' },
   ];
 
   ngAfterViewInit() {
