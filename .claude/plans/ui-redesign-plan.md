@@ -1,7 +1,16 @@
 # План: UI/UX переработка space-CV
 
-Статус: **ready** (решения приняты) · Ведём через скилл `.claude/skills/ui-ux-pro-max` (search.py).
+Статус: **done** (Фазы 0–5 реализованы и провалидированы) · Ведём через скилл `.claude/skills/ui-ux-pro-max` (search.py).
 Цель: усилить визуальный язык и UX, не ломая узнаваемую sci-fi/HUD эстетику.
+
+## Чек-лист реализации
+
+- [x] Фаза 0 — база доступности (уже была в `main`)
+- [x] Фаза 1 — дизайн-токены, Inter, иконки (коммит `b28ba73`)
+- [x] Фаза 2 — HUD-панель: зелёный CTA, иконки в nav, глубина стекла (коммит `409875a`)
+- [x] Фаза 3 — досье: rail + narrative, sticky sub-header, Inter в прозе (коммит `ec0f1f5`)
+- [x] Фаза 4 — космический фон: двойной акцент в nebula/stars, LinkedIn-астероид (коммит `1695cf7`)
+- [x] Фаза 5 — верификация: build/tests зелёные, браузер-прогон 375/768/1024/1440px, focus/Escape/sticky-header проверены
 
 ---
 
@@ -36,7 +45,7 @@
 
 ---
 
-## Фаза 1 — Дизайн-токены + шрифты + иконки
+## Фаза 1 — Дизайн-токены + шрифты + иконки ✅ (сделано)
 
 - Вынести токены в общий `src/app/_design-tokens.scss`: cyan-семейство, **новый `$cta: #22C55E`** (+ hover/glow варианты), текст, spacing-шкала, z-index (10/20/30/50), радиусы, тени/elevation.
 - Подключить **Inter** в `index.html` (Google Fonts, уже есть preconnect); Orbitron/Share Tech Mono оставить. Задать `--font-display / --font-mono / --font-body`.
@@ -44,7 +53,7 @@
 - Проверить контраст `$cta` как текста/бордера (≥4.5:1 на тёмном).
 - Файлы: `_design-tokens.scss`, `index.html`, `public/icons/*`, `content-container.component.scss`.
 
-## Фаза 2 — HUD-панель
+## Фаза 2 — HUD-панель ✅ (сделано)
 
 - Перевести CTA-акцент featured-кнопки «01 CV» на зелёный `$cta` (рамка/стрелка/hover-glow); остальные nav — cyan как сейчас.
 - Иконки в nav/контакты: **LinkedIn** (и GitHub/email) SVG вместо/рядом с текстом.
@@ -52,7 +61,7 @@
 - Состояния hover/active/focus кнопок под новую палитру; landscape-мобила (риск обрезки панели по центру).
 - Файлы: `content-container.component.{html,scss}`.
 
-## Фаза 3 — Досье / модалка (структурный ре-лейаут)
+## Фаза 3 — Досье / модалка (структурный ре-лейаут) ✅ (сделано)
 
 - Пересобрать иерархию: **левый rail «at a glance»** (identity, контакты с иконками, skills, languages, education) + **основная колонка-нарратив** (summary → experience → projects). Уточнить пропорции под ширину 1040px.
 - Тело прозы (summary, буллеты, project-описания) → **Inter**; заголовки/лейблы/чипы остаются mono.
@@ -62,14 +71,14 @@
 - (Опц.) focus-trap + Tab-цикл внутри модалки.
 - Файлы: `content-container.component.{html,scss,ts}`.
 
-## Фаза 4 — Космический фон
+## Фаза 4 — Космический фон ✅ (сделано)
 
 - Тюнинг палитры/плотности nebula/stars под двойной акцент (cyan + точечный зелёный).
 - Рассмотреть **LinkedIn** в наборе floating-плиток `asteroids` (сейчас TS/Angular/Node/Anthropic) — если решим показывать соц-иконку и в фоне.
 - Бюджет перфа на мобиле (dpr ≤2 уже есть).
 - Файлы: `nebula/`, `star-field/`, `asteroids/`, `planet/`, `public/icons/`.
 
-## Фаза 5 — Верификация
+## Фаза 5 — Верификация ✅ (сделано)
 
 - `npm run build` зелёный; браузер-прогон (focus, Escape, reduced-motion, 375/768/1024/1440px).
 - Регресс доступности по чеклисту скилла (SKILL.md → Pre-Delivery Checklist).
