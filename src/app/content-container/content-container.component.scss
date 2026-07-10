@@ -311,6 +311,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   max-height: 100%;
   background: rgba(1, 10, 22, 0.97);
   border: 1px solid rgba(0, 212, 255, 0.5);
+  box-shadow: t.$elevation-modal;
   display: flex;
   flex-direction: column;
   animation: modal-in 0.22s ease-out;
@@ -318,6 +319,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   @include corners(22px, t.$cyan);
 
   .modal-head {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -336,6 +338,46 @@ nav { display: flex; flex-direction: column; gap: 7px; }
       font-size: 11px;
       letter-spacing: 3px;
       color: t.$cyan;
+      transition: opacity .2s ease;
+    }
+
+    // Compact identity that crossfades in over .modal-title once the body
+    // scrolls past the rail identity block, so the reader never loses track
+    // of whose dossier this is.
+    .modal-subhead {
+      position: absolute;
+      left: 24px;
+      right: 132px;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity .2s ease;
+
+      .sub-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: var(--font-display);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: t.$text-bright;
+      }
+      .sub-role {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        letter-spacing: 1px;
+        color: t.$cyan-dim;
+      }
+    }
+
+    &.scrolled {
+      .modal-title { opacity: 0; }
+      .modal-subhead { opacity: 1; }
     }
 
     .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
@@ -379,61 +421,99 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 
 // ── Resume content ──────────────────────────────────────────────────────────
 
-.cv-hero {
-  margin-bottom: 26px;
-
-  .cv-name {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 36px;
-    font-weight: 900;
-    letter-spacing: 6px;
-    color: t.$text-bright;
-    text-shadow: 0 0 28px rgba(0,212,255,.35);
-  }
-  .cv-role {
-    margin-top: 5px;
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 5px;
-    color: t.$cyan;
-  }
-  .cv-contacts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 11px;
-    margin-top: 14px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: t.$text;
-
-    a { color: t.$text; text-decoration: none; transition: color .15s; }
-    a:hover,
-    a:focus-visible { color: t.$cyan; }
-    i { width: 4px; height: 4px; background: t.$cyan-dim; transform: rotate(45deg); }
-  }
-  .cv-summary {
-    margin: 18px 0 0;
-    max-width: 80ch;
-    font-family: var(--font-mono);
-    font-size: 14.5px;
-    line-height: 1.75;
-    color: #b3d0e3;
-  }
-}
-
-.cv-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.25fr;
-  gap: 30px;
+// Rail ("at a glance": identity, contacts, skills, languages, education) +
+// narrative column (summary → experience → projects).
+.dossier {
+  display: flex;
+  align-items: flex-start;
+  gap: 34px;
 }
 @media (max-width: 760px) {
-  .cv-grid { grid-template-columns: 1fr; }
+  .dossier { flex-direction: column; gap: 26px; }
 }
 
-.cv-col { display: flex; flex-direction: column; gap: 24px; }
+.rail {
+  flex: 0 0 260px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+@media (max-width: 760px) {
+  .rail { flex: 1 1 auto; width: 100%; }
+}
+
+.narrative {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rail-id {
+  .rail-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    line-height: 1.25;
+    color: t.$text-bright;
+    text-shadow: 0 0 24px rgba(0,212,255,.3);
+  }
+  .rail-role {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: t.$cyan;
+  }
+}
+
+.rail-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,212,255,.16);
+
+  .contact-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    letter-spacing: .5px;
+    color: t.$text;
+    text-decoration: none;
+    transition: color .15s;
+
+    .icon {
+      flex: 0 0 auto;
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+      color: t.$cyan-dim;
+      transition: color .15s;
+    }
+  }
+
+  a.contact-row:hover,
+  a.contact-row:focus-visible {
+    color: t.$cyan;
+    .icon { color: t.$cyan; }
+  }
+}
+
+.cv-summary {
+  margin: 0;
+  max-width: 74ch;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: t.$text-body;
+}
 
 .cv-block .block-h {
   font-family: var(--font-display);
@@ -462,15 +542,20 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   font-size: 12.5px;
   letter-spacing: .5px;
   color: t.$text;
-  background: rgba(0,160,220,.08);
+  // Faint top-to-bottom gradient + a soft drop-shadow give the chip volume
+  // instead of a flat tint.
+  background: linear-gradient(180deg, rgba(0,160,220,.12), rgba(0,160,220,.05));
   border: 1px solid rgba(0,212,255,.22);
+  box-shadow: 0 3px 8px -5px rgba(0,0,0,.6);
   padding: 6px 12px;
-  transition: background .15s, border-color .15s, color .15s;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s, transform .15s;
 }
 .skill-chip:hover {
-  background: rgba(0,212,255,.14);
+  background: linear-gradient(180deg, rgba(0,212,255,.20), rgba(0,212,255,.10));
   border-color: rgba(0,212,255,.5);
   color: t.$text-bright;
+  box-shadow: 0 6px 14px -6px rgba(0,212,255,.35);
+  transform: translateY(-1px);
 }
 
 // Education
@@ -528,6 +613,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     width: 9px; height: 9px;
     background: #0a1626;
     border: 1px solid t.$cyan-dim;
+    box-shadow: 0 2px 5px -2px rgba(0,0,0,.7); // raised marker, not flush with the rail
     transform: rotate(45deg);
     transition: background .15s, border-color .15s, box-shadow .15s;
   }
@@ -556,22 +642,30 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     position: relative;
     padding-left: 18px;
     margin-bottom: 9px;
-    font-family: var(--font-mono);
-    font-size: 14px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
     line-height: 1.65;
-    color: #b3d0e3;
+    color: t.$text-body;
   }
   li::before { content: '▹'; position: absolute; left: 0; color: t.$cyan; }
 }
 
-// Projects
+// Projects — raised card layer with hover-elevation.
 .project {
   border: 1px solid rgba(0,212,255,.14);
+  background: rgba(6, 18, 34, 0.4);
+  border-radius: t.$radius-md;
+  box-shadow: t.$elevation-card;
   padding: 14px 16px;
   margin-bottom: 14px;
-  transition: border-color .15s, background .15s;
+  transition: border-color .15s, background .15s, box-shadow .15s, transform .15s;
 }
-.project:hover { border-color: rgba(0,212,255,.4); background: rgba(0,160,220,.05); }
+.project:hover {
+  border-color: rgba(0,212,255,.4);
+  background: rgba(0,160,220,.06);
+  box-shadow: t.$elevation-card-hover;
+  transform: translateY(-2px);
+}
 .pr-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .pr-name { font-family: var(--font-display); font-size: 15.5px; font-weight: 700; color: t.$text-bright; letter-spacing: 1px; }
 .pr-tag { font-family: var(--font-mono); font-size: 12px; color: t.$cyan-dim; letter-spacing: 1px; }
@@ -608,10 +702,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     position: relative;
     padding-left: 18px;
     margin-bottom: 7px;
-    font-family: var(--font-mono);
-    font-size: 14px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
     line-height: 1.65;
-    color: #b3d0e3;
+    color: t.$text-body;
   }
   li::before { content: '▹'; position: absolute; left: 0; color: t.$cyan; }
 }
@@ -620,10 +714,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 @media (max-width: 600px) {
   .modal .modal-head { padding: 12px 14px; }
   .modal .modal-head .modal-title { font-size: 9px; letter-spacing: 2px; }
+  .modal .modal-head .sub-name { font-size: 11px; letter-spacing: 1px; }
+  .modal .modal-head .sub-role { font-size: 9px; }
+  .modal .modal-head .modal-subhead { left: 14px; right: 100px; }
   .modal .hbtn { padding: 7px 11px; font-size: 8px; letter-spacing: 1px; }
   .modal-body { padding: 20px 16px 26px; }
-  .cv-hero { margin-bottom: 20px; }
-  .cv-hero .cv-name { font-size: 26px; letter-spacing: 3px; }
-  .cv-hero .cv-role { font-size: 11px; letter-spacing: 3px; }
-  .cv-grid { gap: 22px; }
+  .dossier { gap: 20px; }
+  .rail-id .rail-name { font-size: 21px; letter-spacing: 2px; }
+  .rail-id .rail-role { font-size: 11px; letter-spacing: 2px; }
 }

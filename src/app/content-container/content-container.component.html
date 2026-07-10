@@ -27,13 +27,8 @@
           } @else {
             <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
               <span class="num">0{{ i + 1 }}</span>
-              @switch (item.icon) {
-                @case ('linkedin') {
-                  <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                }
-                @case ('mail') {
-                  <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                }
+              @if (item.icon) {
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(item.icon)"/></svg>
               }
               <span class="label">{{ item.label }}</span>
               <span class="arr" aria-hidden="true">▶</span>
@@ -71,31 +66,46 @@
       <span class="corner bl" aria-hidden="true"></span>
       <span class="corner br" aria-hidden="true"></span>
 
-      <div class="modal-head">
+      <div class="modal-head" [class.scrolled]="modalScrolled">
         <span class="modal-title">{{ cv.profile.dossierTitle }}</span>
+        <div class="modal-subhead" aria-hidden="true">
+          <span class="sub-name">{{ cv.profile.fullName }}</span>
+          <span class="sub-role">{{ cv.profile.resumeRole }}</span>
+        </div>
         <div class="head-actions">
           <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener"><span aria-hidden="true">⤓</span> PDF</a>
           <button class="hbtn close-btn" (click)="closeCv()" aria-label="Close dossier"><span aria-hidden="true">✕</span> CLOSE</button>
         </div>
       </div>
 
-      <div class="modal-body">
-        <!-- Hero -->
-        <header class="cv-hero">
-          <h1 class="cv-name">{{ cv.profile.fullName }}</h1>
-          <div class="cv-role">{{ cv.profile.resumeRole }}</div>
-          <div class="cv-contacts">
-            <span>{{ cv.contacts.location }}</span><i></i>
-            <a [href]="'mailto:' + cv.contacts.email">{{ cv.contacts.email }}</a><i></i>
-            <a [href]="cv.contacts.linkedin.url" target="_blank" rel="noopener">{{ cv.contacts.linkedin.label }}</a><i></i>
-            <a [href]="cv.contacts.github.url" target="_blank" rel="noopener">{{ cv.contacts.github.label }}</a>
-          </div>
-          <p class="cv-summary">{{ cv.summary }}</p>
-        </header>
+      <div class="modal-body" (scroll)="onModalScroll($event)">
+        <div class="dossier">
+          <!-- Rail: at-a-glance identity, contacts, skills, languages, education -->
+          <aside class="rail">
+            <div class="rail-id">
+              <h1 class="rail-name">{{ cv.profile.fullName }}</h1>
+              <div class="rail-role">{{ cv.profile.resumeRole }}</div>
+            </div>
 
-        <div class="cv-grid">
-          <!-- LEFT column -->
-          <div class="cv-col">
+            <div class="rail-contacts">
+              <span class="contact-row">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="2.4"/><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                {{ cv.contacts.location }}
+              </span>
+              <a class="contact-row" [href]="'mailto:' + cv.contacts.email">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('mail')"/></svg>
+                {{ cv.contacts.email }}
+              </a>
+              <a class="contact-row" [href]="cv.contacts.linkedin.url" target="_blank" rel="noopener">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('linkedin')"/></svg>
+                {{ cv.contacts.linkedin.label }}
+              </a>
+              <a class="contact-row" [href]="cv.contacts.github.url" target="_blank" rel="noopener">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('github')"/></svg>
+                {{ cv.contacts.github.label }}
+              </a>
+            </div>
+
             <section class="cv-block">
               <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SKILLS</div>
               @for (g of cv.skills; track g.label) {
@@ -111,6 +121,15 @@
             </section>
 
             <section class="cv-block">
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> LANGUAGES</div>
+              <div class="lang-row">
+                @for (l of cv.languages; track l) {
+                  <span class="lang-chip">{{ l }}</span>
+                }
+              </div>
+            </section>
+
+            <section class="cv-block">
               <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EDUCATION</div>
               @for (e of cv.education; track e.title) {
                 <div class="edu">
@@ -119,19 +138,15 @@
                 </div>
               }
             </section>
+          </aside>
 
+          <!-- Narrative: summary → experience → projects -->
+          <main class="narrative">
             <section class="cv-block">
-              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> LANGUAGES</div>
-              <div class="lang-row">
-                @for (l of cv.languages; track l) {
-                  <span class="lang-chip">{{ l }}</span>
-                }
-              </div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SUMMARY</div>
+              <p class="cv-summary">{{ cv.summary }}</p>
             </section>
-          </div>
 
-          <!-- RIGHT column -->
-          <div class="cv-col">
             <section class="cv-block">
               <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EXPERIENCE TIMELINE</div>
               <div class="timeline">
@@ -177,7 +192,7 @@
                 </div>
               }
             </section>
-          </div>
+          </main>
         </div>
       </div>
     </div>
