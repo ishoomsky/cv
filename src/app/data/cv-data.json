@@ -19,8 +19,8 @@
   "pdf": "assets/CV-Ivan-Shumski.pdf",
   "nav": [
     { "label": "CV", "action": "cv" },
-    { "label": "LINKEDIN", "url": "https://www.linkedin.com/in/ivanshumski/" },
-    { "label": "SEND EMAIL", "url": "mailto:ishoomsky@gmail.com" }
+    { "label": "LINKEDIN", "url": "https://www.linkedin.com/in/ivanshumski/", "icon": "linkedin" },
+    { "label": "SEND EMAIL", "url": "mailto:ishoomsky@gmail.com", "icon": "mail" }
   ],
   "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
   "summary": "Frontend Developer with 6+ years building high-performance, reactive web apps with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality — and has shipped full products with it end to end.",

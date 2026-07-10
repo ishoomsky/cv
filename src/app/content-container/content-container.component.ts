@@ -6,7 +6,7 @@ import cvData from '../data/cv-data.json';
 interface SkillGroup { label: string; items: string[]; }
 interface Job { role: string; company: string; period: string; points: string[]; }
 interface Project { name: string; tagline: string; flow: string[]; points: string[]; }
-interface NavItem { label: string; action?: string; url?: string; }
+interface NavItem { label: string; action?: string; url?: string; icon?: string; }
 interface Link { label: string; url: string; }
 
 interface CvData {

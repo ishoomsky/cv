@@ -58,13 +58,18 @@
   margin-left: clamp(16px, 4vw, 80px);
   width: min(420px, calc(100vw - 32px));
   box-sizing: border-box;
-  background: t.$bg;
+  // Denser glass fill with a faint top-to-bottom gradient for depth, plus an
+  // inset highlight along the top edge to sell a layered-glass surface.
+  background: linear-gradient(180deg, rgba(6, 22, 42, 0.92) 0%, t.$bg 100%);
   border: 1px solid t.$border;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   padding: 40px 36px 34px;
   overflow: hidden;
   animation: panel-in 0.7s cubic-bezier(.22,1,.36,1) both;
+  // Drop-shadow for elevation + inset top highlight for the glass edge, combined
+  // into one declaration since box-shadow values don't merge across rules.
+  box-shadow: t.$elevation-panel, inset 0 1px 0 rgba(255, 255, 255, 0.10);
 
   @include corners(22px);
 
@@ -163,6 +168,15 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     transition: color .15s;
   }
 
+  .nav-icon {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    color: t.$cyan-dim;
+    transition: color .15s;
+  }
+
   .label { flex: 1; text-align: left; }
 
   .arr {
@@ -177,14 +191,26 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     border-color: rgba(0,212,255,.45);
     color: t.$text-bright;
     .num { color: t.$cyan; }
+    .nav-icon { color: t.$cyan; }
     .arr { color: t.$cyan; transform: translateX(4px); }
   }
 
+  // CTA — the single primary action in the panel. Green, not cyan, so it
+  // reads as "the one to press" against the cyan structural chrome around it.
   &.featured {
-    border-color: rgba(0,212,255,.35);
+    border-color: t.$cta-border;
     color: t.$text-bright;
-    .num { color: t.$cyan; }
-    .arr { color: t.$cyan; animation: arr-pulse 1.6s ease-in-out infinite; }
+    .num { color: t.$cta; }
+    .arr { color: t.$cta; animation: arr-pulse 1.6s ease-in-out infinite; }
+
+    &:hover,
+    &:focus-visible {
+      background: t.$cta-bg-hover;
+      border-color: t.$cta;
+      box-shadow: 0 0 18px t.$cta-glow;
+      .num { color: t.$cta; }
+      .arr { color: t.$cta; }
+    }
   }
 }
 
