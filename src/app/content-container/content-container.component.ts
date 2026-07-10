@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, HostListener, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 import cvData from '../data/cv-data.json';
@@ -61,11 +61,33 @@ export class ContentContainerComponent implements OnDestroy {
 
   private syncFromUrl() {
     const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
+    const wasOpen = this.cvOpen;
     this.cvOpen = path === '/resume';
+    // Keyboard focus follows the dialog: move into it on open, restore on close.
+    if (this.cvOpen && !wasOpen) this.focusModal();
+    else if (!this.cvOpen && wasOpen) this.restoreFocus();
   }
 
-  openCv()  { this.router.navigate(['/resume']); }
+  // Esc closes the dossier — expected keyboard behaviour for a modal dialog.
+  @HostListener('document:keydown.escape')
+  onEscape() { if (this.cvOpen) this.closeCv(); }
+
+  openCv()  { this.opener = document.activeElement as HTMLElement; this.router.navigate(['/resume']); }
   closeCv() { this.router.navigate(['/']); }
+
+  private opener: HTMLElement | null = null;
+
+  private focusModal() {
+    // Wait a frame so the dialog is in the DOM, then focus its first control.
+    requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('.modal .close-btn')?.focus();
+    });
+  }
+
+  private restoreFocus() {
+    this.opener?.focus();
+    this.opener = null;
+  }
 
   toggleJob(i: number) {
     this.openJob = this.openJob === i ? -1 : i;

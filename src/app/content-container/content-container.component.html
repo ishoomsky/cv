@@ -8,27 +8,27 @@
 
     <div class="header">
       <div class="tag">{{ cv.profile.identityTag }}</div>
-      <h1 class="name">{{ cv.profile.firstName }}<span class="dot">.</span>{{ cv.profile.lastName }}</h1>
+      <h1 class="name">{{ cv.profile.firstName }}<span class="dot" aria-hidden="true">.</span>{{ cv.profile.lastName }}</h1>
       <div class="role">{{ cv.profile.panelRole }}</div>
     </div>
 
     <div class="divider"></div>
 
     <div class="section">
-      <div class="section-label"><span class="diamond">◈</span> NAVIGATION</div>
+      <div class="section-label"><span class="diamond" aria-hidden="true">◈</span> NAVIGATION</div>
       <nav>
         @for (item of cv.nav; track item.label; let i = $index) {
           @if (item.action === 'cv') {
             <button class="nav-item featured" (click)="openCv()">
               <span class="num">0{{ i + 1 }}</span>
               <span class="label">{{ item.label }}</span>
-              <span class="arr">▶</span>
+              <span class="arr" aria-hidden="true">▶</span>
             </button>
           } @else {
             <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
               <span class="num">0{{ i + 1 }}</span>
               <span class="label">{{ item.label }}</span>
-              <span class="arr">▶</span>
+              <span class="arr" aria-hidden="true">▶</span>
             </a>
           }
         }
@@ -38,10 +38,10 @@
     <div class="divider"></div>
 
     <div class="section">
-      <div class="section-label"><span class="diamond">◈</span>STATUS</div>
-      <div class="readout"><span class="key">LOCATION</span><span class="sep">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
+      <div class="section-label"><span class="diamond" aria-hidden="true">◈</span>STATUS</div>
+      <div class="readout"><span class="key">LOCATION</span><span class="sep" aria-hidden="true">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
       <div class="readout stack">
-        <span class="key">STACK</span><span class="sep">∷</span>
+        <span class="key">STACK</span><span class="sep" aria-hidden="true">∷</span>
         <span class="marquee">
           <span class="marquee-track">
             <span class="chunk">{{ ticker }}</span>
@@ -49,24 +49,25 @@
           </span>
         </span>
       </div>
-      <div class="readout"><span class="key">STATUS</span><span class="sep">∷</span><span class="val online">{{ cv.status }}</span></div>
+      <div class="readout"><span class="key">STATUS</span><span class="sep" aria-hidden="true">∷</span><span class="val online">{{ cv.status }}</span></div>
     </div>
   </div>
 </div>
 
 @if (cvOpen) {
   <div class="backdrop" (click)="closeCv()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <span class="corner tl"></span>
-      <span class="corner tr"></span>
-      <span class="corner bl"></span>
-      <span class="corner br"></span>
+    <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="cv.profile.dossierTitle"
+         (click)="$event.stopPropagation()">
+      <span class="corner tl" aria-hidden="true"></span>
+      <span class="corner tr" aria-hidden="true"></span>
+      <span class="corner bl" aria-hidden="true"></span>
+      <span class="corner br" aria-hidden="true"></span>
 
       <div class="modal-head">
         <span class="modal-title">{{ cv.profile.dossierTitle }}</span>
         <div class="head-actions">
-          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener">⤓ PDF</a>
-          <button class="hbtn close-btn" (click)="closeCv()">✕ CLOSE</button>
+          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener"><span aria-hidden="true">⤓</span> PDF</a>
+          <button class="hbtn close-btn" (click)="closeCv()" aria-label="Close dossier"><span aria-hidden="true">✕</span> CLOSE</button>
         </div>
       </div>
 
@@ -88,7 +89,7 @@
           <!-- LEFT column -->
           <div class="cv-col">
             <section class="cv-block">
-              <div class="block-h"><span class="diamond">◈</span> SKILLS</div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> SKILLS</div>
               @for (g of cv.skills; track g.label) {
                 <div class="skill-group">
                   <div class="skill-cat">{{ g.label }}</div>
@@ -102,7 +103,7 @@
             </section>
 
             <section class="cv-block">
-              <div class="block-h"><span class="diamond">◈</span> EDUCATION</div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EDUCATION</div>
               @for (e of cv.education; track e.title) {
                 <div class="edu">
                   <div class="edu-top"><span class="edu-title">{{ e.title }}</span><span class="edu-year">{{ e.year }}</span></div>
@@ -112,7 +113,7 @@
             </section>
 
             <section class="cv-block">
-              <div class="block-h"><span class="diamond">◈</span> LANGUAGES</div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> LANGUAGES</div>
               <div class="lang-row">
                 @for (l of cv.languages; track l) {
                   <span class="lang-chip">{{ l }}</span>
@@ -124,18 +125,18 @@
           <!-- RIGHT column -->
           <div class="cv-col">
             <section class="cv-block">
-              <div class="block-h"><span class="diamond">◈</span> EXPERIENCE TIMELINE</div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> EXPERIENCE TIMELINE</div>
               <div class="timeline">
                 @for (j of cv.experience; track j.company; let i = $index) {
                   <div class="tl-item" [class.open]="openJob === i">
-                    <button class="tl-head" (click)="toggleJob(i)">
+                    <button class="tl-head" (click)="toggleJob(i)" [attr.aria-expanded]="openJob === i">
                       <span class="tl-node"></span>
                       <span class="tl-meta">
                         <span class="tl-company">{{ j.company }}</span>
                         <span class="tl-role">{{ j.role }}</span>
                       </span>
                       <span class="tl-period">{{ j.period }}</span>
-                      <span class="tl-chev">▾</span>
+                      <span class="tl-chev" aria-hidden="true">▾</span>
                     </button>
                     @if (openJob === i) {
                       <ul class="tl-points">
@@ -148,7 +149,7 @@
             </section>
 
             <section class="cv-block">
-              <div class="block-h"><span class="diamond">◈</span> PROJECTS</div>
+              <div class="block-h"><span class="diamond" aria-hidden="true">◈</span> PROJECTS</div>
               @for (pr of cv.projects; track pr.name) {
                 <div class="project">
                   <div class="pr-top">
@@ -159,7 +160,7 @@
                   <div class="flow">
                     @for (node of pr.flow; track node; let last = $last) {
                       <span class="flow-node">{{ node }}</span>
-                      @if (!last) { <span class="flow-link">→</span> }
+                      @if (!last) { <span class="flow-link" aria-hidden="true">→</span> }
                     }
                   </div>
                   <ul class="pr-points">

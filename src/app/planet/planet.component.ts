@@ -29,12 +29,15 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private loaderHidden = false;
   private loaderTimeout = 0;
   private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
+  // Reduced-motion: hold the globe still and render on demand instead of spinning.
+  private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
     this.initThree();
     this.buildEarth();
-    this.animate();
+    if (this.reduceMotion) this.renderStill();
+    else this.animate();
     // Safety net: never let a failed/slow asset trap the user on the loader.
     this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
   }
@@ -100,7 +103,7 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     // Drive the intro loader from real texture-download progress.
     const manager = new THREE.LoadingManager();
     manager.onProgress = (_url, loaded, total) => this.updateLoader(loaded / total);
-    manager.onLoad  = () => this.hideLoader();
+    manager.onLoad  = () => { this.hideLoader(); if (this.reduceMotion) this.renderStill(); };
     manager.onError = () => this.hideLoader(); // never leave the loader stuck
 
     const loader = new THREE.TextureLoader(manager);
@@ -265,11 +268,15 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.renderer.render(this.scene, this.camera);
   };
 
+  // One-off render for reduced-motion mode (no spin, no rAF loop).
+  private renderStill = () => this.renderer.render(this.scene, this.camera);
+
   @HostListener('window:resize')
   onResize() {
     const w = window.innerWidth, h = window.innerHeight;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
+    if (this.reduceMotion) this.renderStill();
   }
 }

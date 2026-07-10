@@ -38,6 +38,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private start = performance.now();
   private nextMeteor = 1.5; // seconds until the first meteor
   private lastW = -1;       // last width — recreate stars only when it changes
+  // Users who asked for less motion get a still starfield (no drift/twinkle/meteors).
+  private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   // Depth layers: [count, driftSpeed]. Far layers barely move (parallax).
   private readonly layers: { count: number; speed: number }[] = [
@@ -54,7 +56,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     this.canvas = document.getElementById('starCanvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
     this.resizeCanvas();
-    this.animate();
+    if (this.reduceMotion) this.renderStatic();
+    else this.animate();
   }
 
   ngOnDestroy() {
@@ -72,6 +75,14 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
       this.lastW = w;
       this.createStars();
     }
+    // The rAF loop is off in reduced-motion mode, so repaint the still frame here.
+    if (this.reduceMotion) this.renderStatic();
+  }
+
+  // Single static frame: every star at its base brightness, no motion.
+  private renderStatic() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    for (const s of this.stars) this.drawStar(s, s.baseAlpha);
   }
 
   private createStars() {

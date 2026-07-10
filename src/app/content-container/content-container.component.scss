@@ -148,6 +148,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   display: flex;
   align-items: center;
   gap: 14px;
+  min-height: 44px;              // comfortable touch target
   padding: 12px 17px;
   background: transparent;
   border: 1px solid rgba(0,160,220,.18);
@@ -175,7 +176,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     transition: color .15s, transform .15s;
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     background: rgba(0,160,220,.10);
     border-color: rgba(0,212,255,.45);
     color: $text-bright;
@@ -318,6 +320,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
 
     .hbtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;             // meet the 44px touch-target minimum
       white-space: nowrap;
       background: transparent;
       border: 1px solid rgba(0,212,255,.28);
@@ -330,7 +336,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
       text-decoration: none;
       transition: background .15s, color .15s, border-color .15s;
 
-      &:hover {
+      &:hover,
+      &:focus-visible {
         background: rgba(0,212,255,.12);
         border-color: $cyan;
         color: $text-bright;
@@ -382,7 +389,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     color: $text;
 
     a { color: $text; text-decoration: none; transition: color .15s; }
-    a:hover { color: $cyan; }
+    a:hover,
+    a:focus-visible { color: $cyan; }
     i { width: 4px; height: 4px; background: $cyan-dim; transform: rotate(45deg); }
   }
   .cv-summary {

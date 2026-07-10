@@ -28,6 +28,8 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
   private W = 0;
   private H = 0;
   private dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // Reduced-motion: park the tiles in place and stop the loop once painted.
+  private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   // Floating tech debris carries the CV's actual stack.
   private readonly iconDefs = [
@@ -82,8 +84,8 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
     return {
       x: 0,
       y: 0,
-      vx: horiz * (0.1 + depth * 0.5),
-      vy: (Math.random() - 0.5) * 0.3 * depth,
+      vx: this.reduceMotion ? 0 : horiz * (0.1 + depth * 0.5),
+      vy: this.reduceMotion ? 0 : (Math.random() - 0.5) * 0.3 * depth,
       size: 19 * (0.7 + depth * 0.85),
       swayPhase: Math.random() * Math.PI * 2,
       depth,
@@ -93,7 +95,8 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
   }
 
   private animate = () => {
-    const t = (performance.now() - this.start) / 1000;
+    // Freeze time (no sway) when the user prefers reduced motion.
+    const t = this.reduceMotion ? 0 : (performance.now() - this.start) / 1000;
     this.ctx.clearRect(0, 0, this.W, this.H);
 
     for (const tile of this.tiles) {
@@ -102,6 +105,8 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
       this.wrap(tile);
       this.drawTile(tile, t);
     }
+    // Once the still frame is fully painted (icons decoded), stop looping.
+    if (this.reduceMotion && this.icons.every(i => i.img.complete && i.img.naturalWidth)) return;
     this.frameId = requestAnimationFrame(this.animate);
   };
 
