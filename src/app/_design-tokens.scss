@@ -1,0 +1,70 @@
+// ── Design tokens ────────────────────────────────────────────────────────────
+// Single source of truth for colour, type, spacing, elevation used across the
+// HUD panel and dossier modal. `@use 'design-tokens' as t;` from component
+// styles (component scss files live one level below `src/app/`, so the path
+// is `../design-tokens`).
+
+// ── Cyan — structural accent (chrome, borders, labels, HUD furniture) ───────
+$cyan: #00d4ff;
+// 0.65 keeps the muted-cyan look while lifting small labels to ~5:1 (WCAG AA).
+$cyan-dim: rgba(0, 212, 255, 0.65);
+$cyan-border: rgba(0, 170, 230, 0.40);
+$cyan-glow: rgba(0, 212, 255, 0.35);
+
+// ── CTA green — reserved for the single primary action per view ─────────────
+// (featured "01 CV" nav item, PDF download). Do not spread across secondary UI.
+$cta: #22c55e;
+$cta-dim: rgba(34, 197, 94, 0.65);
+$cta-border: rgba(34, 197, 94, 0.45);
+$cta-glow: rgba(34, 197, 94, 0.45);
+$cta-bg-hover: rgba(34, 197, 94, 0.12);
+
+// ── Status green (kept distinct from CTA — "online" pulse, not an action) ───
+$status-green: #00ff88;
+
+// ── Text ──────────────────────────────────────────────────────────────────
+$text: #8ec8e8;
+$text-bright: #d0eeff;
+$text-body: #b3d0e3; // long-form prose (summary, bullets, descriptions)
+
+// ── Surfaces ──────────────────────────────────────────────────────────────
+$bg: rgba(1, 10, 22, 0.84);
+$bg-modal: rgba(1, 10, 22, 0.97);
+$bg-raised: rgba(0, 160, 220, 0.08); // chips, flow-nodes, hover fills
+$border: $cyan-border;
+
+// ── Type ──────────────────────────────────────────────────────────────────
+// Actual families are CSS custom properties (--font-display/--font-mono/--font-body,
+// defined on :root in styles.scss) so they resolve at runtime; reference them
+// with var(--font-display) etc. from component styles.
+
+// ── Spacing scale ─────────────────────────────────────────────────────────
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 12px;
+$space-4: 16px;
+$space-5: 24px;
+$space-6: 32px;
+$space-7: 48px;
+
+// ── Z-index scale ─────────────────────────────────────────────────────────
+$z-canvas: 0;
+$z-hud: 10;
+$z-panel: 20;
+$z-modal: 30;
+$z-loader: 50;
+
+// ── Radii ─────────────────────────────────────────────────────────────────
+$radius-sm: 2px;
+$radius-md: 4px;
+
+// ── Elevation (drop-shadows for glass panels/cards) ──────────────────────
+$elevation-panel: 0 24px 60px -20px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 212, 255, 0.06);
+$elevation-modal: 0 32px 90px -24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 212, 255, 0.08);
+$elevation-card: 0 10px 24px -12px rgba(0, 0, 0, 0.55);
+$elevation-card-hover: 0 16px 32px -14px rgba(0, 212, 255, 0.25);
+
+// Inset top-highlight used on glass surfaces to sell "layered glass" depth.
+@mixin glass-top-highlight($opacity: 0.08) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, $opacity);
+}

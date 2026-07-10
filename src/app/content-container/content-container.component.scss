@@ -1,12 +1,6 @@
-$cyan: #00d4ff;
-// 0.65 keeps the muted-cyan look while lifting small labels to ~5:1 (WCAG AA).
-$cyan-dim: rgba(0, 212, 255, 0.65);
-$bg: rgba(1, 10, 22, 0.84);
-$border: rgba(0, 170, 230, 0.40);
-$text: #8ec8e8;
-$text-bright: #d0eeff;
+@use '../design-tokens' as t;
 
-@mixin corners($s: 16px, $c: $cyan) {
+@mixin corners($s: 16px, $c: t.$cyan) {
   .corner {
     position: absolute;
     width: $s;
@@ -53,7 +47,7 @@ $text-bright: #d0eeff;
   pointer-events: none;
   display: flex;
   align-items: center;
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-display);
 }
 
 // ── Main panel ─────────────────────────────────────────────────────────────
@@ -64,8 +58,8 @@ $text-bright: #d0eeff;
   margin-left: clamp(16px, 4vw, 80px);
   width: min(420px, calc(100vw - 32px));
   box-sizing: border-box;
-  background: $bg;
-  border: 1px solid $border;
+  background: t.$bg;
+  border: 1px solid t.$border;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 40px 36px 34px;
@@ -93,10 +87,10 @@ $text-bright: #d0eeff;
   margin-bottom: 26px;
 
   .tag {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
     letter-spacing: 3px;
-    color: $cyan-dim;
+    color: t.$cyan-dim;
     margin-bottom: 14px;
   }
 
@@ -105,16 +99,16 @@ $text-bright: #d0eeff;
     font-size: 34px;
     font-weight: 900;
     letter-spacing: 7px;
-    color: $text-bright;
+    color: t.$text-bright;
     text-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
 
-    .dot { color: $cyan; }
+    .dot { color: t.$cyan; }
   }
 
   .role {
     font-size: 13px;
     letter-spacing: 6px;
-    color: $text;
+    color: t.$text;
     opacity: 0.75;
   }
 }
@@ -123,7 +117,7 @@ $text-bright: #d0eeff;
 
 .divider {
   height: 1px;
-  background: linear-gradient(to right, $border 60%, transparent);
+  background: linear-gradient(to right, t.$border 60%, transparent);
   margin: 22px 0;
 }
 
@@ -132,10 +126,10 @@ $text-bright: #d0eeff;
 .section { margin-bottom: 6px; }
 
 .section-label {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 4px;
-  color: $cyan;
+  color: t.$cyan;
   margin-bottom: 17px;
 
   .diamond { margin-right: 9px; }
@@ -153,8 +147,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   padding: 12px 17px;
   background: transparent;
   border: 1px solid rgba(0,160,220,.18);
-  color: $text;
-  font-family: 'Orbitron', monospace;
+  color: t.$text;
+  font-family: var(--font-display);
   font-size: 13px;
   letter-spacing: 3px;
   cursor: pointer;
@@ -162,9 +156,9 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   transition: background .15s, border-color .15s, color .15s;
 
   .num {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 15px;
-    color: $cyan-dim;
+    color: t.$cyan-dim;
     min-width: 25px;
     transition: color .15s;
   }
@@ -181,16 +175,16 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   &:focus-visible {
     background: rgba(0,160,220,.10);
     border-color: rgba(0,212,255,.45);
-    color: $text-bright;
-    .num { color: $cyan; }
-    .arr { color: $cyan; transform: translateX(4px); }
+    color: t.$text-bright;
+    .num { color: t.$cyan; }
+    .arr { color: t.$cyan; transform: translateX(4px); }
   }
 
   &.featured {
     border-color: rgba(0,212,255,.35);
-    color: $text-bright;
-    .num { color: $cyan; }
-    .arr { color: $cyan; animation: arr-pulse 1.6s ease-in-out infinite; }
+    color: t.$text-bright;
+    .num { color: t.$cyan; }
+    .arr { color: t.$cyan; animation: arr-pulse 1.6s ease-in-out infinite; }
   }
 }
 
@@ -201,20 +195,20 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   align-items: baseline;
   gap: 11px;
   margin-bottom: 10px;
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
 
   .key {
     font-size: 12px;
     letter-spacing: 3px;
-    color: $cyan-dim;
+    color: t.$cyan-dim;
     min-width: 95px;
   }
 
   .sep { color: rgba(0,212,255,.25); }
 
   .val {
-    color: $text;
+    color: t.$text;
     letter-spacing: 1.5px;
   }
 
@@ -239,7 +233,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     will-change: transform;
     animation: marquee 16s linear infinite;
   }
-  .marquee .chunk { color: $text; letter-spacing: 1.5px; padding-right: 4px; }
+  .marquee .chunk { color: t.$text; letter-spacing: 1.5px; padding-right: 4px; }
 }
 
 @keyframes marquee {
@@ -295,7 +289,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   flex-direction: column;
   animation: modal-in 0.22s ease-out;
 
-  @include corners(22px, $cyan);
+  @include corners(22px, t.$cyan);
 
   .modal-head {
     display: flex;
@@ -312,10 +306,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;      // never wrap → buttons stay put
-      font-family: 'Share Tech Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       letter-spacing: 3px;
-      color: $cyan;
+      color: t.$cyan;
     }
 
     .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
@@ -328,8 +322,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
       white-space: nowrap;
       background: transparent;
       border: 1px solid rgba(0,212,255,.28);
-      color: $text;
-      font-family: 'Orbitron', monospace;
+      color: t.$text;
+      font-family: var(--font-display);
       font-size: 9px;
       letter-spacing: 2px;
       padding: 8px 16px;
@@ -340,8 +334,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
       &:hover,
       &:focus-visible {
         background: rgba(0,212,255,.12);
-        border-color: $cyan;
-        color: $text-bright;
+        border-color: t.$cyan;
+        color: t.$text-bright;
       }
     }
   }
@@ -364,19 +358,19 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 
   .cv-name {
     margin: 0;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--font-display);
     font-size: 36px;
     font-weight: 900;
     letter-spacing: 6px;
-    color: $text-bright;
+    color: t.$text-bright;
     text-shadow: 0 0 28px rgba(0,212,255,.35);
   }
   .cv-role {
     margin-top: 5px;
-    font-family: 'Orbitron', monospace;
+    font-family: var(--font-display);
     font-size: 13px;
     letter-spacing: 5px;
-    color: $cyan;
+    color: t.$cyan;
   }
   .cv-contacts {
     display: flex;
@@ -384,20 +378,20 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     align-items: center;
     gap: 11px;
     margin-top: 14px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
     letter-spacing: 1px;
-    color: $text;
+    color: t.$text;
 
-    a { color: $text; text-decoration: none; transition: color .15s; }
+    a { color: t.$text; text-decoration: none; transition: color .15s; }
     a:hover,
-    a:focus-visible { color: $cyan; }
-    i { width: 4px; height: 4px; background: $cyan-dim; transform: rotate(45deg); }
+    a:focus-visible { color: t.$cyan; }
+    i { width: 4px; height: 4px; background: t.$cyan-dim; transform: rotate(45deg); }
   }
   .cv-summary {
     margin: 18px 0 0;
     max-width: 80ch;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 14.5px;
     line-height: 1.75;
     color: #b3d0e3;
@@ -416,10 +410,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 .cv-col { display: flex; flex-direction: column; gap: 24px; }
 
 .cv-block .block-h {
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-display);
   font-size: 14px;
   letter-spacing: 3px;
-  color: $cyan;
+  color: t.$cyan;
   padding-bottom: 8px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(0,212,255,.16);
@@ -430,18 +424,18 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 // Skills — plain listing of chips, grouped by category
 .skill-group { margin-bottom: 16px; }
 .skill-cat {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 2px;
-  color: $cyan-dim;
+  color: t.$cyan-dim;
   margin-bottom: 10px;
 }
 .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-chip {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 12.5px;
   letter-spacing: .5px;
-  color: $text;
+  color: t.$text;
   background: rgba(0,160,220,.08);
   border: 1px solid rgba(0,212,255,.22);
   padding: 6px 12px;
@@ -450,7 +444,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 .skill-chip:hover {
   background: rgba(0,212,255,.14);
   border-color: rgba(0,212,255,.5);
-  color: $text-bright;
+  color: t.$text-bright;
 }
 
 // Education
@@ -459,15 +453,15 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-display);
   font-size: 13.5px;
-  color: $text-bright;
+  color: t.$text-bright;
 }
-.edu-year { color: $cyan-dim; font-family: 'Share Tech Mono', monospace; }
+.edu-year { color: t.$cyan-dim; font-family: var(--font-mono); }
 .edu-org {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
-  color: $text;
+  color: t.$text;
   opacity: .8;
   margin-top: 3px;
 }
@@ -475,10 +469,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 // Languages
 .lang-row { display: flex; flex-wrap: wrap; gap: 9px; }
 .lang-chip {
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: 2px;
-  color: $text;
+  color: t.$text;
   border: 1px solid rgba(0,212,255,.3);
   padding: 8px 15px;
 }
@@ -500,30 +494,30 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   cursor: pointer;
   text-align: left;
   padding: 12px 0;
-  font-family: 'Orbitron', monospace;
+  font-family: var(--font-display);
 
   .tl-node {
     position: absolute;
     left: -5px;
     width: 9px; height: 9px;
     background: #0a1626;
-    border: 1px solid $cyan-dim;
+    border: 1px solid t.$cyan-dim;
     transform: rotate(45deg);
     transition: background .15s, border-color .15s, box-shadow .15s;
   }
   .tl-meta { display: flex; flex-direction: column; flex: 1; gap: 2px; }
-  .tl-company { font-size: 15.5px; font-weight: 700; color: $text-bright; letter-spacing: 1px; }
-  .tl-role { font-size: 11px; letter-spacing: 2px; color: $cyan-dim; }
+  .tl-company { font-size: 15.5px; font-weight: 700; color: t.$text-bright; letter-spacing: 1px; }
+  .tl-role { font-size: 11px; letter-spacing: 2px; color: t.$cyan-dim; }
   .tl-period {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12.5px;
-    color: $text;
+    color: t.$text;
     white-space: nowrap;
   }
-  .tl-chev { color: $cyan; font-size: 12px; transition: transform .2s; }
+  .tl-chev { color: t.$cyan; font-size: 12px; transition: transform .2s; }
 }
 .tl-item.open {
-  .tl-node { background: $cyan; border-color: $cyan; box-shadow: 0 0 10px rgba(0,212,255,.9); }
+  .tl-node { background: t.$cyan; border-color: t.$cyan; box-shadow: 0 0 10px rgba(0,212,255,.9); }
   .tl-chev { transform: rotate(180deg); }
 }
 .tl-points {
@@ -536,12 +530,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     position: relative;
     padding-left: 18px;
     margin-bottom: 9px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 14px;
     line-height: 1.65;
     color: #b3d0e3;
   }
-  li::before { content: '▹'; position: absolute; left: 0; color: $cyan; }
+  li::before { content: '▹'; position: absolute; left: 0; color: t.$cyan; }
 }
 
 // Projects
@@ -553,8 +547,8 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 }
 .project:hover { border-color: rgba(0,212,255,.4); background: rgba(0,160,220,.05); }
 .pr-top { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.pr-name { font-family: 'Orbitron', monospace; font-size: 15.5px; font-weight: 700; color: $text-bright; letter-spacing: 1px; }
-.pr-tag { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: $cyan-dim; letter-spacing: 1px; }
+.pr-name { font-family: var(--font-display); font-size: 15.5px; font-weight: 700; color: t.$text-bright; letter-spacing: 1px; }
+.pr-tag { font-family: var(--font-mono); font-size: 12px; color: t.$cyan-dim; letter-spacing: 1px; }
 
 .flow {
   display: flex;
@@ -564,10 +558,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   margin: 12px 0;
 }
 .flow-node {
-  font-family: 'Share Tech Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 12.5px;
   letter-spacing: 1px;
-  color: $text-bright;
+  color: t.$text-bright;
   background: rgba(0,160,220,.08);
   border: 1px solid rgba(0,212,255,.3);
   padding: 7px 13px;
@@ -578,7 +572,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   color: #fff;
   box-shadow: 0 0 12px rgba(0,212,255,.5);
 }
-.flow-link { color: $cyan; font-size: 13px; }
+.flow-link { color: t.$cyan; font-size: 13px; }
 
 .pr-points {
   list-style: none;
@@ -588,12 +582,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     position: relative;
     padding-left: 18px;
     margin-bottom: 7px;
-    font-family: 'Share Tech Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 14px;
     line-height: 1.65;
     color: #b3d0e3;
   }
-  li::before { content: '▹'; position: absolute; left: 0; color: $cyan; }
+  li::before { content: '▹'; position: absolute; left: 0; color: t.$cyan; }
 }
 
 // ── Mobile (≤600px): tighten the resume so the larger type still fits ───────
