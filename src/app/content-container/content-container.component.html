@@ -11,32 +11,6 @@
       <div class="role">{{ cv.profile.panelRole }}</div>
     </div>
 
-    <div class="divider"></div>
-
-    <div class="section">
-      <div class="section-label"><span class="diamond" aria-hidden="true">◈</span> NAVIGATION</div>
-      <nav>
-        @for (item of cv.nav; track item.label; let i = $index) {
-          @if (item.action === 'cv') {
-            <button class="nav-item featured" (click)="openCv()">
-              <span class="num">0{{ i + 1 }}</span>
-              <span class="label">{{ item.label }}</span>
-              <span class="arr" aria-hidden="true">▶</span>
-            </button>
-          } @else {
-            <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
-              <span class="num">0{{ i + 1 }}</span>
-              @if (item.icon) {
-                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(item.icon)"/></svg>
-              }
-              <span class="label">{{ item.label }}</span>
-              <span class="arr" aria-hidden="true">▶</span>
-            </a>
-          }
-        }
-      </nav>
-    </div>
-
     <div class="status-block">
       <div class="divider"></div>
       <div class="section">
@@ -53,6 +27,38 @@
         </div>
         <div class="readout"><span class="key">STATUS</span><span class="sep" aria-hidden="true">∷</span><span class="val online">{{ cv.status }}</span></div>
       </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label"><span class="diamond" aria-hidden="true">◈</span> NAVIGATION</div>
+      <nav>
+        @for (item of cv.nav; track item.label; let i = $index) {
+          @if (item.action === 'cv') {
+            <button class="nav-item" [class.active]="activeAction === 'cv'" (click)="openCv()">
+              <span class="num">0{{ i + 1 }}</span>
+              <span class="label">{{ item.label }}</span>
+              <span class="arr" aria-hidden="true">▶</span>
+            </button>
+          } @else if (item.action === 'portfolio') {
+            <button class="nav-item" [class.active]="activeAction === 'portfolio'" (click)="openPortfolio()">
+              <span class="num">0{{ i + 1 }}</span>
+              <span class="label">{{ item.label }}</span>
+              <span class="arr" aria-hidden="true">▶</span>
+            </button>
+          } @else {
+            <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
+              <span class="num">0{{ i + 1 }}</span>
+              @if (item.icon) {
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(item.icon)"/></svg>
+              }
+              <span class="label">{{ item.label }}</span>
+              <span class="arr" aria-hidden="true">▶</span>
+            </a>
+          }
+        }
+      </nav>
     </div>
   </div>
 </div>

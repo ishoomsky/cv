@@ -23,11 +23,6 @@
   50%       { color: #80ffcc; text-shadow: 0 0 16px rgba(0,255,136,1); }
 }
 
-@keyframes arr-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
-}
-
 @keyframes panel-in {
   from { opacity: 0; transform: translateX(-24px); }
   to   { opacity: 1; transform: translateX(0); }
@@ -105,14 +100,6 @@
   }
 }
 
-// Groups the STATUS divider + section so they can be pushed to the bottom of
-// the panel as one unit on desktop (see .panel above).
-.status-block {
-  @include t.desktop {
-    margin-top: auto;
-  }
-}
-
 // ── Header ─────────────────────────────────────────────────────────────────
 
 .header {
@@ -167,7 +154,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   display: flex;
   align-items: center;
   gap: 14px;
-  min-height: 44px;              // comfortable touch target
+  // Force a consistent box model: <button> defaults to border-box and <a> to
+  // content-box, which made the button items shorter than the link items.
+  box-sizing: border-box;
+  min-height: 68px;             // uniform height across button/anchor nav items
   padding: 12px 17px;
   background: transparent;
   border: 1px solid rgba(0,160,220,.18);
@@ -214,22 +204,15 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     .arr { color: t.$cyan; transform: translateX(4px); }
   }
 
-  // CTA — the single primary action in the panel. Green, not cyan, so it
-  // reads as "the one to press" against the cyan structural chrome around it.
-  &.featured {
-    border-color: t.$cta-border;
+  // Active — the panel this item opens is currently on screen. Filled cyan
+  // with a persistent arrow so it reads as "selected", distinct from hover.
+  &.active {
+    background: rgba(0,212,255,.12);
+    border-color: t.$cyan;
     color: t.$text-bright;
-    .num { color: t.$cta; }
-    .arr { color: t.$cta; animation: arr-pulse 1.6s ease-in-out infinite; }
-
-    &:hover,
-    &:focus-visible {
-      background: t.$cta-bg-hover;
-      border-color: t.$cta;
-      box-shadow: 0 0 18px t.$cta-glow;
-      .num { color: t.$cta; }
-      .arr { color: t.$cta; }
-    }
+    box-shadow: inset 3px 0 0 t.$cyan, 0 0 18px rgba(0,212,255,.18);
+    .num { color: t.$cyan; }
+    .arr { color: t.$cyan; transform: translateX(2px); }
   }
 }
 

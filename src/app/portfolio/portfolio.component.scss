@@ -1,0 +1,383 @@
+@use '../design-tokens' as t;
+
+@mixin corners($s: 16px, $c: t.$cyan) {
+  .corner {
+    position: absolute;
+    width: $s;
+    height: $s;
+    pointer-events: none;
+    &.tl { top: -1px; left: -1px;   border-top: 2px solid $c; border-left: 2px solid $c; }
+    &.tr { top: -1px; right: -1px;  border-top: 2px solid $c; border-right: 2px solid $c; }
+    &.bl { bottom: -1px; left: -1px;  border-bottom: 2px solid $c; border-left: 2px solid $c; }
+    &.br { bottom: -1px; right: -1px; border-bottom: 2px solid $c; border-right: 2px solid $c; }
+  }
+}
+
+@keyframes pf-modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+// Slow, constant left↔right drift of the background screenshot. The image is
+// scaled up so the pan never exposes an edge.
+@keyframes pf-pan {
+  0%, 100% { transform: scale(1.12) translateX(-3%); }
+  50%      { transform: scale(1.12) translateX(3%); }
+}
+
+// ── Backdrop & modal — mirrors the CV dossier so both panels behave alike ────
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 4, 14, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  box-sizing: border-box;
+  padding:
+    max(env(safe-area-inset-top), 12px)
+    max(env(safe-area-inset-right), 10px)
+    max(env(safe-area-inset-bottom), 12px)
+    max(env(safe-area-inset-left), 10px);
+
+  // Desktop: sits beside the nav panel as a peer, nothing to dim, and clicks
+  // fall through instead of closing (only the close button / a route change
+  // closes it). See PortfolioComponent.onEscape().
+  @include t.desktop {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: block;
+    padding: 0;
+    pointer-events: none;
+  }
+}
+
+.pf-modal {
+  position: relative;
+  width: min(1040px, 95vw);
+  height: min(900px, 92dvh);
+  max-height: 100%;
+  background: t.$bg-modal;
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  box-shadow: t.$elevation-modal;
+  display: flex;
+  flex-direction: column;
+  animation: pf-modal-in 0.22s ease-out;
+
+  @include corners(22px, t.$cyan);
+
+  // Desktop: pinned to the right, filling the space next to the nav panel —
+  // same gutter / 80vh as the CV dossier so the boxes line up edge to edge.
+  @include t.desktop {
+    position: fixed;
+    top: t.$hud-gutter;
+    left: calc(#{t.$hud-gutter} + #{t.$hud-panel-width} + #{t.$hud-inner-gap});
+    right: t.$hud-gutter;
+    width: auto;
+    height: 80vh;
+    max-height: none;
+    pointer-events: auto;
+  }
+
+  .modal-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.18);
+    flex: 0 0 auto;
+
+    .modal-title {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: t.$cyan;
+    }
+
+    .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
+
+    .hbtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      white-space: nowrap;
+      background: transparent;
+      border: 1px solid rgba(0,212,255,.28);
+      color: t.$text;
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 2px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+
+      &:hover,
+      &:focus-visible {
+        background: rgba(0,212,255,.12);
+        border-color: t.$cyan;
+        color: t.$text-bright;
+      }
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 30px 34px 36px;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); }
+  }
+}
+
+// ── Project cards ────────────────────────────────────────────────────────────
+
+.pf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// ── Hero card: screenshot carousel (background) + identity/description (foreground)
+.pf-card {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  min-height: 340px;
+  max-height: 66vh;
+  border: 1px solid rgba(0,212,255,.18);
+  border-radius: t.$radius-md;
+  box-shadow: t.$elevation-card;
+  background: rgba(1, 10, 22, 0.6);
+  // Horizontal swipe is handled in JS; keep vertical scroll flowing.
+  touch-action: pan-y;
+  transition: border-color .2s, box-shadow .2s, opacity .45s ease, filter .45s ease, transform .45s ease;
+
+  @include corners(18px, t.$cyan);
+
+  &:hover {
+    border-color: rgba(0,212,255,.45);
+    box-shadow: t.$elevation-card-hover;
+    .pf-arrow { opacity: 1; }
+  }
+
+  // Out of focus: recede and dim; the card in the scroll centre stays bright.
+  &.dimmed {
+    opacity: .38;
+    filter: saturate(.8);
+    transform: scale(.98);
+    // Freeze the background drift; only the focused project keeps moving.
+    .pf-img { animation-play-state: paused; }
+  }
+}
+
+// ── Background layer ─────────────────────────────────────────────────────────
+.pf-media { position: absolute; inset: 0; z-index: 0; }
+
+.pf-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .5s ease;
+  &.active { opacity: 1; }
+}
+
+.pf-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  // Constant, subtle horizontal drift instead of a hover zoom.
+  animation: pf-pan 22s ease-in-out infinite;
+}
+// Alternate cards drift the opposite way so a stack doesn't move in lockstep.
+.pf-card:nth-child(even) .pf-img { animation-direction: reverse; }
+
+// Respect users who prefer less motion: hold the image still.
+@media (prefers-reduced-motion: reduce) {
+  .pf-img { animation: none; }
+}
+
+.pf-placeholder {
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(-45deg, rgba(0,212,255,.05) 0 14px, transparent 14px 28px),
+    linear-gradient(135deg, rgba(0,160,220,.14), rgba(1,10,22,.55));
+}
+
+// Scrim: darken from the bottom-left so foreground text stays legible over
+// any screenshot without hiding the image up top.
+.pf-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(1,8,18,.72) 0%, rgba(1,8,18,.34) 30%, transparent 60%);
+}
+
+// ── Foreground layer ─────────────────────────────────────────────────────────
+.pf-content {
+  position: absolute;
+  left: clamp(14px, 2.2vw, 26px);
+  right: auto;
+  bottom: clamp(14px, 2.2vw, 26px);
+  max-width: min(680px, 86%);
+  z-index: 2;
+  padding: clamp(15px, 1.8vw, 22px) clamp(17px, 2vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  // Let clicks/drags fall through to the media layer (swipe); links n/a here.
+  pointer-events: none;
+  // Translucent frosted plate so the text sits on its own surface instead of
+  // blending into the screenshot; the image still shows through it.
+  border-radius: t.$radius-md;
+  border: 1px solid rgba(0,212,255,.16);
+  background: rgba(1, 9, 20, 0.5);
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  box-shadow: 0 12px 34px -14px rgba(0,0,0,.6);
+}
+
+.pf-company {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: t.$cyan;
+  text-shadow: 0 1px 10px rgba(0,0,0,.7);
+  .diamond { opacity: .9; }
+}
+
+.pf-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.6vw, 30px);
+  font-weight: 800;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  color: t.$text-bright;
+  text-shadow: 0 2px 22px rgba(0,0,0,.65), 0 0 26px rgba(0,212,255,.22);
+}
+
+.pf-desc {
+  margin: 4px 0 0;
+  max-width: min(68ch, 78%);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d3e6f5;
+  text-shadow: 0 1px 12px rgba(0,0,0,.75);
+}
+
+// ── Controls — frosted, matching the content plate ──────────────────────────
+// Round frosted arrows, hidden until the card is hovered (or focused for a11y),
+// so they don't compete with the artwork.
+.pf-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 9, 20, 0.5);
+  border: 1px solid rgba(0,212,255,.22);
+  color: t.$text-bright;
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0;
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  box-shadow: 0 8px 24px -10px rgba(0,0,0,.6);
+  transition: opacity .2s, background .15s, border-color .15s, color .15s, box-shadow .15s;
+
+  &.prev { left: clamp(10px, 1.6vw, 18px); }
+  &.next { right: clamp(10px, 1.6vw, 18px); }
+
+  &:focus-visible { opacity: 1; }
+  &:hover,
+  &:focus-visible {
+    background: rgba(0,212,255,.18);
+    border-color: t.$cyan;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(0,212,255,.45);
+  }
+}
+
+// Dots live in a frosted pill on the same baseline as the content plate.
+.pf-dots {
+  position: absolute;
+  right: clamp(14px, 2.2vw, 26px);
+  bottom: clamp(14px, 2.2vw, 26px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(1, 9, 20, 0.5);
+  border: 1px solid rgba(0,212,255,.16);
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  box-shadow: 0 12px 34px -14px rgba(0,0,0,.6);
+}
+.pf-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(0,212,255,.3);
+  border: none;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s, width .2s;
+
+  &:hover { background: rgba(0,212,255,.6); }
+  // Active dot elongates into a small indicator bar.
+  &.active {
+    width: 20px;
+    background: t.$cyan;
+    box-shadow: 0 0 8px rgba(0,212,255,.8);
+  }
+}
+
+// ── Mobile (≤600px): tighten to match the CV dossier ────────────────────────
+@media (max-width: 600px) {
+  .pf-modal .modal-head { padding: 12px 14px; }
+  .pf-modal .modal-head .modal-title { font-size: 9px; letter-spacing: 2px; }
+  .pf-modal .hbtn { padding: 7px 11px; font-size: 8px; letter-spacing: 1px; }
+  .pf-modal .modal-body { padding: 20px 16px 26px; }
+
+  .pf-card { min-height: 300px; aspect-ratio: 4 / 3; }
+  .pf-desc {
+    font-size: 13px;
+    max-width: 100%;
+    // Keep the hero compact on phones: cap the overlaid blurb.
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  // Give the clamped text the full width; dots move clear of it.
+  .pf-dots { bottom: auto; top: 14px; right: 14px; }
+}

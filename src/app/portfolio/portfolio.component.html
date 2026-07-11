@@ -1,0 +1,70 @@
+@if (portfolioOpen) {
+  <div class="backdrop" (click)="closePortfolio()">
+    <div class="pf-modal" role="dialog" aria-modal="true" [attr.aria-label]="portfolio.title"
+         (click)="$event.stopPropagation()">
+      <span class="corner tl" aria-hidden="true"></span>
+      <span class="corner tr" aria-hidden="true"></span>
+      <span class="corner bl" aria-hidden="true"></span>
+      <span class="corner br" aria-hidden="true"></span>
+
+      <div class="modal-head">
+        <span class="modal-title">{{ portfolio.title }}</span>
+        <div class="head-actions">
+          <button class="hbtn close-btn" (click)="closePortfolio()" aria-label="Close portfolio"><span aria-hidden="true">✕</span> CLOSE</button>
+        </div>
+      </div>
+
+      <div class="modal-body" (scroll)="onScroll($event)">
+        <div class="pf-list">
+          @for (pr of portfolio.projects; track pr.name; let i = $index) {
+            @if (slidesFor(pr); as slides) {
+              <div class="pf-card" [class.dimmed]="focusedIndex !== i">
+                <span class="corner tl" aria-hidden="true"></span>
+                <span class="corner tr" aria-hidden="true"></span>
+                <span class="corner bl" aria-hidden="true"></span>
+                <span class="corner br" aria-hidden="true"></span>
+
+                <!-- Background layer: screenshot carousel (crossfade) -->
+                <div class="pf-media"
+                     (pointerdown)="onPointerDown($event)"
+                     (pointerup)="onPointerUp($event, i)">
+                  @for (src of slides; track $index) {
+                    <div class="pf-slide" [class.active]="slide[i] === $index">
+                      @if (src) {
+                        <img class="pf-img" [src]="src" [alt]="pr.name + ' screenshot ' + ($index + 1)" />
+                      } @else {
+                        <div class="pf-placeholder" aria-hidden="true"></div>
+                      }
+                    </div>
+                  }
+                </div>
+                <div class="pf-scrim" aria-hidden="true"></div>
+
+                <!-- Foreground layer: identity + description -->
+                <div class="pf-content">
+                  <span class="pf-company"><span class="diamond" aria-hidden="true">◈</span> {{ pr.company }}</span>
+                  <h3 class="pf-name">{{ pr.name }}</h3>
+                  @if (pr.description) {
+                    <p class="pf-desc">{{ pr.description }}</p>
+                  }
+                </div>
+
+                @if (slides.length > 1) {
+                  <button class="pf-arrow prev" (click)="prev(i)" aria-label="Previous image"><span aria-hidden="true">◀</span></button>
+                  <button class="pf-arrow next" (click)="next(i)" aria-label="Next image"><span aria-hidden="true">▶</span></button>
+                  <div class="pf-dots">
+                    @for (src of slides; track $index) {
+                      <button class="pf-dot" [class.active]="slide[i] === $index"
+                              (click)="goTo(i, $index)"
+                              [attr.aria-label]="'Go to image ' + ($index + 1)"></button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}

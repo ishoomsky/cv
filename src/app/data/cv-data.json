@@ -15,44 +15,49 @@
     "github": { "label": "github/ishoomsky", "url": "https://github.com/ishoomsky" }
   },
   "status": "#OPENTOWORK",
-  "pdf": "assets/CV-Ivan-Shumski.pdf",
+  "pdf": "assets/cv-ivan-shumski.pdf",
   "nav": [
     { "label": "CV", "action": "cv" },
+    { "label": "PORTFOLIO", "action": "portfolio" },
     { "label": "LINKEDIN", "url": "https://www.linkedin.com/in/ivanshumski/", "icon": "linkedin" },
     { "label": "SEND EMAIL", "url": "mailto:ishoomsky@gmail.com", "icon": "mail" }
   ],
   "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
-  "summary": "Frontend Developer with 6+ years building high-performance, reactive web apps with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality — and has shipped full products with it end to end.",
+  "summary": "Frontend Developer with 6+ years building high-performance, reactive web apps with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.",
   "skills": [
     {
-      "label": "FRONTEND",
-      "items": ["Angular", "Signals", "RxJS", "TypeScript", "React", "React Native", "Vue.js", "HTML5", "CSS3"]
+      "label": "FRAMEWORKS & LIBRARIES",
+      "items": ["Angular", "Signals", "RxJS", "React", "React Native", "Vue.js"]
+    },
+    {
+      "label": "LANGUAGES",
+      "items": ["TypeScript", "JavaScript", "HTML5", "CSS3"]
     },
     {
       "label": "BACKEND & DATA",
       "items": ["Node.js", "NestJS", "Express", "PostgreSQL", "MongoDB", "RESTful APIs"]
     },
     {
-      "label": "AI & CLOUD",
-      "items": ["Claude Code", "GitHub Copilot", "Gemini API", "Google Cloud Platform", "Firebase"]
+      "label": "AI TOOLS & CLOUD",
+      "items": ["Claude Code", "GitHub Copilot", "Gemini API", "Google Cloud Platform"]
     }
   ],
   "experience": [
     {
       "role": "Frontend Developer",
       "company": "Baba Entertainment",
-      "period": "2024 — 2026",
+      "period": "Sep 2024 — Jun 2026",
       "points": [
         "Architected reactive, high-performance features for a high-traffic social-casino platform, significantly reducing unnecessary re-renders by migrating to Angular Signals, OnPush change detection, and RxJS-driven state.",
         "Owned business-critical UI and core user-facing features of a live production application, delivering reliably under tight sprint deadlines.",
-        "Used AI-assisted coding tools (GitHub Copilot, Claude Code) daily to accelerate feature delivery and reduce repetitive boilerplate.",
-        "Built end-to-end mobile responsiveness and a reusable frontend styling system for consistent high-fidelity UX across all device breakpoints."
+        "Used AI-assisted coding tools (GitHub Copilot, Claude Code) in daily development to accelerate feature delivery and reduce repetitive boilerplate.",
+        "Built end-to-end mobile responsiveness and a reusable frontend styling system, delivering consistent high-fidelity UX across all device breakpoints."
       ]
     },
     {
       "role": "Frontend Developer",
       "company": "Neotech Development",
-      "period": "2022 — 2023",
+      "period": "Sep 2022 — Sep 2023",
       "points": [
         "Built responsive, user-facing interfaces for web and mobile gaming services using Angular and Vue.js, integrating RESTful APIs across 20+ features.",
         "Collaborated in an Agile / Scrum team and conducted regular design and code reviews."
@@ -61,18 +66,19 @@
     {
       "role": "Frontend Developer",
       "company": "IBA Group",
-      "period": "2020 — 2022",
+      "period": "Oct 2020 — Sep 2022",
       "points": [
-        "Developed and maintained UIs for an IBM enterprise product, ensuring reliable functionality and a polished user experience.",
-        "Partnered with UX/UI designers and backend engineers to architect client/server APIs and translate designs into production interfaces."
+        "Developed and maintained UIs for an IBM enterprise B2B product over two years.",
+        "Built and maintained an internal Angular-based tool in parallel, and partnered with UX/UI designers and backend engineers to ship production interfaces."
       ]
     },
     {
       "role": "Frontend Developer",
       "company": "Vysnova Publishing House",
-      "period": "2018 — 2020",
+      "period": "Feb 2018 — Sep 2020",
       "points": [
-        "Delivered cross-platform solutions with React, React Native, and TypeScript; maintained Node.js / Express / MongoDB backends and integrated Google Cloud Services."
+        "Delivered cross-platform solutions with React Native and TypeScript; maintained Node.js / Express / MongoDB backends and integrated Google Cloud Services.",
+        "Developed an internal CRM module integrated with a VoIP system (Yeastar API) to streamline communication workflows."
       ]
     }
   ],
@@ -80,7 +86,7 @@
     {
       "name": "BUDGET TRACKER",
       "tagline": "Full-Stack Personal Finance App",
-      "flow": ["Angular", "NestJS", "PostgreSQL", "GCP"],
+      "flow": ["Angular", "NestJS", "GCP"],
       "points": [
         "Designed and built a full-stack budget-tracking app end to end — Angular frontend, NestJS backend, deployed on Google Cloud Platform.",
         "Delivered the entire codebase through an AI-driven workflow with Claude Code — agentic, spec-driven development to plan architecture, generate features, and iteratively refactor."
@@ -96,6 +102,44 @@
       ]
     }
   ],
+  "portfolio": {
+    "title": "◈ PROJECT PORTFOLIO // IVAN.SHUMSKI",
+    "projects": [
+      {
+        "name": "SOCIAL-CASINO PLATFORM",
+        "company": "Baba Entertainment",
+        "description": "Social-casino platform (web and mobile WebView) with real-time gameplay, where I owned business-critical, player-facing UI in an Agile team. Drove a reactive rewrite on Angular Signals, OnPush change detection, and RxJS-based state to cut unnecessary re-renders, plus a reusable styling system for consistent, high-fidelity UX across every breakpoint.",
+        "images": [
+          "projects/baba-entertainment/baba16-9.png"
+        ]
+      },
+      {
+        "name": "WEB & MOBILE GAMING UI",
+        "company": "Neotech Development",
+        "description": "Responsive, user-facing web interfaces for online gaming and betting services, built with Angular and Vue.js and wired to RESTful APIs across 20+ features. Worked in an Agile / Scrum team with regular design and code reviews.",
+        "images": [
+          "projects/neotech/leon.webp",
+          "projects/neotech/twin.webp"
+        ]
+      },
+      {
+        "name": "IBM ENTERPRISE PRODUCT UI",
+        "company": "IBA Group",
+        "description": "Enterprise B2B web application for IBM, delivered within a large international team over two years. Maintained the product UI (React / Angular) and built an internal Angular-based tool in parallel, partnering with UX/UI designers and backend engineers to ship reliable production interfaces.",
+        "images": [
+          "projects/iba/iba16-9.png"
+        ]
+      },
+      {
+        "name": "CROSS-PLATFORM APPS",
+        "company": "Vysnova Publishing House",
+        "description": "Cross-platform mobile and web apps with full-stack Node.js work: React Native / TypeScript clients on Node.js / Express / MongoDB backends with Google Cloud Services, plus an internal CRM module integrated with a VoIP system (Yeastar API).",
+        "images": [
+          "projects/vysnova/vsnv-16-9.png"
+        ]
+      }
+    ]
+  },
   "education": [
     { "title": "B.A., Web Design & Computer Graphics", "org": "Belarusian State University, Minsk", "year": "2017" },
     { "title": "JavaScript Development Courses", "org": "IT Academy, Minsk", "year": "2020" }

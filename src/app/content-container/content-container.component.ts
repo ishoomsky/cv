@@ -23,6 +23,7 @@ interface CvData {
   skills: SkillGroup[];
   experience: Job[];
   projects: Project[];
+  portfolio: { title: string; projects: { name: string; company: string; description: string; images: string[]; }[]; };
   education: { title: string; org: string; year: string; }[];
   languages: string[];
 }
@@ -50,6 +51,9 @@ export class ContentContainerComponent implements OnDestroy {
   readonly ticker = this.cv.stackTicker.join('  ·  ') + '  ·  ';
 
   cvOpen = false;
+  // Which nav action's panel is currently open, so the nav can show an
+  // "active/selected" state. Driven by the route (see syncFromUrl).
+  activeAction: 'cv' | 'portfolio' | '' = '';
   // Sticky sub-header (name/role) fades in once the dossier body scrolls
   // past the rail identity block.
   modalScrolled = false;
@@ -81,6 +85,7 @@ export class ContentContainerComponent implements OnDestroy {
     const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
     const wasOpen = this.cvOpen;
     this.cvOpen = path === '/resume';
+    this.activeAction = path === '/resume' ? 'cv' : path === '/portfolio' ? 'portfolio' : '';
     // Keyboard focus follows the dialog: move into it on open, restore on close.
     if (this.cvOpen && !wasOpen) this.focusModal();
     else if (!this.cvOpen && wasOpen) this.restoreFocus();
@@ -98,6 +103,8 @@ export class ContentContainerComponent implements OnDestroy {
 
   openCv()  { this.opener = document.activeElement as HTMLElement; this.router.navigate(['/resume']); }
   closeCv() { this.router.navigate(['/']); }
+
+  openPortfolio() { this.router.navigate(['/portfolio']); }
 
   private opener: HTMLElement | null = null;
 
