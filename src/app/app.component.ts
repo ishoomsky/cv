@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AnalyticsService } from './analytics.service';
 import { PlanetComponent } from "./planet/planet.component";
 import { StarFieldComponent } from "./star-field/star-field.component";
 import { NebulaComponent } from "./nebula/nebula.component";
@@ -16,4 +17,6 @@ import { PortfolioComponent } from "./portfolio/portfolio.component";
 })
 export class AppComponent {
   title = 'cv';
+  // Instantiate the analytics service so it wires up SPA route tracking.
+  private analytics = inject(AnalyticsService);
 }
