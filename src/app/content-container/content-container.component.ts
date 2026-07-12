@@ -2,6 +2,7 @@ import { Component, OnDestroy, HostListener, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 import cvData from '../data/cv-data.json';
+import { AnalyticsService } from '../analytics.service';
 
 interface SkillGroup { label: string; items: string[]; }
 interface Job { role: string; company: string; period: string; points: string[]; }
@@ -67,6 +68,7 @@ export class ContentContainerComponent implements OnDestroy {
   }
 
   private router = inject(Router);
+  readonly analytics = inject(AnalyticsService);
   private sub: Subscription;
 
   constructor() {

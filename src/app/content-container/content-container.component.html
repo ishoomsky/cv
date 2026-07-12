@@ -79,7 +79,7 @@
           <span class="sub-role">{{ cv.profile.resumeRole }}</span>
         </div>
         <div class="head-actions">
-          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener"><span aria-hidden="true">⤓</span> PDF</a>
+          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener" (click)="analytics.event('pdf-download')"><span aria-hidden="true">⤓</span> PDF</a>
           <button class="hbtn close-btn" (click)="closeCv()" aria-label="Close dossier"><span aria-hidden="true">✕</span> CLOSE</button>
         </div>
       </div>
