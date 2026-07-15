@@ -24,7 +24,7 @@
                 <span class="corner bl" aria-hidden="true"></span>
                 <span class="corner br" aria-hidden="true"></span>
 
-                <!-- Background layer: screenshot carousel (crossfade) -->
+                <!-- Top: screenshot carousel (crossfade) -->
                 <div class="pf-media"
                      (pointerdown)="onPointerDown($event)"
                      (pointerup)="onPointerUp($event, i)">
@@ -37,29 +37,28 @@
                       }
                     </div>
                   }
-                </div>
-                <div class="pf-scrim" aria-hidden="true"></div>
 
-                <!-- Foreground layer: identity + description -->
-                <div class="pf-content">
+                  @if (slides.length > 1) {
+                    <button class="pf-arrow prev" (click)="prev(i)" aria-label="Previous image"><span aria-hidden="true">◀</span></button>
+                    <button class="pf-arrow next" (click)="next(i)" aria-label="Next image"><span aria-hidden="true">▶</span></button>
+                    <div class="pf-dots">
+                      @for (src of slides; track $index) {
+                        <button class="pf-dot" [class.active]="slide[i] === $index"
+                                (click)="goTo(i, $index)"
+                                [attr.aria-label]="'Go to image ' + ($index + 1)"></button>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Bottom: identity + description block (fills the rest) -->
+                <div class="pf-info">
                   <span class="pf-company"><span class="diamond" aria-hidden="true">◈</span> {{ pr.company }}</span>
                   <h3 class="pf-name">{{ pr.name }}</h3>
                   @if (pr.description) {
                     <p class="pf-desc">{{ pr.description }}</p>
                   }
                 </div>
-
-                @if (slides.length > 1) {
-                  <button class="pf-arrow prev" (click)="prev(i)" aria-label="Previous image"><span aria-hidden="true">◀</span></button>
-                  <button class="pf-arrow next" (click)="next(i)" aria-label="Next image"><span aria-hidden="true">▶</span></button>
-                  <div class="pf-dots">
-                    @for (src of slides; track $index) {
-                      <button class="pf-dot" [class.active]="slide[i] === $index"
-                              (click)="goTo(i, $index)"
-                              [attr.aria-label]="'Go to image ' + ($index + 1)"></button>
-                    }
-                  </div>
-                }
               </div>
             }
           }

@@ -143,6 +143,9 @@
     // behind the modal, both of which reduce perceived stutter on touch.
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    // Size container so each card can be sized as a share of the visible panel
+    // height (cqh) — one project fills ~80% of the panel at a time.
+    container-type: size;
 
     &::-webkit-scrollbar { width: 8px; }
     &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); }
@@ -157,13 +160,17 @@
   gap: 24px;
 }
 
-// ── Hero card: screenshot carousel (background) + identity/description (foreground)
+// ── Project card: image container (top) + description block (bottom) ─────────
+// Each card fills ~80% of the visible panel height, so one project reads at a
+// time. The card is a column: the media grows to fill whatever the description
+// block leaves, keeping the image dominant while the copy sits on its own row.
 .pf-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
-  min-height: 340px;
-  max-height: 66vh;
+  height: 80cqh;
+  min-height: 420px;
   border: 1px solid rgba(0,212,255,.18);
   border-radius: t.$radius-md;
   box-shadow: t.$elevation-card;
@@ -184,14 +191,21 @@
   &.dimmed {
     opacity: .38;
     filter: saturate(.8);
-    transform: scale(.98);
+    // Shrink ~10% so the focused project reads clearly larger than its neighbours.
+    transform: scale(.9);
     // Freeze the background drift; only the focused project keeps moving.
     .pf-img { animation-play-state: paused; }
   }
 }
 
-// ── Background layer ─────────────────────────────────────────────────────────
-.pf-media { position: absolute; inset: 0; z-index: 0; }
+// ── Image container (top, grows to fill) ─────────────────────────────────────
+.pf-media {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0,212,255,.16);
+}
 
 .pf-slide {
   position: absolute;
@@ -225,39 +239,21 @@
     linear-gradient(135deg, rgba(0,160,220,.14), rgba(1,10,22,.55));
 }
 
-// Scrim: darken from the bottom-left so foreground text stays legible over
-// any screenshot without hiding the image up top.
-.pf-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(to top, rgba(1,8,18,.72) 0%, rgba(1,8,18,.34) 30%, transparent 60%);
-}
-
-// ── Foreground layer ─────────────────────────────────────────────────────────
-.pf-content {
-  position: absolute;
-  left: clamp(14px, 2.2vw, 26px);
-  right: auto;
-  bottom: clamp(14px, 2.2vw, 26px);
-  max-width: min(680px, 86%);
-  z-index: 2;
-  padding: clamp(15px, 1.8vw, 22px) clamp(17px, 2vw, 26px);
+// ── Description block (bottom, fills the remaining height) ───────────────────
+.pf-info {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  // Let clicks/drags fall through to the media layer (swipe); links n/a here.
-  pointer-events: none;
-  // Translucent frosted plate so the text sits on its own surface instead of
-  // blending into the screenshot; the image still shows through it.
-  border-radius: t.$radius-md;
-  border: 1px solid rgba(0,212,255,.16);
-  background: rgba(1, 9, 20, 0.5);
-  backdrop-filter: blur(10px) saturate(1.05);
-  -webkit-backdrop-filter: blur(10px) saturate(1.05);
-  box-shadow: 0 12px 34px -14px rgba(0,0,0,.6);
+  gap: 8px;
+  padding: clamp(16px, 1.8vw, 24px) clamp(18px, 2vw, 28px) clamp(18px, 2vw, 26px);
+  background: linear-gradient(180deg, rgba(2, 13, 26, 0.96), rgba(1, 9, 20, 0.98));
+  // If a description runs long, keep the block from eating the whole card —
+  // scroll within it instead so the image stays dominant.
+  max-height: 46%;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.25); }
 }
 
 .pf-company {
@@ -266,7 +262,6 @@
   letter-spacing: 2px;
   text-transform: uppercase;
   color: t.$cyan;
-  text-shadow: 0 1px 10px rgba(0,0,0,.7);
   .diamond { opacity: .9; }
 }
 
@@ -278,17 +273,15 @@
   letter-spacing: 2px;
   line-height: 1.1;
   color: t.$text-bright;
-  text-shadow: 0 2px 22px rgba(0,0,0,.65), 0 0 26px rgba(0,212,255,.22);
 }
 
 .pf-desc {
-  margin: 4px 0 0;
-  max-width: min(68ch, 78%);
+  margin: 2px 0 0;
+  max-width: 78ch;
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.6;
-  color: #d3e6f5;
-  text-shadow: 0 1px 12px rgba(0,0,0,.75);
+  color: t.$text-body;
 }
 
 // ── Controls — frosted, matching the content plate ──────────────────────────
@@ -372,16 +365,7 @@
   .pf-modal .hbtn { padding: 7px 11px; font-size: 8px; letter-spacing: 1px; }
   .pf-modal .modal-body { padding: 20px 16px 26px; }
 
-  .pf-card { min-height: 300px; aspect-ratio: 4 / 3; }
-  .pf-desc {
-    font-size: 13px;
-    max-width: 100%;
-    // Keep the hero compact on phones: cap the overlaid blurb.
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  // Give the clamped text the full width; dots move clear of it.
-  .pf-dots { bottom: auto; top: 14px; right: 14px; }
+  .pf-card { min-height: 360px; }
+  .pf-info { max-height: 50%; padding: 14px 15px 16px; }
+  .pf-desc { font-size: 13px; max-width: 100%; }
 }
