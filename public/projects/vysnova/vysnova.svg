@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#02101f"/><stop offset=".55" stop-color="#010a16"/><stop offset="1" stop-color="#01060f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="66%" cy="24%" r="64%">
+      <stop offset="0" stop-color="#00d4ff" stop-opacity=".24"/><stop offset=".45" stop-color="#0a6fa0" stop-opacity=".08"/><stop offset="1" stop-color="#010a16" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="scrim" x1="0" y1="1" x2=".55" y2=".25">
+      <stop offset="0" stop-color="#01060f" stop-opacity=".62"/><stop offset="1" stop-color="#01060f" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#0d3b55" fill-opacity=".55"/></pattern>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#dots)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+
+  <!-- network topology (backdrop) -->
+  <g stroke="#00d4ff" stroke-opacity=".3" stroke-width="1.5" fill="none">
+    <path d="M1360,210 L1520,160 M1520,160 L1680,250 M1680,250 L1810,390 M1560,330 L1520,160 M1560,330 L1680,250 M1560,330 L1400,430 M1400,430 L1360,210 M1810,390 L1700,480 M1560,330 L1700,480"/>
+  </g>
+  <g fill="#00d4ff">
+    <circle cx="1360" cy="210" r="6"/><circle cx="1360" cy="210" r="13" fill-opacity=".18"/>
+    <circle cx="1680" cy="250" r="6"/>
+    <circle cx="1810" cy="390" r="5" fill-opacity=".8"/>
+    <circle cx="1400" cy="430" r="5" fill-opacity=".8"/>
+    <circle cx="1700" cy="480" r="5" fill-opacity=".7"/>
+  </g>
+
+  <!-- database node (backend) -->
+  <g transform="translate(1520,160)" stroke="#00d4ff" stroke-opacity=".8" stroke-width="2" fill="#02121f">
+    <ellipse cx="0" cy="-16" rx="20" ry="7"/>
+    <path d="M-20,-16 V16 A20,7 0 0 0 20,16 V-16" fill="#02121f"/>
+    <path d="M-20,0 A20,7 0 0 0 20,0" fill="none" stroke-opacity=".45"/>
+  </g>
+
+  <!-- headset node (CRM / VoIP) -->
+  <g transform="translate(1560,330)" stroke="#22c55e" stroke-opacity=".85" stroke-width="2.5" fill="none">
+    <path d="M-22,4 A22,22 0 0 1 22,4"/>
+    <rect x="-27" y="2" width="12" height="22" rx="5" fill="#02121f"/>
+    <rect x="15" y="2" width="12" height="22" rx="5" fill="#02121f"/>
+    <path d="M21,24 q0,12 -12,12" />
+    <circle cx="9" cy="36" r="3" fill="#22c55e" stroke="none"/>
+  </g>
+
+  <!-- data links: devices -> network -->
+  <g stroke="#00d4ff" stroke-opacity=".4" stroke-width="1.5" stroke-dasharray="2 8" stroke-linecap="round" fill="none">
+    <path d="M1392,480 C1392,450 1398,445 1400,432"/>
+    <path d="M1470,470 C1520,420 1545,380 1558,346"/>
+  </g>
+
+  <!-- laptop -->
+  <g>
+    <rect x="1180" y="474" width="420" height="266" rx="12" fill="#00d4ff" fill-opacity=".05" stroke="#00d4ff" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M1154,740 H1626 L1666,772 H1114 Z" fill="#00d4ff" fill-opacity=".06" stroke="#00d4ff" stroke-opacity=".4" stroke-width="2"/>
+    <rect x="1204" y="498" width="372" height="26" rx="6" fill="#00d4ff" fill-opacity=".08"/>
+    <g fill="#00d4ff" fill-opacity=".06" stroke="#00d4ff" stroke-opacity=".28">
+      <rect x="1204" y="540" width="118" height="82" rx="6"/><rect x="1332" y="540" width="118" height="82" rx="6"/><rect x="1460" y="540" width="116" height="82" rx="6"/>
+    </g>
+    <g fill="#00d4ff" fill-opacity=".45"><rect x="1218" y="556" width="60" height="8" rx="4"/><rect x="1346" y="556" width="60" height="8" rx="4"/><rect x="1474" y="556" width="60" height="8" rx="4"/></g>
+    <polyline points="1218,690 1300,660 1382,676 1464,636 1546,652" fill="none" stroke="#00d4ff" stroke-opacity=".55" stroke-width="2"/>
+  </g>
+
+  <!-- phone (front, same UI) -->
+  <g>
+    <rect x="1060" y="546" width="142" height="284" rx="22" fill="#02121f" stroke="#00d4ff" stroke-opacity=".6" stroke-width="2"/>
+    <rect x="1108" y="560" width="46" height="8" rx="4" fill="#00d4ff" fill-opacity=".4"/>
+    <rect x="1078" y="584" width="106" height="40" rx="8" fill="#00d4ff" fill-opacity=".08" stroke="#00d4ff" stroke-opacity=".3"/>
+    <g fill="#00d4ff" fill-opacity=".22"><rect x="1078" y="640" width="106" height="14" rx="7"/><rect x="1078" y="664" width="80" height="14" rx="7"/><rect x="1078" y="688" width="94" height="14" rx="7"/></g>
+    <rect x="1078" y="770" width="106" height="34" rx="8" fill="#22c55e" fill-opacity=".18" stroke="#22c55e" stroke-opacity=".5"/>
+  </g>
+
+  <g fill="#00d4ff" fill-opacity=".5"><circle cx="1480" cy="180" r="2.2"/><circle cx="1780" cy="250" r="2"/><circle cx="1840" cy="520" r="1.8"/></g>
+
+  <rect width="1920" height="1080" fill="url(#scrim)"/>
+</svg>

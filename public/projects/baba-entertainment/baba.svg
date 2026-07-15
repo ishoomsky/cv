@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#02101f"/>
+      <stop offset=".55" stop-color="#010a16"/>
+      <stop offset="1" stop-color="#01060f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="68%" cy="27%" r="62%">
+      <stop offset="0" stop-color="#00d4ff" stop-opacity=".26"/>
+      <stop offset=".45" stop-color="#0a6fa0" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#010a16" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="scrim" x1="0" y1="1" x2=".55" y2=".25">
+      <stop offset="0" stop-color="#01060f" stop-opacity=".62"/>
+      <stop offset="1" stop-color="#01060f" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00d4ff" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#00d4ff" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#00d4ff" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#0d3b55" fill-opacity=".55"/>
+    </pattern>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#dots)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+
+  <!-- reactive signal streams -->
+  <g fill="none" stroke="url(#wave)">
+    <path d="M-60,360 C300,285 620,285 960,360 S1620,455 1990,365" stroke-width="2.5"/>
+    <path d="M-60,415 C320,350 640,350 980,420 S1640,510 1990,420" stroke-width="1.8" opacity=".55"/>
+    <path d="M-60,300 C300,250 640,250 960,305 S1620,380 1990,300" stroke-width="1.4" opacity=".32"/>
+  </g>
+  <g fill="#00d4ff">
+    <circle cx="960" cy="360" r="5"/><circle cx="960" cy="360" r="11" fill-opacity=".22"/>
+    <circle cx="620" cy="303" r="3.5" fill-opacity=".8"/>
+    <circle cx="1300" cy="404" r="4" fill-opacity=".7"/>
+  </g>
+
+  <!-- game screen panel -->
+  <g>
+    <rect x="1055" y="300" width="560" height="480" rx="18" fill="#00d4ff" fill-opacity=".05" stroke="#00d4ff" stroke-opacity=".55" stroke-width="2"/>
+    <path d="M1055,346 h560" stroke="#00d4ff" stroke-opacity=".3" stroke-width="1.5"/>
+    <g fill="#00d4ff" fill-opacity=".55"><circle cx="1085" cy="323" r="5"/><circle cx="1107" cy="323" r="5"/><circle cx="1129" cy="323" r="5"/></g>
+    <!-- 3 reels -->
+    <g stroke="#00d4ff" stroke-opacity=".28" stroke-width="1.5"><path d="M1242,360 v405"/><path d="M1428,360 v405"/></g>
+    <g fill="none" stroke="#00d4ff" stroke-width="2.2">
+      <!-- col 1 -->
+      <path d="M1148,430 l22,22 l-22,22 l-22,-22 z" stroke-opacity=".85"/>
+      <circle cx="1148" cy="560" r="24" stroke-opacity=".5"/>
+      <path d="M1128,672 h40 l-8,42 h-24 z" stroke-opacity=".4"/>
+      <!-- col 2 -->
+      <path d="M1335,438 l24,14 v28 l-24,14 l-24,-14 v-28 z" stroke-opacity=".7"/>
+      <path d="M1335,536 l22,22 l-22,22 l-22,-22 z" stroke-opacity=".9"/>
+      <circle cx="1335" cy="692" r="24" stroke-opacity=".45"/>
+      <!-- col 3 -->
+      <circle cx="1522" cy="452" r="24" stroke-opacity=".5"/>
+      <path d="M1502,548 h40 l-8,42 h-24 z" stroke-opacity=".55"/>
+      <path d="M1522,650 l24,14 v28 l-24,14 l-24,-14 v-28 z" stroke-opacity=".7"/>
+    </g>
+  </g>
+
+  <!-- chip stack accent -->
+  <g transform="translate(1470,876)">
+    <ellipse cx="0" cy="0" rx="66" ry="20" fill="#010a16" stroke="#22c55e" stroke-opacity=".6" stroke-width="2"/>
+    <ellipse cx="0" cy="-16" rx="66" ry="20" fill="#02121f" stroke="#00d4ff" stroke-opacity=".6" stroke-width="2"/>
+    <ellipse cx="0" cy="-32" rx="66" ry="20" fill="#02121f" stroke="#00d4ff" stroke-opacity=".75" stroke-width="2"/>
+    <ellipse cx="0" cy="-48" rx="66" ry="20" fill="#031a2b" stroke="#00d4ff" stroke-opacity=".9" stroke-width="2"/>
+    <circle cx="0" cy="-48" r="8" fill="#00d4ff" fill-opacity=".5"/>
+  </g>
+
+  <!-- particles -->
+  <g fill="#00d4ff" fill-opacity=".5">
+    <circle cx="1690" cy="200" r="2.5"/><circle cx="1780" cy="300" r="2"/><circle cx="1620" cy="150" r="1.8"/>
+    <circle cx="1840" cy="240" r="2.2"/><circle cx="1720" cy="470" r="2"/><circle cx="1560" cy="240" r="1.6"/>
+  </g>
+
+  <rect width="1920" height="1080" fill="url(#scrim)"/>
+</svg>
