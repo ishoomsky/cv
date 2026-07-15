@@ -120,7 +120,7 @@
         "company": "Baba Entertainment",
         "description": "Social-casino platform (web and mobile WebView) with real-time gameplay, where I owned business-critical, player-facing UI in an Agile team. Drove a reactive rewrite on Angular Signals, OnPush change detection, and RxJS-based state to cut unnecessary re-renders, plus a reusable styling system for consistent, high-fidelity UX across every breakpoint.",
         "images": [
-          "projects/baba-entertainment/baba.svg"
+          "projects/baba-entertainment/baba16-9.png"
         ]
       },
       {
@@ -128,8 +128,8 @@
         "company": "Neotech Development",
         "description": "Responsive, user-facing web interfaces for online gaming and betting services, built with Angular and Vue.js and wired to RESTful APIs across 20+ features. Worked in an Agile / Scrum team with regular design and code reviews.",
         "images": [
-          "projects/neotech/neotech-1.svg",
-          "projects/neotech/neotech-2.svg"
+          "projects/neotech/leon.webp",
+          "projects/neotech/twin.webp"
         ]
       },
       {
@@ -137,7 +137,7 @@
         "company": "IBA Group",
         "description": "Enterprise B2B web application for IBM, delivered within a large international team over two years. Maintained the product UI (React / Angular) and built an internal Angular-based tool in parallel, partnering with UX/UI designers and backend engineers to ship reliable production interfaces.",
         "images": [
-          "projects/iba/iba.svg"
+          "projects/iba/iba16-9.png"
         ]
       },
       {
@@ -145,7 +145,7 @@
         "company": "Vysnova Publishing House",
         "description": "Cross-platform mobile and web apps with full-stack Node.js work: React Native / TypeScript clients on Node.js / Express / MongoDB backends with Google Cloud Services, plus an internal CRM module integrated with a VoIP system (Yeastar API).",
         "images": [
-          "projects/vysnova/vysnova.svg"
+          "projects/vysnova/vsnv-16-9.png"
         ]
       }
     ]
