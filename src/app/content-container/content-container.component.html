@@ -6,6 +6,10 @@
     <span class="corner br"></span>
     <div class="scanline"></div>
 
+    <!-- Content wrapper. Normally display:contents (transparent to layout), so
+         the corners/scanline frame stays a direct child of .panel. In mobile
+         landscape it becomes the scroll container, leaving the frame fixed. -->
+    <div class="panel-scroll">
     <div class="header">
       <h1 class="name">{{ cv.profile.firstName }}<span class="dot" aria-hidden="true">.</span>{{ cv.profile.lastName }}</h1>
       <div class="role">{{ cv.profile.panelRole }}</div>
@@ -60,6 +64,7 @@
         }
       </nav>
     </div>
+    </div><!-- /.panel-scroll -->
   </div>
 </div>
 
