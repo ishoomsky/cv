@@ -230,8 +230,7 @@
     }
   }
 
-  // Phone, email & linkedin — secondary channels: structural cyan.
-  &.phone,
+  // Email & linkedin — secondary channels: structural cyan.
   &.email,
   &.linkedin {
     color: t.$cyan;
@@ -256,4 +255,108 @@
   .ct-btn { padding: 15px 16px; gap: 14px; }
   .ct-btn .ct-icon { width: 26px; height: 26px; }
   .ct-btn .ct-sub { font-size: 12px; }
+}
+
+// ── Confirm dialog — shown before a channel opens ───────────────────────────
+.ct-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;                 // above the contact panel (z 100)
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 4, 14, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  pointer-events: all;
+  box-sizing: border-box;
+  padding:
+    max(env(safe-area-inset-top), 16px)
+    max(env(safe-area-inset-right), 16px)
+    max(env(safe-area-inset-bottom), 16px)
+    max(env(safe-area-inset-left), 16px);
+}
+
+.ct-confirm {
+  position: relative;
+  width: min(400px, 100%);
+  background: t.$bg-modal;
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  box-shadow: t.$elevation-modal;
+  padding: 24px 24px 20px;
+  animation: ct-modal-in 0.18s ease-out;
+
+  @include corners(16px, t.$cyan);
+
+  .cf-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: t.$cyan;
+    margin-bottom: 12px;
+    .diamond { margin-right: 6px; opacity: .9; }
+  }
+
+  .cf-msg {
+    margin: 0 0 22px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    color: t.$text-body;
+  }
+
+  .cf-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .cf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 8px 20px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 9px;
+    letter-spacing: 2px;
+    background: transparent;
+    border: 1px solid rgba(0,212,255,.28);
+    color: t.$text;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+
+    &.cancel:hover,
+    &.cancel:focus-visible {
+      background: rgba(0,212,255,.10);
+      border-color: t.$cyan;
+      color: t.$text-bright;
+    }
+
+    // Confirm — cyan by default, CTA green for WhatsApp.
+    &.cf-yes {
+      border-color: t.$cyan;
+      color: t.$cyan;
+      &:hover, &:focus-visible {
+        background: rgba(0,212,255,.14);
+        color: t.$text-bright;
+        box-shadow: 0 0 16px t.$cyan-glow;
+      }
+      &.green {
+        border-color: t.$cta-border;
+        color: t.$cta;
+        &:hover, &:focus-visible {
+          background: t.$cta-bg-hover;
+          color: #eafff1;
+          box-shadow: 0 0 16px t.$cta-glow;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .ct-confirm { padding: 20px 18px 16px; }
+  .ct-confirm .cf-msg { font-size: 13px; }
 }
