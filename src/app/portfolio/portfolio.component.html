@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <div class="modal-body" (scroll)="onScroll($event)">
+      <div class="modal-body">
         <div class="pf-list">
           @for (pr of portfolio.projects; track pr.name; let i = $index) {
             @if (slidesFor(pr); as slides) {

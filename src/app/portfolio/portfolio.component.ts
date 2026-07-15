@@ -1,4 +1,4 @@
-import { Component, OnDestroy, HostListener, inject } from '@angular/core';
+import { Component, OnDestroy, HostListener, NgZone, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 import cvData from '../data/cv-data.json';
@@ -30,31 +30,76 @@ export class PortfolioComponent implements OnDestroy {
   // are dimmed; scrolling moves the focus and un-dims the card that enters it.
   focusedIndex = 0;
 
+  // ── Focus tracking on scroll ────────────────────────────────────────────────
+  // The scroll listener runs OUTSIDE Angular's zone and is coalesced to one
+  // measurement per animation frame, so fast scrolling (esp. on mobile) never
+  // fires a synchronous getBoundingClientRect storm + change-detection pass on
+  // every pixel. Change detection is re-entered only when the focused card
+  // actually changes.
+  private zone = inject(NgZone);
+  private scrollEl: HTMLElement | null = null;
+  private readonly onScroll = () => this.scheduleMeasure();
+  private rafId = 0;
+
+  private attachScroll() {
+    this.zone.runOutsideAngular(() => {
+      // Wait a frame so the conditionally-rendered modal body is in the DOM.
+      requestAnimationFrame(() => {
+        this.scrollEl = document.querySelector<HTMLElement>('.pf-modal .modal-body');
+        this.scrollEl?.addEventListener('scroll', this.onScroll, { passive: true });
+      });
+    });
+  }
+
+  private detachScroll() {
+    this.scrollEl?.removeEventListener('scroll', this.onScroll);
+    this.scrollEl = null;
+    if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = 0; }
+  }
+
+  private scheduleMeasure() {
+    if (this.rafId) return; // one measurement per frame
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = 0;
+      this.measureFocus();
+    });
+  }
+
   // Recompute the focused card from scroll position: the card whose centre is
   // closest to the scroll container's centre wins.
-  onScroll(e: Event) {
-    const container = e.target as HTMLElement;
+  private measureFocus() {
+    const container = this.scrollEl;
+    if (!container) return;
     const cards = container.querySelectorAll<HTMLElement>('.pf-card');
     if (!cards.length) return;
 
+    let next: number;
     // Edge clamp: a first/last card that's taller-adjacent to the viewport edge
     // never reaches the centre, so pin focus to it at the scroll extremes.
     const top = container.scrollTop;
     const max = container.scrollHeight - container.clientHeight;
     const EDGE = 24;
-    if (top <= EDGE) { this.focusedIndex = 0; return; }
-    if (top >= max - EDGE) { this.focusedIndex = cards.length - 1; return; }
+    if (top <= EDGE) {
+      next = 0;
+    } else if (top >= max - EDGE) {
+      next = cards.length - 1;
+    } else {
+      const rect = container.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      cards.forEach((card, i) => {
+        const r = card.getBoundingClientRect();
+        const dist = Math.abs(r.top + r.height / 2 - centerY);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+      next = best;
+    }
 
-    const rect = container.getBoundingClientRect();
-    const centerY = rect.top + rect.height / 2;
-    let best = 0;
-    let bestDist = Infinity;
-    cards.forEach((card, i) => {
-      const r = card.getBoundingClientRect();
-      const dist = Math.abs(r.top + r.height / 2 - centerY);
-      if (dist < bestDist) { bestDist = dist; best = i; }
-    });
-    this.focusedIndex = best;
+    // Re-enter Angular only when the highlight actually moves.
+    if (next !== this.focusedIndex) {
+      this.zone.run(() => { this.focusedIndex = next; });
+    }
   }
 
   // Returns the slides to render for a project: real image paths when present,
@@ -105,6 +150,7 @@ export class PortfolioComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.sub.unsubscribe();
+    this.detachScroll();
   }
 
   private syncFromUrl() {
@@ -112,8 +158,9 @@ export class PortfolioComponent implements OnDestroy {
     const wasOpen = this.portfolioOpen;
     this.portfolioOpen = path === '/portfolio';
     // Keyboard focus follows the dialog: move into it on open, restore on close.
-    if (this.portfolioOpen && !wasOpen) { this.focusModal(); this.focusedIndex = 0; }
-    else if (!this.portfolioOpen && wasOpen) this.restoreFocus();
+    // The scroll listener is bound/unbound with the (conditionally-rendered) body.
+    if (this.portfolioOpen && !wasOpen) { this.focusModal(); this.focusedIndex = 0; this.attachScroll(); }
+    else if (!this.portfolioOpen && wasOpen) { this.restoreFocus(); this.detachScroll(); }
   }
 
   // Esc closes the panel on mobile/tablet, where it's still a true popup. On

@@ -139,6 +139,10 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 30px 34px 36px;
+    // Momentum scrolling on iOS + keep scroll chaining from leaking to the page
+    // behind the modal, both of which reduce perceived stutter on touch.
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 
     &::-webkit-scrollbar { width: 8px; }
     &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); }
