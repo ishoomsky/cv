@@ -1,8 +1,9 @@
 import { Component, OnDestroy, HostListener, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription, filter } from 'rxjs';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import cvData from '../data/cv-data.json';
 import { AnalyticsService } from '../analytics.service';
+import { PanelService } from '../panel.service';
 
 interface ContactData {
   title: string;
@@ -43,8 +44,13 @@ export class ContactComponent implements OnDestroy {
 
   contactOpen = false;
 
-  // When set, a confirm dialog is shown clarifying what opening a channel does.
+  // The confirm dialog's content. Kept populated even while the dialog animates
+  // closed (visibility is driven by `confirmOpen`, not by nulling this) so its
+  // exit transition never flashes empty text.
   pending: Pending | null = null;
+  // Whether the confirm dialog is shown. Split from `pending` so closing can
+  // run an exit animation while the last content stays rendered.
+  confirmOpen = false;
 
   // Intercept a channel button: instead of following the link straight away,
   // ask the user to confirm and spell out what happens next.
@@ -69,6 +75,7 @@ export class ContactComponent implements OnDestroy {
       },
     };
     this.pending = map[type];
+    this.confirmOpen = true;
     requestAnimationFrame(() => document.querySelector<HTMLElement>('.ct-confirm .cf-yes')?.focus());
   }
 
@@ -76,35 +83,31 @@ export class ContactComponent implements OnDestroy {
     const p = this.pending;
     if (!p) return;
     this.analytics.event(p.event);
-    this.pending = null;
+    this.confirmOpen = false;
     if (p.newTab) window.open(p.url, '_blank', 'noopener');
     else window.location.href = p.url;
   }
 
-  cancel() { this.pending = null; }
+  cancel() { this.confirmOpen = false; }
 
   private router = inject(Router);
-  private sub: Subscription;
+  private panels = inject(PanelService);
+  private sub = new Subscription();
 
   constructor() {
-    // The panel is derived from the route: /contact → open, anything else → closed.
-    this.syncFromUrl();
-    this.sub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.syncFromUrl());
+    // Open state comes from the panel coordinator, which sequences panel→panel
+    // switches so this panel opens only after the outgoing one finishes closing.
+    this.sub.add(this.panels.visible$.subscribe(v => {
+      const wasOpen = this.contactOpen;
+      this.contactOpen = v === 'contact';
+      // Keyboard focus follows the dialog: move into it on open, restore on close.
+      if (this.contactOpen && !wasOpen) this.focusModal();
+      else if (!this.contactOpen && wasOpen) { this.restoreFocus(); this.confirmOpen = false; }
+    }));
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
-
-  private syncFromUrl() {
-    const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
-    const wasOpen = this.contactOpen;
-    this.contactOpen = path === '/contact';
-    // Keyboard focus follows the dialog: move into it on open, restore on close.
-    if (this.contactOpen && !wasOpen) this.focusModal();
-    else if (!this.contactOpen && wasOpen) { this.restoreFocus(); this.pending = null; }
   }
 
   // Esc closes the panel on mobile/tablet, where it's still a true popup. On
@@ -114,7 +117,7 @@ export class ContactComponent implements OnDestroy {
   @HostListener('document:keydown.escape')
   onEscape() {
     // A live confirm dialog swallows Esc first, then the panel (mobile only).
-    if (this.pending) { this.cancel(); return; }
+    if (this.confirmOpen) { this.cancel(); return; }
     if (this.contactOpen && !window.matchMedia('(min-width: 1200px)').matches) this.closeContact();
   }
 

@@ -13,6 +13,16 @@
   }
 }
 
+// Nav-item highlight, shared by keyboard focus and pointer hover.
+@mixin nav-hilite {
+  background: rgba(0,160,220,.10);
+  border-color: rgba(0,212,255,.45);
+  color: t.$text-bright;
+  .num { color: t.$cyan; }
+  .nav-icon { color: t.$cyan; }
+  .arr { color: t.$cyan; transform: translateX(4px); }
+}
+
 @keyframes scan {
   0%   { top: -10%; opacity: 0.7; }
   100% { top: 110%; opacity: 0; }
@@ -214,14 +224,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     transition: color .15s, transform .15s;
   }
 
-  &:hover,
-  &:focus-visible {
-    background: rgba(0,160,220,.10);
-    border-color: rgba(0,212,255,.45);
-    color: t.$text-bright;
-    .num { color: t.$cyan; }
-    .nav-icon { color: t.$cyan; }
-    .arr { color: t.$cyan; transform: translateX(4px); }
+  // Keyboard focus always lights the item. Hover is gated to hover-capable
+  // (pointer) devices so a touch tap doesn't leave the item "stuck" hovered
+  // and glowing behind the popup it just opened.
+  &:focus-visible { @include nav-hilite; }
+  @media (hover: hover) {
+    &:hover { @include nav-hilite; }
   }
 
   // Active — the panel this item opens is currently on screen. Filled cyan
@@ -356,7 +364,13 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: all;
+  // Closed by default: faded out and click-through. Opening adds .open, which
+  // fades the dim/blur in; closing runs the reverse so the popup animates out
+  // instead of snapping (the node stays mounted — see [attr.inert] in the
+  // template, which keeps a closed dossier out of the tab order / a11y tree).
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity t.$motion-exit t.$ease-in;
   // Keep the modal clear of the notch / home indicator and screen edges.
   box-sizing: border-box;
   padding:
@@ -364,6 +378,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     max(env(safe-area-inset-right), 10px)
     max(env(safe-area-inset-bottom), 12px)
     max(env(safe-area-inset-left), 10px);
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity t.$motion-enter t.$ease-out;
+  }
 
   // Desktop: the dossier sits beside the nav panel as a peer, not on top of
   // it, so there's nothing to dim — .modal below positions itself with fixed
@@ -379,7 +399,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     -webkit-backdrop-filter: none;
     display: block;
     padding: 0;
+    // Nothing to dim here, so the backdrop itself stays fully shown and the
+    // .modal handles its own fade/slide. Clicks fall through in BOTH states —
+    // override .open's pointer-events so an open dossier never blocks the nav.
+    opacity: 1;
     pointer-events: none;
+    &.open { pointer-events: none; }
   }
 }
 
@@ -394,7 +419,18 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   box-shadow: t.$elevation-modal;
   display: flex;
   flex-direction: column;
-  animation: modal-in 0.22s ease-out;
+  // Enter/exit is driven by .backdrop.open (below), not a mount-time keyframe,
+  // so the dossier animates on the way OUT too. Mobile: scale + rise from the
+  // centre. Desktop closed-state transform is overridden to a right-edge slide.
+  opacity: 0;
+  transform: scale(.96) translateY(8px);
+  transition: opacity t.$motion-exit t.$ease-in, transform t.$motion-exit t.$ease-in;
+
+  .backdrop.open & {
+    opacity: 1;
+    transform: none;
+    transition: opacity t.$motion-enter t.$ease-out, transform t.$motion-enter t.$ease-out;
+  }
 
   @include corners(22px, t.$cyan);
 
@@ -412,6 +448,9 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     // Opt back into clicks since .backdrop (its positioning ancestor) is
     // pointer-events: none on desktop.
     pointer-events: auto;
+    // Closed state slides off toward the right edge it lives against; the
+    // shared .backdrop.open & rule above resets it to transform: none on open.
+    transform: translateX(40px);
   }
 
   .modal-head {

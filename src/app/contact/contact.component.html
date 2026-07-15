@@ -1,5 +1,4 @@
-@if (contactOpen) {
-  <div class="backdrop" (click)="closeContact()">
+<div class="backdrop" [class.open]="contactOpen" [attr.inert]="contactOpen ? null : ''" (click)="closeContact()">
     <div class="ct-modal" role="dialog" aria-modal="true" [attr.aria-label]="contact.title"
          (click)="$event.stopPropagation()">
       <span class="corner tl" aria-hidden="true"></span>
@@ -57,23 +56,20 @@
       </div>
     </div>
   </div>
-}
 
-@if (pending) {
-  <div class="ct-confirm-backdrop" (click)="cancel()">
+<div class="ct-confirm-backdrop" [class.open]="confirmOpen" [attr.inert]="confirmOpen ? null : ''" (click)="cancel()">
     <div class="ct-confirm" role="alertdialog" aria-modal="true"
-         [attr.aria-label]="pending.title" (click)="$event.stopPropagation()">
+         [attr.aria-label]="pending?.title" (click)="$event.stopPropagation()">
       <span class="corner tl" aria-hidden="true"></span>
       <span class="corner tr" aria-hidden="true"></span>
       <span class="corner bl" aria-hidden="true"></span>
       <span class="corner br" aria-hidden="true"></span>
 
-      <div class="cf-title"><span class="diamond" aria-hidden="true">◈</span> {{ pending.title }}</div>
-      <p class="cf-msg">{{ pending.message }}</p>
+      <div class="cf-title"><span class="diamond" aria-hidden="true">◈</span> {{ pending?.title }}</div>
+      <p class="cf-msg">{{ pending?.message }}</p>
       <div class="cf-actions">
         <button class="cf-btn cancel" (click)="cancel()">CANCEL</button>
-        <button class="cf-btn cf-yes" [class.green]="pending.accent === 'green'" (click)="confirm()">CONTINUE</button>
+        <button class="cf-btn cf-yes" [class.green]="pending?.accent === 'green'" (click)="confirm()">CONTINUE</button>
       </div>
     </div>
   </div>
-}

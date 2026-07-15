@@ -58,6 +58,15 @@ $z-loader: 50;
 $radius-sm: 2px;
 $radius-md: 4px;
 
+// ── Motion ────────────────────────────────────────────────────────────────
+// Shared timing/easing for panel enter/exit so every popup (dossier, portfolio,
+// contact, confirm) feels uniform. Exit is a touch quicker than enter. Reduced
+// motion is neutralised globally in styles.scss, so these never need guarding.
+$motion-enter: 260ms;
+$motion-exit:  180ms;
+$ease-out: cubic-bezier(.22, 1, .36, 1);   // decelerate — matches panel-in
+$ease-in:  cubic-bezier(.4, 0, 1, 1);      // accelerate — for exits
+
 // ── Elevation (drop-shadows for glass panels/cards) ──────────────────────
 $elevation-panel: 0 24px 60px -20px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 212, 255, 0.06);
 $elevation-modal: 0 32px 90px -24px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 212, 255, 0.08);

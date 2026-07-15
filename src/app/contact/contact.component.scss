@@ -13,11 +13,6 @@
   }
 }
 
-@keyframes ct-modal-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
 // ── Backdrop & modal — mirrors the CV dossier / portfolio so all panels behave alike ──
 
 .backdrop {
@@ -30,13 +25,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: all;
+  // Closed by default; .open fades the dim/blur in and the reverse animates it
+  // out. The node stays mounted (see [attr.inert] in the template).
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity t.$motion-exit t.$ease-in;
   box-sizing: border-box;
   padding:
     max(env(safe-area-inset-top), 12px)
     max(env(safe-area-inset-right), 10px)
     max(env(safe-area-inset-bottom), 12px)
     max(env(safe-area-inset-left), 10px);
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity t.$motion-enter t.$ease-out;
+  }
 
   // Desktop: sits beside the nav panel as a peer; clicks fall through instead
   // of closing (only the close button / a route change closes it).
@@ -46,7 +51,11 @@
     -webkit-backdrop-filter: none;
     display: block;
     padding: 0;
+    // The .ct-modal handles its own fade/slide; the backdrop stays shown and
+    // click-through in both states so an open panel never blocks the nav.
+    opacity: 1;
     pointer-events: none;
+    &.open { pointer-events: none; }
   }
 }
 
@@ -60,7 +69,17 @@
   box-shadow: t.$elevation-modal;
   display: flex;
   flex-direction: column;
-  animation: ct-modal-in 0.22s ease-out;
+  // Enter/exit driven by .backdrop.open (not a mount-time keyframe) so the panel
+  // animates out too. Mobile: scale + rise from centre; desktop: right-edge slide.
+  opacity: 0;
+  transform: scale(.96) translateY(8px);
+  transition: opacity t.$motion-exit t.$ease-in, transform t.$motion-exit t.$ease-in;
+
+  .backdrop.open & {
+    opacity: 1;
+    transform: none;
+    transition: opacity t.$motion-enter t.$ease-out, transform t.$motion-enter t.$ease-out;
+  }
 
   @include corners(22px, t.$cyan);
 
@@ -75,6 +94,8 @@
     height: 80vh;
     max-height: none;
     pointer-events: auto;
+    // Closed state slides off toward its right edge; .backdrop.open & resets it.
+    transform: translateX(40px);
   }
 
   .modal-head {
@@ -268,13 +289,24 @@
   background: rgba(0, 4, 14, 0.82);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  pointer-events: all;
+  // Closed by default; .open fades it in and the reverse animates it out. The
+  // node stays mounted (content is held in `pending` — see the component), so
+  // the exit never flashes empty. Centered popup on every size (no desktop split).
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity t.$motion-exit t.$ease-in;
   box-sizing: border-box;
   padding:
     max(env(safe-area-inset-top), 16px)
     max(env(safe-area-inset-right), 16px)
     max(env(safe-area-inset-bottom), 16px)
     max(env(safe-area-inset-left), 16px);
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity t.$motion-enter t.$ease-out;
+  }
 }
 
 .ct-confirm {
@@ -284,7 +316,15 @@
   border: 1px solid rgba(0, 212, 255, 0.5);
   box-shadow: t.$elevation-modal;
   padding: 24px 24px 20px;
-  animation: ct-modal-in 0.18s ease-out;
+  opacity: 0;
+  transform: scale(.96) translateY(8px);
+  transition: opacity t.$motion-exit t.$ease-in, transform t.$motion-exit t.$ease-in;
+
+  .ct-confirm-backdrop.open & {
+    opacity: 1;
+    transform: none;
+    transition: opacity t.$motion-enter t.$ease-out, transform t.$motion-enter t.$ease-out;
+  }
 
   @include corners(16px, t.$cyan);
 

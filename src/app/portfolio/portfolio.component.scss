@@ -13,11 +13,6 @@
   }
 }
 
-@keyframes pf-modal-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
 // Slow, constant left↔right drift of the background screenshot. The image is
 // scaled up so the pan never exposes an edge.
 @keyframes pf-pan {
@@ -37,13 +32,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: all;
+  // Closed by default; .open fades the dim/blur in and the reverse animates it
+  // out. The node stays mounted (see [attr.inert] in the template).
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity t.$motion-exit t.$ease-in;
   box-sizing: border-box;
   padding:
     max(env(safe-area-inset-top), 12px)
     max(env(safe-area-inset-right), 10px)
     max(env(safe-area-inset-bottom), 12px)
     max(env(safe-area-inset-left), 10px);
+
+  &.open {
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity t.$motion-enter t.$ease-out;
+  }
 
   // Desktop: sits beside the nav panel as a peer, nothing to dim, and clicks
   // fall through instead of closing (only the close button / a route change
@@ -54,7 +59,11 @@
     -webkit-backdrop-filter: none;
     display: block;
     padding: 0;
+    // The .pf-modal handles its own fade/slide; the backdrop stays shown and
+    // click-through in both states so an open panel never blocks the nav.
+    opacity: 1;
     pointer-events: none;
+    &.open { pointer-events: none; }
   }
 }
 
@@ -68,7 +77,17 @@
   box-shadow: t.$elevation-modal;
   display: flex;
   flex-direction: column;
-  animation: pf-modal-in 0.22s ease-out;
+  // Enter/exit driven by .backdrop.open (not a mount-time keyframe) so the panel
+  // animates out too. Mobile: scale + rise from centre; desktop: right-edge slide.
+  opacity: 0;
+  transform: scale(.96) translateY(8px);
+  transition: opacity t.$motion-exit t.$ease-in, transform t.$motion-exit t.$ease-in;
+
+  .backdrop.open & {
+    opacity: 1;
+    transform: none;
+    transition: opacity t.$motion-enter t.$ease-out, transform t.$motion-enter t.$ease-out;
+  }
 
   @include corners(22px, t.$cyan);
 
@@ -83,6 +102,8 @@
     height: 80vh;
     max-height: none;
     pointer-events: auto;
+    // Closed state slides off toward its right edge; .backdrop.open & resets it.
+    transform: translateX(40px);
   }
 
   .modal-head {
@@ -225,6 +246,10 @@
 }
 // Alternate cards drift the opposite way so a stack doesn't move in lockstep.
 .pf-card:nth-child(even) .pf-img { animation-direction: reverse; }
+
+// The panel stays mounted while closed (for the exit animation), so pause the
+// drift whenever it isn't open — no point spending frames on an invisible pan.
+.backdrop:not(.open) .pf-img { animation-play-state: paused; }
 
 // Respect users who prefer less motion: hold the image still.
 @media (prefers-reduced-motion: reduce) {

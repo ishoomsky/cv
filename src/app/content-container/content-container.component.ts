@@ -1,8 +1,9 @@
 import { Component, OnDestroy, HostListener, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription, filter } from 'rxjs';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import cvData from '../data/cv-data.json';
 import { AnalyticsService } from '../analytics.service';
+import { PanelService } from '../panel.service';
 
 interface SkillGroup { label: string; items: string[]; }
 interface Job { role: string; company: string; period: string; points: string[]; }
@@ -68,33 +69,27 @@ export class ContentContainerComponent implements OnDestroy {
   }
 
   private router = inject(Router);
+  private panels = inject(PanelService);
   readonly analytics = inject(AnalyticsService);
-  private sub: Subscription;
+  private sub = new Subscription();
 
   constructor() {
-    // The popup is derived from the route: /cv → open, anything else → closed.
-    this.syncFromUrl();
-    this.sub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.syncFromUrl());
+    // Open state comes from the panel coordinator, which sequences panel→panel
+    // switches (close the current one before opening the next). The nav "active"
+    // highlight follows the route target immediately for instant click feedback.
+    this.sub.add(this.panels.target$.subscribe(t => this.activeAction = t));
+    this.sub.add(this.panels.visible$.subscribe(v => {
+      const wasOpen = this.cvOpen;
+      this.cvOpen = v === 'cv';
+      // Keyboard focus follows the dialog: move into it on open, restore on close.
+      if (this.cvOpen && !wasOpen) this.focusModal();
+      else if (!this.cvOpen && wasOpen) this.restoreFocus();
+      if (this.cvOpen !== wasOpen) this.modalScrolled = false;
+    }));
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
-  }
-
-  private syncFromUrl() {
-    const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
-    const wasOpen = this.cvOpen;
-    this.cvOpen = path === '/resume';
-    this.activeAction = path === '/resume' ? 'cv'
-      : path === '/portfolio' ? 'portfolio'
-      : path === '/contact' ? 'contact'
-      : '';
-    // Keyboard focus follows the dialog: move into it on open, restore on close.
-    if (this.cvOpen && !wasOpen) this.focusModal();
-    else if (!this.cvOpen && wasOpen) this.restoreFocus();
-    if (this.cvOpen !== wasOpen) this.modalScrolled = false;
   }
 
   // Esc closes the dossier on mobile/tablet, where it's still a true popup.

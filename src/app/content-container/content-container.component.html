@@ -74,8 +74,7 @@
   </div>
 </div>
 
-@if (cvOpen) {
-  <div class="backdrop" (click)="closeCv()">
+<div class="backdrop" [class.open]="cvOpen" [attr.inert]="cvOpen ? null : ''" (click)="closeCv()">
     <div class="modal" role="dialog" aria-modal="true" [attr.aria-label]="cv.profile.dossierTitle"
          (click)="$event.stopPropagation()">
       <span class="corner tl" aria-hidden="true"></span>
@@ -216,4 +215,3 @@
       </div>
     </div>
   </div>
-}

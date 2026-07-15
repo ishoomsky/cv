@@ -14,6 +14,11 @@ html, body {
   // window:resize and made the planet/star-field flicker and crop).
   overflow: hidden;
   overscroll-behavior: none;
+  // Kill the native mobile tap-highlight flash. It's tied to the click event
+  // (fires on touch release), so on a nav/channel tap it lingers into the
+  // popup's entrance and reads as a stray "click animation" over the popup.
+  // (Inherited, so setting it here covers every tappable element.)
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {

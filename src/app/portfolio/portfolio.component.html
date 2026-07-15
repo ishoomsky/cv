@@ -1,5 +1,4 @@
-@if (portfolioOpen) {
-  <div class="backdrop" (click)="closePortfolio()">
+<div class="backdrop" [class.open]="portfolioOpen" [attr.inert]="portfolioOpen ? null : ''" (click)="closePortfolio()">
     <div class="pf-modal" role="dialog" aria-modal="true" [attr.aria-label]="portfolio.title"
          (click)="$event.stopPropagation()">
       <span class="corner tl" aria-hidden="true"></span>
@@ -66,4 +65,3 @@
       </div>
     </div>
   </div>
-}

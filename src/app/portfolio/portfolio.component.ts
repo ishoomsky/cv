@@ -1,7 +1,8 @@
 import { Component, OnDestroy, HostListener, NgZone, inject } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
-import { Subscription, filter } from 'rxjs';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import cvData from '../data/cv-data.json';
+import { PanelService } from '../panel.service';
 
 interface PortfolioProject { name: string; company: string; description: string; images: string[]; }
 interface PortfolioData { title: string; projects: PortfolioProject[]; }
@@ -138,29 +139,25 @@ export class PortfolioComponent implements OnDestroy {
   }
 
   private router = inject(Router);
-  private sub: Subscription;
+  private panels = inject(PanelService);
+  private sub = new Subscription();
 
   constructor() {
-    // The panel is derived from the route: /portfolio → open, anything else → closed.
-    this.syncFromUrl();
-    this.sub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => this.syncFromUrl());
+    // Open state comes from the panel coordinator, which sequences panel→panel
+    // switches so this panel opens only after the outgoing one finishes closing.
+    this.sub.add(this.panels.visible$.subscribe(v => {
+      const wasOpen = this.portfolioOpen;
+      this.portfolioOpen = v === 'portfolio';
+      // Keyboard focus follows the dialog; the scroll listener is bound/unbound
+      // with the open state.
+      if (this.portfolioOpen && !wasOpen) { this.focusModal(); this.focusedIndex = 0; this.attachScroll(); }
+      else if (!this.portfolioOpen && wasOpen) { this.restoreFocus(); this.detachScroll(); }
+    }));
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
     this.detachScroll();
-  }
-
-  private syncFromUrl() {
-    const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
-    const wasOpen = this.portfolioOpen;
-    this.portfolioOpen = path === '/portfolio';
-    // Keyboard focus follows the dialog: move into it on open, restore on close.
-    // The scroll listener is bound/unbound with the (conditionally-rendered) body.
-    if (this.portfolioOpen && !wasOpen) { this.focusModal(); this.focusedIndex = 0; this.attachScroll(); }
-    else if (!this.portfolioOpen && wasOpen) { this.restoreFocus(); this.detachScroll(); }
   }
 
   // Esc closes the panel on mobile/tablet, where it's still a true popup. On
