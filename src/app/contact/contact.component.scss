@@ -1,0 +1,257 @@
+@use '../design-tokens' as t;
+
+@mixin corners($s: 16px, $c: t.$cyan) {
+  .corner {
+    position: absolute;
+    width: $s;
+    height: $s;
+    pointer-events: none;
+    &.tl { top: -1px; left: -1px;   border-top: 2px solid $c; border-left: 2px solid $c; }
+    &.tr { top: -1px; right: -1px;  border-top: 2px solid $c; border-right: 2px solid $c; }
+    &.bl { bottom: -1px; left: -1px;  border-bottom: 2px solid $c; border-left: 2px solid $c; }
+    &.br { bottom: -1px; right: -1px; border-bottom: 2px solid $c; border-right: 2px solid $c; }
+  }
+}
+
+@keyframes ct-modal-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+// ── Backdrop & modal — mirrors the CV dossier / portfolio so all panels behave alike ──
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 4, 14, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  box-sizing: border-box;
+  padding:
+    max(env(safe-area-inset-top), 12px)
+    max(env(safe-area-inset-right), 10px)
+    max(env(safe-area-inset-bottom), 12px)
+    max(env(safe-area-inset-left), 10px);
+
+  // Desktop: sits beside the nav panel as a peer; clicks fall through instead
+  // of closing (only the close button / a route change closes it).
+  @include t.desktop {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    display: block;
+    padding: 0;
+    pointer-events: none;
+  }
+}
+
+.ct-modal {
+  position: relative;
+  width: min(1040px, 95vw);
+  height: min(900px, 92dvh);
+  max-height: 100%;
+  background: t.$bg-modal;
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  box-shadow: t.$elevation-modal;
+  display: flex;
+  flex-direction: column;
+  animation: ct-modal-in 0.22s ease-out;
+
+  @include corners(22px, t.$cyan);
+
+  // Desktop: pinned to the right, filling the space next to the nav panel —
+  // same gutter / 80vh as the dossier & portfolio so the boxes line up.
+  @include t.desktop {
+    position: fixed;
+    top: t.$hud-gutter;
+    left: calc(#{t.$hud-gutter} + #{t.$hud-panel-width} + #{t.$hud-inner-gap});
+    right: t.$hud-gutter;
+    width: auto;
+    height: 80vh;
+    max-height: none;
+    pointer-events: auto;
+  }
+
+  .modal-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 24px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.18);
+    flex: 0 0 auto;
+
+    .modal-title {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: t.$cyan;
+    }
+
+    .head-actions { display: flex; gap: 10px; flex: 0 0 auto; }
+
+    .hbtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      white-space: nowrap;
+      background: transparent;
+      border: 1px solid rgba(0,212,255,.28);
+      color: t.$text;
+      font-family: var(--font-display);
+      font-size: 9px;
+      letter-spacing: 2px;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+
+      &:hover,
+      &:focus-visible {
+        background: rgba(0,212,255,.12);
+        border-color: t.$cyan;
+        color: t.$text-bright;
+      }
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 30px 34px 36px;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); }
+  }
+}
+
+// ── Body ─────────────────────────────────────────────────────────────────────
+
+.ct-intro {
+  margin: 0 0 26px;
+  max-width: 62ch;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: t.$text-body;
+}
+
+.ct-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 560px;
+}
+
+// ── Contact buttons — big, framed, HUD-style rows ────────────────────────────
+.ct-btn {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  border-radius: t.$radius-md;
+  border: 1px solid rgba(0,212,255,.22);
+  background: rgba(0, 160, 220, 0.06);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .16s, border-color .16s, box-shadow .16s, transform .16s;
+
+  .ct-icon {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    fill: currentColor;
+  }
+
+  .ct-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .ct-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: t.$text-bright;
+  }
+
+  .ct-sub {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: t.$text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ct-arr {
+    flex: 0 0 auto;
+    font-size: 11px;
+    opacity: .55;
+    transition: transform .16s, opacity .16s;
+  }
+
+  &:hover,
+  &:focus-visible {
+    transform: translateX(2px);
+    .ct-arr { opacity: 1; transform: translateX(3px); }
+  }
+
+  // WhatsApp — the primary, fastest channel: reserved CTA green.
+  &.whatsapp {
+    color: t.$cta;
+    border-color: t.$cta-border;
+    background: rgba(34, 197, 94, 0.08);
+
+    &:hover,
+    &:focus-visible {
+      border-color: t.$cta;
+      background: t.$cta-bg-hover;
+      box-shadow: 0 0 18px t.$cta-glow;
+    }
+  }
+
+  // Email — secondary channel: structural cyan.
+  &.email {
+    color: t.$cyan;
+
+    &:hover,
+    &:focus-visible {
+      border-color: t.$cyan;
+      background: rgba(0,212,255,.10);
+      box-shadow: 0 0 16px t.$cyan-glow;
+    }
+  }
+}
+
+// ── Mobile (≤600px): tighten to match the other panels ──────────────────────
+@media (max-width: 600px) {
+  .ct-modal .modal-head { padding: 12px 14px; }
+  .ct-modal .modal-head .modal-title { font-size: 9px; letter-spacing: 2px; }
+  .ct-modal .hbtn { padding: 7px 11px; font-size: 8px; letter-spacing: 1px; }
+  .ct-modal .modal-body { padding: 22px 16px 26px; }
+
+  .ct-intro { font-size: 14px; margin-bottom: 22px; }
+  .ct-btn { padding: 15px 16px; gap: 14px; }
+  .ct-btn .ct-icon { width: 26px; height: 26px; }
+  .ct-btn .ct-sub { font-size: 12px; }
+}

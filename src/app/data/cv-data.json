@@ -20,8 +20,15 @@
     { "label": "CV", "action": "cv" },
     { "label": "PORTFOLIO", "action": "portfolio" },
     { "label": "LINKEDIN", "url": "https://www.linkedin.com/in/ivanshumski/", "icon": "linkedin" },
-    { "label": "SEND EMAIL", "url": "mailto:ishoomsky@gmail.com", "icon": "mail" }
+    { "label": "CONTACT", "action": "contact" }
   ],
+  "contact": {
+    "title": "ESTABLISH CONTACT",
+    "intro": "Channel open. WhatsApp is the fastest way to reach me; email for anything longer-form. Usually reply within a few hours.",
+    "whatsapp": "+972 55 771 0044",
+    "whatsappUrl": "https://wa.me/972557710044",
+    "email": "ishoomsky@gmail.com"
+  },
   "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
   "summary": "Frontend Developer with 6+ years building high-performance, reactive web apps with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.",
   "skills": [

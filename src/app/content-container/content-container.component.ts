@@ -54,7 +54,7 @@ export class ContentContainerComponent implements OnDestroy {
   cvOpen = false;
   // Which nav action's panel is currently open, so the nav can show an
   // "active/selected" state. Driven by the route (see syncFromUrl).
-  activeAction: 'cv' | 'portfolio' | '' = '';
+  activeAction: 'cv' | 'portfolio' | 'contact' | '' = '';
   // Sticky sub-header (name/role) fades in once the dossier body scrolls
   // past the rail identity block.
   modalScrolled = false;
@@ -87,7 +87,10 @@ export class ContentContainerComponent implements OnDestroy {
     const path = this.router.url.split(/[?#]/)[0].replace(/\/+$/, '');
     const wasOpen = this.cvOpen;
     this.cvOpen = path === '/resume';
-    this.activeAction = path === '/resume' ? 'cv' : path === '/portfolio' ? 'portfolio' : '';
+    this.activeAction = path === '/resume' ? 'cv'
+      : path === '/portfolio' ? 'portfolio'
+      : path === '/contact' ? 'contact'
+      : '';
     // Keyboard focus follows the dialog: move into it on open, restore on close.
     if (this.cvOpen && !wasOpen) this.focusModal();
     else if (!this.cvOpen && wasOpen) this.restoreFocus();
@@ -107,6 +110,8 @@ export class ContentContainerComponent implements OnDestroy {
   closeCv() { this.router.navigate(['/']); }
 
   openPortfolio() { this.router.navigate(['/portfolio']); }
+
+  openContact() { this.router.navigate(['/contact']); }
 
   private opener: HTMLElement | null = null;
 

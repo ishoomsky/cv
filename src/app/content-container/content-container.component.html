@@ -51,6 +51,12 @@
               <span class="label">{{ item.label }}</span>
               <span class="arr" aria-hidden="true">▶</span>
             </button>
+          } @else if (item.action === 'contact') {
+            <button class="nav-item" [class.active]="activeAction === 'contact'" (click)="openContact()">
+              <span class="num">0{{ i + 1 }}</span>
+              <span class="label">{{ item.label }}</span>
+              <span class="arr" aria-hidden="true">▶</span>
+            </button>
           } @else {
             <a class="nav-item" [href]="item.url" target="_blank" rel="noopener">
               <span class="num">0{{ i + 1 }}</span>
