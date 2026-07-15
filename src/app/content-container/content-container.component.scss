@@ -282,6 +282,41 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   .readout .key { min-width: 76px; font-size: 10px; letter-spacing: 2px; }
 }
 
+// ── Mobile landscape / short viewport ───────────────────────────────────────
+// The nav panel is taller than a landscape phone screen. Vertically centering
+// it (the default) clips the name off the top and the last nav items off the
+// bottom with no way to reach them. Pin the panel to the top and let it scroll
+// inside the viewport instead, and tighten spacing so most of it fits without
+// scrolling. Scoped below the desktop breakpoint so the side-by-side layout is
+// untouched.
+@media (max-width: 1199px) and (max-height: 600px) and (orientation: landscape) {
+  .hud { align-items: flex-start; }
+
+  .panel {
+    margin-top: max(env(safe-area-inset-top), 12px);
+    margin-bottom: max(env(safe-area-inset-bottom), 12px);
+    // Clear a landscape notch on the left edge.
+    margin-left: max(env(safe-area-inset-left), t.$hud-gutter);
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 20px 24px 20px;
+    // The slide-in animation on a now-scrollable box reads as a jump; drop it.
+    animation: none;
+    // An absolutely-positioned scanline running to 110% would extend the
+    // scrollable area past the content — hide it while the panel scrolls.
+    .scanline { display: none; }
+  }
+
+  .header { margin-bottom: 16px; }
+  .header .name { font-size: 24px; letter-spacing: 4px; }
+  .header .role { font-size: 11px; letter-spacing: 4px; }
+  .divider { margin: 16px 0; }
+  .section-label { margin-bottom: 12px; }
+}
+
 // ── CV Backdrop & Modal ────────────────────────────────────────────────────
 
 .backdrop {
