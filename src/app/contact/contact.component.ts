@@ -12,6 +12,8 @@ interface ContactData {
   phone: string;
   phoneUrl: string;
   email: string;
+  linkedin: string;
+  linkedinUrl: string;
 }
 
 @Component({

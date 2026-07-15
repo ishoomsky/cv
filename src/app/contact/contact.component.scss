@@ -230,9 +230,10 @@
     }
   }
 
-  // Phone & email — secondary channels: structural cyan.
+  // Phone, email & linkedin — secondary channels: structural cyan.
   &.phone,
-  &.email {
+  &.email,
+  &.linkedin {
     color: t.$cyan;
 
     &:hover,
