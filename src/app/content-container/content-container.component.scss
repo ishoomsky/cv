@@ -362,8 +362,18 @@ nav { display: flex; flex-direction: column; gap: 7px; }
     border-bottom: 1px solid rgba(0, 212, 255, 0.18);
     flex: 0 0 auto;
 
-    .modal-title {
+    // Left zone that holds the title and the crossfading identity. Taking the
+    // flex-grow here (instead of on .modal-title) means it occupies exactly the
+    // space left of the actions cluster, so the absolutely-positioned subhead
+    // inside it can never slide under the PDF / CLOSE buttons.
+    .head-titles {
+      position: relative;
       flex: 1;
+      min-width: 0;
+    }
+
+    .modal-title {
+      display: block;
       min-width: 0;                 // allow it to shrink below content size
       white-space: nowrap;
       overflow: hidden;
@@ -377,13 +387,13 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 
     // Compact identity that crossfades in over .modal-title once the body
     // scrolls past the rail identity block, so the reader never loses track
-    // of whose dossier this is.
+    // of whose dossier this is. Fills its .head-titles wrapper, so it clears
+    // the actions cluster automatically at any button width / locale.
     .modal-subhead {
       position: absolute;
-      left: 24px;
-      right: 132px;
+      inset: 0;
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 10px;
       overflow: hidden;
       opacity: 0;
@@ -723,8 +733,10 @@ nav { display: flex; flex-direction: column; gap: 7px; }
   .modal .modal-head { padding: 12px 14px; }
   .modal .modal-head .modal-title { font-size: 9px; letter-spacing: 2px; }
   .modal .modal-head .sub-name { font-size: 11px; letter-spacing: 1px; }
-  .modal .modal-head .sub-role { font-size: 9px; }
-  .modal .modal-head .modal-subhead { left: 14px; right: 100px; }
+  // Narrow screens: two action buttons leave little room beside them, so keep
+  // just the name in the sticky head (the role still shows in the body's
+  // identity block) and hand it the whole left zone.
+  .modal .modal-head .sub-role { display: none; }
   .modal .hbtn { padding: 7px 11px; font-size: 8px; letter-spacing: 1px; }
   .modal-body { padding: 20px 16px 26px; }
   .dossier { gap: 20px; }

@@ -73,10 +73,12 @@
       <span class="corner br" aria-hidden="true"></span>
 
       <div class="modal-head" [class.scrolled]="modalScrolled">
-        <span class="modal-title">{{ cv.profile.dossierTitle }}</span>
-        <div class="modal-subhead" aria-hidden="true">
-          <span class="sub-name">{{ cv.profile.fullName }}</span>
-          <span class="sub-role">{{ cv.profile.resumeRole }}</span>
+        <div class="head-titles">
+          <span class="modal-title">{{ cv.profile.dossierTitle }}</span>
+          <div class="modal-subhead" aria-hidden="true">
+            <span class="sub-name">{{ cv.profile.fullName }}</span>
+            <span class="sub-role">{{ cv.profile.resumeRole }}</span>
+          </div>
         </div>
         <div class="head-actions">
           <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener" (click)="analytics.event('pdf-download')"><span aria-hidden="true">⤓</span> PDF</a>
