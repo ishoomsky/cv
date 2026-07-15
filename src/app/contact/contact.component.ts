@@ -9,6 +9,8 @@ interface ContactData {
   intro: string;
   whatsapp: string;
   whatsappUrl: string;
+  phone: string;
+  phoneUrl: string;
   email: string;
 }
 

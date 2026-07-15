@@ -230,7 +230,8 @@
     }
   }
 
-  // Email — secondary channel: structural cyan.
+  // Phone & email — secondary channels: structural cyan.
+  &.phone,
   &.email {
     color: t.$cyan;
 

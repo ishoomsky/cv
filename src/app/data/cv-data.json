@@ -27,6 +27,8 @@
     "intro": "Channel open. WhatsApp is the fastest way to reach me; email for anything longer-form. Usually reply within a few hours.",
     "whatsapp": "+972 55 771 0044",
     "whatsappUrl": "https://wa.me/972557710044",
+    "phone": "+972 55 771 0044",
+    "phoneUrl": "tel:+972557710044",
     "email": "ishoomsky@gmail.com"
   },
   "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
