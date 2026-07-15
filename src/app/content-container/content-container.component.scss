@@ -103,7 +103,22 @@
 // Content wrapper. display:contents makes it transparent to layout everywhere
 // except mobile landscape (see the short-viewport query), where it turns into
 // the scroll container so the .panel frame — and its corner marks — stay put.
-.panel-scroll { display: contents; }
+.panel-scroll {
+  display: contents;
+
+  // Desktop: .panel is a fixed 80vh flex-column frame. On a short viewport its
+  // content exceeds 80vh and, with overflow:hidden, would be clipped and
+  // unreachable. Make the wrapper a growing, scrollable flex item so the
+  // content scrolls inside while the frame + corner marks stay pinned.
+  @include t.desktop {
+    display: block;
+    flex: 1 1 auto;
+    min-height: 0;             // allow shrinking below content so it can scroll
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+}
 
 // ── Header ─────────────────────────────────────────────────────────────────
 
