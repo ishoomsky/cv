@@ -137,9 +137,11 @@
 
   .name {
     margin: 0 0 7px;
-    font-size: 34px;
+    // Sized to fit "IVAN.SHUMSKI" inside the fixed 420px panel (348px content
+    // box) at 900 font-weight — 34px/7px letter-spacing overflowed the panel.
+    font-size: 30px;
     font-weight: 900;
-    letter-spacing: 7px;
+    letter-spacing: 6px;
     color: t.$text-bright;
     text-shadow: 0 0 30px rgba(0, 212, 255, 0.35);
 
