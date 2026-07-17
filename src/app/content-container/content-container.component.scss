@@ -23,14 +23,23 @@
   .arr { color: t.$cyan; transform: translateX(4px); }
 }
 
+// Compositor-only sweep: animating `top` here made this element the sole
+// source of the page's CLS (Lighthouse flags layout-property animations), so
+// the bar is parked at top:0 and travels via transform instead. Its height is
+// a percentage of the panel, which makes the element's own 100% a fixed
+// fraction of the panel height — translateY(-100%) hides it above the top
+// edge and 100%/0.12 of its own height carries it past the bottom edge.
 @keyframes scan {
-  0%   { top: -10%; opacity: 0.7; }
-  100% { top: 110%; opacity: 0; }
+  0%   { transform: translateY(-100%); opacity: 0.7; }
+  100% { transform: translateY(calc(100% / 0.12)); opacity: 0; }
 }
 
+// Pulse via opacity only — animating color/text-shadow forced a repaint every
+// frame for the whole session (flagged by Lighthouse as a non-composited
+// animation). The bright glow is now the static state and opacity breathes.
 @keyframes online-pulse {
-  0%, 100% { color: #00ff88; text-shadow: 0 0 6px rgba(0,255,136,.7); }
-  50%       { color: #80ffcc; text-shadow: 0 0 16px rgba(0,255,136,1); }
+  0%, 100% { opacity: .68; }
+  50%      { opacity: 1; }
 }
 
 @keyframes panel-in {
@@ -87,8 +96,10 @@
 
   .scanline {
     position: absolute;
-    left: 0; right: 0;
-    height: 112px;
+    top: 0; left: 0; right: 0;
+    // Percentage height (not px) so the `scan` keyframes can express the full
+    // panel sweep in the element's own coordinate space — see @keyframes scan.
+    height: 12%;
     background: linear-gradient(to bottom,
       transparent,
       rgba(0, 212, 255, 0.05) 50%,
@@ -127,6 +138,9 @@
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
+
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0,212,255,.3); }
   }
 }
 
@@ -272,6 +286,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 
   .online {
     color: #00ff88;
+    text-shadow: 0 0 12px rgba(0,255,136,.9);
     animation: online-pulse 2.2s ease-in-out infinite;
     font-weight: bold;
   }

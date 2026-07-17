@@ -29,8 +29,9 @@
                      (pointerup)="onPointerUp($event, i)">
                   @for (src of slides; track $index) {
                     <div class="pf-slide" [class.active]="slide[i] === $index">
-                      @if (src) {
-                        <img class="pf-img" [src]="src" [alt]="pr.name + ' screenshot ' + ($index + 1)" />
+                      @if (src && assetsRequested) {
+                        <img class="pf-img" [src]="src" [alt]="pr.name + ' screenshot ' + ($index + 1)"
+                             loading="lazy" decoding="async" />
                       } @else {
                         <div class="pf-placeholder" aria-hidden="true"></div>
                       }

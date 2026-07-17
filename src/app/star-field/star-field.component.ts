@@ -38,6 +38,12 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private start = performance.now();
   private nextMeteor = 1.5; // seconds until the first meteor
   private lastW = -1;       // last width — recreate stars only when it changes
+  // Decorative layer: capped at ~30fps — halves the loop's main-thread cost
+  // and slow drift/twinkle can't tell the difference. Motion below is scaled
+  // by dt (in 60fps-frame units) so the visual speed stays what it was tuned
+  // to at 60fps.
+  private static readonly FRAME_MS = 1000 / 30;
+  private lastFrame = 0;
   // Users who asked for less motion get a still starfield (no drift/twinkle/meteors).
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -110,14 +116,21 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private animate = () => {
-    const t = (performance.now() - this.start) / 1000;
+  private animate = (now = performance.now()) => {
+    this.frameId = requestAnimationFrame(this.animate);
+    const elapsed = now - this.lastFrame;
+    if (elapsed < StarFieldComponent.FRAME_MS) return;
+    this.lastFrame = now;
+    // Clamped so a background-tab pause doesn't teleport everything on return.
+    const dt = Math.min(elapsed / (1000 / 60), 4);
+
+    const t = (now - this.start) / 1000;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Stars: drift + twinkle.
     for (const s of this.stars) {
       if (s.speed > 0) {
-        s.x += s.speed;
+        s.x += s.speed * dt;
         if (s.x > this.canvas.width + 4) s.x = -4;
       }
       const tw = 0.45 + 0.55 * Math.abs(Math.sin(t * s.twSpeed + s.twPhase));
@@ -129,9 +142,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
       this.spawnMeteor();
       this.nextMeteor = t + 2.5 + Math.random() * 4.5;
     }
-    this.updateMeteors();
-
-    this.frameId = requestAnimationFrame(this.animate);
+    this.updateMeteors(dt);
   };
 
   private drawStar(s: Star, alpha: number) {
@@ -179,14 +190,14 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  private updateMeteors() {
+  private updateMeteors(dt: number) {
     const { ctx } = this;
     this.meteors = this.meteors.filter(m => {
-      m.life += 1 / 60;
+      m.life += dt / 60;
       m.progress = m.life / m.max;
       if (m.progress >= 1) return false;
-      m.x += m.vx;
-      m.y += m.vy;
+      m.x += m.vx * dt;
+      m.y += m.vy * dt;
 
       // Fade in then out across the lifetime.
       const fade = Math.sin(m.progress * Math.PI);

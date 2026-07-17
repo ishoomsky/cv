@@ -27,6 +27,11 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
   private start = performance.now();
   private W = 0;
   private H = 0;
+  // Decorative layer: capped at ~30fps (same pattern as the star field) —
+  // halves the loop's main-thread cost; drift speeds are dt-scaled so the
+  // visual pace is unchanged from the 60fps tuning.
+  private static readonly FRAME_MS = 1000 / 30;
+  private lastFrame = 0;
   private dpr = Math.min(window.devicePixelRatio || 1, 2);
   // Reduced-motion: park the tiles in place and stop the loop once painted.
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -95,14 +100,23 @@ export class AsteroidsComponent implements AfterViewInit, OnDestroy {
     };
   }
 
-  private animate = () => {
+  private animate = (now = performance.now()) => {
+    const elapsed = now - this.lastFrame;
+    if (elapsed < AsteroidsComponent.FRAME_MS && !this.reduceMotion) {
+      this.frameId = requestAnimationFrame(this.animate);
+      return;
+    }
+    this.lastFrame = now;
+    // Clamped so a background-tab pause doesn't teleport tiles on return.
+    const dt = Math.min(elapsed / (1000 / 60), 4);
+
     // Freeze time (no sway) when the user prefers reduced motion.
-    const t = this.reduceMotion ? 0 : (performance.now() - this.start) / 1000;
+    const t = this.reduceMotion ? 0 : (now - this.start) / 1000;
     this.ctx.clearRect(0, 0, this.W, this.H);
 
     for (const tile of this.tiles) {
-      tile.x += tile.vx;
-      tile.y += tile.vy;
+      tile.x += tile.vx * dt;
+      tile.y += tile.vy * dt;
       this.wrap(tile);
       this.drawTile(tile, t);
     }

@@ -28,6 +28,11 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private frameId = 0;
   private loaderHidden = false;
   private loaderTimeout = 0;
+  // The WebGL render is the most expensive per-frame work on the page, and the
+  // globe spin is far too slow for 60fps to matter — cap the loop at ~30fps
+  // (rotation is dt-scaled below so the spin rate is unchanged).
+  private static readonly FRAME_MS = 1000 / 30;
+  private lastFrame = 0;
   private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
   // Reduced-motion: hold the globe still and render on demand instead of spinning.
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -80,7 +85,12 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
       alpha: true,        // let nebula + stars show through
       antialias: true,
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // A full-screen WebGL background doesn't need full retina resolution on
+    // small screens: on mobile viewports (below the 1200px desktop breakpoint —
+    // keep in sync with the `desktop` mixin in _design-tokens.scss) cap DPR at
+    // 1.5 instead of 2, which renders ~44% fewer pixels per frame.
+    const mobile = window.matchMedia('(max-width: 1199px)').matches;
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     this.scene = new THREE.Scene();
@@ -261,10 +271,15 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   // ── Loop & resize ─────────────────────────────────────────────────────────
 
-  private animate = () => {
+  private animate = (now = performance.now()) => {
     this.frameId = requestAnimationFrame(this.animate);
-    this.earth.rotation.y   += 0.00008;
-    this.clouds.rotation.y  += 0.00012; // clouds drift slightly faster
+    const elapsed = now - this.lastFrame;
+    if (elapsed < PlanetComponent.FRAME_MS) return;
+    this.lastFrame = now;
+    // dt in 60fps-frame units, clamped so a background-tab pause doesn't jump.
+    const dt = Math.min(elapsed / (1000 / 60), 4);
+    this.earth.rotation.y   += 0.00008 * dt;
+    this.clouds.rotation.y  += 0.00012 * dt; // clouds drift slightly faster
     this.renderer.render(this.scene, this.camera);
   };
 

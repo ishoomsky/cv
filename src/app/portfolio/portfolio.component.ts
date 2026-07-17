@@ -25,6 +25,11 @@ export class PortfolioComponent implements OnDestroy {
   readonly portfolio = (cvData as { portfolio: PortfolioData }).portfolio;
 
   portfolioOpen = false;
+  // Image srcs are withheld from the template until the panel is first opened,
+  // so the screenshots (the heaviest assets on the site) never load for a
+  // visitor who doesn't open the portfolio. Never reset once true — reopening
+  // must not flash placeholders over already-cached images.
+  assetsRequested = false;
   // Current slide index per project (indexed by project position).
   slide: number[] = this.portfolio.projects.map(() => 0);
   // Which card is "in focus" (nearest the centre of the scroll area). The rest
@@ -150,7 +155,7 @@ export class PortfolioComponent implements OnDestroy {
       this.portfolioOpen = v === 'portfolio';
       // Keyboard focus follows the dialog; the scroll listener is bound/unbound
       // with the open state.
-      if (this.portfolioOpen && !wasOpen) { this.focusModal(); this.focusedIndex = 0; this.attachScroll(); }
+      if (this.portfolioOpen && !wasOpen) { this.assetsRequested = true; this.focusModal(); this.focusedIndex = 0; this.attachScroll(); }
       else if (!this.portfolioOpen && wasOpen) { this.restoreFocus(); this.detachScroll(); }
     }));
   }

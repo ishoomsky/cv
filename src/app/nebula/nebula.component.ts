@@ -13,13 +13,21 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
   private frameId = 0;
   private start = performance.now();
   private lastW = -1;   // last width — re-bake the nebula only when it changes
+  // The drift is a minutes-long sine — between 60fps frames it moves by a
+  // sub-pixel amount, so redrawing that often is pure waste. ~15fps keeps the
+  // breathe/drift visually identical at a quarter of the cost.
+  private static readonly FRAME_MS = 1000 / 15;
+  private lastFrame = 0;
+  // Reduced-motion: bake once and hold still, like the other canvas layers.
+  private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('nebulaCanvas') as HTMLCanvasElement;
     this.ctx = this.canvas.getContext('2d')!;
     this.offscreen = document.createElement('canvas');
     this.resizeCanvas();
-    this.animate();
+    if (this.reduceMotion) this.renderStatic();
+    else this.animate();
   }
 
   ngOnDestroy() {
@@ -36,6 +44,15 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
       this.lastW = this.canvas.width;
       this.prerender();
     }
+    // The rAF loop is off in reduced-motion mode, so repaint the still frame here.
+    if (this.reduceMotion) this.renderStatic();
+  }
+
+  // Single still frame at base position/opacity (no drift, no breathe).
+  private renderStatic() {
+    const w = this.canvas.width, h = this.canvas.height;
+    this.ctx.clearRect(0, 0, w, h);
+    this.ctx.drawImage(this.offscreen, -24, -24, w + 48, h + 48);
   }
 
   // Bake the expensive blurred blobs once into an offscreen canvas.
@@ -76,8 +93,12 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
   }
 
   // Slowly drift and "breathe" the baked nebula so the backdrop feels alive.
-  private animate = () => {
-    const t = (performance.now() - this.start) / 1000;
+  private animate = (now = performance.now()) => {
+    this.frameId = requestAnimationFrame(this.animate);
+    if (now - this.lastFrame < NebulaComponent.FRAME_MS) return;
+    this.lastFrame = now;
+
+    const t = (now - this.start) / 1000;
     const w = this.canvas.width, h = this.canvas.height;
 
     const dx = Math.sin(t * 0.03) * 18;
@@ -89,7 +110,5 @@ export class NebulaComponent implements AfterViewInit, OnDestroy {
     // Draw slightly oversized so the drift never exposes a hard edge.
     this.ctx.drawImage(this.offscreen, dx - 24, dy - 24, w + 48, h + 48);
     this.ctx.globalAlpha = 1;
-
-    this.frameId = requestAnimationFrame(this.animate);
   };
 }
