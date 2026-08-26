@@ -567,6 +567,12 @@ nav { display: flex; flex-direction: column; gap: 7px; }
         border-color: t.$cyan;
         color: t.$text-bright;
       }
+
+      &.is-disabled {
+        opacity: .35;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
     }
   }
 

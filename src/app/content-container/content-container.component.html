@@ -91,7 +91,8 @@
           </div>
         </div>
         <div class="head-actions">
-          <a class="hbtn" [href]="cv.pdf" target="_blank" rel="noopener" (click)="analytics.event('pdf-download')"><span aria-hidden="true">⤓</span> PDF</a>
+          <!-- Temporarily disabled: PDF download muted, see git history to restore -->
+          <span class="hbtn is-disabled" aria-disabled="true" role="button" tabindex="-1"><span aria-hidden="true">⤓</span> PDF</span>
           <button class="hbtn close-btn" (click)="closeCv()" aria-label="Close dossier"><span aria-hidden="true">✕</span> CLOSE</button>
         </div>
       </div>
