@@ -16,7 +16,7 @@ interface CvData {
     firstName: string; lastName: string; fullName: string;
     panelRole: string; resumeRole: string; dossierTitle: string;
   };
-  contacts: { location: string; email: string; phone: string; linkedin: Link; github: Link; };
+  contacts: { email: string; phone: string; linkedin: Link; github: Link; };
   status: string;
   pdf: string;
   nav: NavItem[];
