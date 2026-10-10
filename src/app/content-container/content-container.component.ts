@@ -16,7 +16,7 @@ interface CvData {
     firstName: string; lastName: string; fullName: string;
     panelRole: string; resumeRole: string; dossierTitle: string;
   };
-  contacts: { email: string; phone: string; linkedin: Link; github: Link; };
+  contacts: { location: string; email: string; phone: string; linkedin: Link; github: Link; };
   status: string;
   pdf: string;
   nav: NavItem[];
@@ -25,7 +25,7 @@ interface CvData {
   skills: SkillGroup[];
   experience: Job[];
   projects: Project[];
-  portfolio: { title: string; projects: { name: string; company: string; description: string; images: string[]; }[]; };
+  portfolio: { title: string; projects: { name: string; company: string; description: string; url?: string; images: string[]; }[]; };
   education: { title: string; org: string; year: string; }[];
   languages: string[];
 }

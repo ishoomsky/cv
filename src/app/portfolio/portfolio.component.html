@@ -24,6 +24,7 @@
                 <span class="corner br" aria-hidden="true"></span>
 
                 <!-- Top: screenshot carousel (crossfade) -->
+                @if (pr.images.length) {
                 <div class="pf-media"
                      (pointerdown)="onPointerDown($event)"
                      (pointerup)="onPointerUp($event, i)">
@@ -50,6 +51,7 @@
                     </div>
                   }
                 </div>
+                }
 
                 <!-- Bottom: identity + description block (fills the rest) -->
                 <div class="pf-info">
@@ -57,6 +59,9 @@
                   <h3 class="pf-name">{{ pr.name }}</h3>
                   @if (pr.description) {
                     <p class="pf-desc">{{ pr.description }}</p>
+                  }
+                  @if (pr.url) {
+                    <a class="pf-link" [href]="pr.url" target="_blank" rel="noopener">{{ hostOf(pr.url) }} <span aria-hidden="true">↗</span></a>
                   }
                 </div>
               </div>

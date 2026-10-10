@@ -19,6 +19,7 @@
       <div class="divider"></div>
       <div class="section">
         <div class="section-label"><span class="diamond" aria-hidden="true">◈</span>STATUS</div>
+        <div class="readout"><span class="key">LOCATION</span><span class="sep" aria-hidden="true">∷</span><span class="val">{{ cv.contacts.location }}</span></div>
         <div class="readout stack">
           <span class="key">STACK</span><span class="sep" aria-hidden="true">∷</span>
           <span class="marquee">
@@ -106,6 +107,10 @@
             </div>
 
             <div class="rail-contacts">
+              <span class="contact-row">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="2.4"/><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+                {{ cv.contacts.location }}
+              </span>
               <a class="contact-row" [href]="'mailto:' + cv.contacts.email">
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon('mail')"/></svg>
                 {{ cv.contacts.email }}
