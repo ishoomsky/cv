@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import cvData from '../data/cv-data.json';
 import { PanelService } from '../panel.service';
 
-interface PortfolioProject { name: string; company: string; description: string; images: string[]; }
+interface PortfolioProject { name: string; company: string; description: string; url?: string; images: string[]; }
 interface PortfolioData { title: string; projects: PortfolioProject[]; }
 
 // How many gradient placeholder slides to show for a project that has no real
@@ -113,6 +113,8 @@ export class PortfolioComponent implements OnDestroy {
   slidesFor(p: PortfolioProject): (string | null)[] {
     return p.images.length ? p.images : new Array(PLACEHOLDER_SLIDES).fill(null);
   }
+
+  hostOf(url: string): string { return new URL(url).host; }
 
   private count(i: number): number {
     return this.slidesFor(this.portfolio.projects[i]).length;

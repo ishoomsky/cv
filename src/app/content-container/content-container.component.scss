@@ -659,6 +659,7 @@ nav { display: flex; flex-direction: column; gap: 7px; }
 }
 
 .cv-summary {
+  white-space: pre-line; // paragraphs are separated by \n\n in cv-data.json
   margin: 0;
   max-width: 74ch;
   font-family: var(--font-body);

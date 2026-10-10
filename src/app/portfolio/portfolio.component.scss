@@ -309,6 +309,27 @@
   color: t.$text-body;
 }
 
+.pf-link {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 7px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  color: t.$cyan;
+  text-decoration: none;
+  border: 1px solid rgba(0,212,255,.3);
+  transition: background .15s, border-color .15s, box-shadow .15s, color .15s;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(0,212,255,.15);
+    border-color: t.$cyan;
+    color: #fff;
+    box-shadow: 0 0 14px rgba(0,212,255,.4);
+  }
+}
+
 // ── Controls — frosted, matching the content plate ──────────────────────────
 // Round frosted arrows, hidden until the card is hovered (or focused for a11y),
 // so they don't compete with the artwork.

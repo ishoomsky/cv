@@ -3,12 +3,12 @@
     "firstName": "IVAN",
     "lastName": "SHUMSKI",
     "fullName": "IVAN SHUMSKI",
-    "panelRole": "FRONTEND DEVELOPER",
-    "resumeRole": "SENIOR FRONTEND DEVELOPER",
+    "panelRole": "FRONTEND & FULL-STACK ENGINEER",
+    "resumeRole": "FRONTEND & FULL-STACK ENGINEER",
     "dossierTitle": "◈ PERSONNEL DOSSIER // IVAN.SHUMSKI"
   },
   "contacts": {
-    "location": "HAIFA, IL",
+    "location": "ISRAEL",
     "email": "ishoomsky@gmail.com",
     "phone": "+972 55 771 0044",
     "linkedin": { "label": "linkedin/ivanshumski", "url": "https://www.linkedin.com/in/ivanshumski/" },
@@ -33,7 +33,7 @@
     "linkedinUrl": "https://www.linkedin.com/in/ivanshumski/"
   },
   "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
-  "summary": "Frontend Developer with 5+ years building high-performance, reactive web apps with Angular (Signals, RxJS), React, and TypeScript. Focused on clean architecture, rendering performance, and UIs that hold up under real traffic. Uses modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.",
+  "summary": "I'm a frontend developer with 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
   "skills": [
     {
       "label": "FRAMEWORKS & LIBRARIES",
@@ -165,6 +165,27 @@
         "images": [
           "projects/vysnova/vsnv-16-9.webp"
         ]
+      },
+      {
+        "name": "HEBREW LEARNING APP",
+        "company": "Personal project",
+        "description": "A Hebrew learning app with AI-generated vocabulary and morphology, a personal dictionary, and spaced-repetition practice, built with Expo, NestJS and Google Cloud.",
+        "url": "https://hebrew.shumski.dev",
+        "images": []
+      },
+      {
+        "name": "PERSONAL FINANCE TRACKER",
+        "company": "Personal project",
+        "description": "A personal finance app with account and transaction tracking, budgets, financial reports, and AI-assisted receipt scanning.",
+        "url": "https://expenses.shumski.dev",
+        "images": []
+      },
+      {
+        "name": "MEAL PLANNER",
+        "company": "Personal project",
+        "description": "A multilingual meal planner with Hebrew RTL support, AI-generated recipes, weekly meal planning, shopping lists, and food tracking.",
+        "url": "https://food.shumski.dev",
+        "images": []
       }
     ]
   },
