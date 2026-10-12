@@ -28,11 +28,10 @@ why several details below care about `<base href>`.
 |---|---|---|
 | `NebulaComponent` | `nebulaCanvas` | Static blurred nebula blobs, drawn once (redrawn on resize) |
 | `StarFieldComponent` | `starCanvas` | Animated multi-layer parallax star field via `requestAnimationFrame` |
-| `AsteroidsComponent` | `asteroidCanvas` | Floating tech-logo tiles (TS/Angular/Node/Anthropic) drifting + wrapping across screen |
 | `PlanetComponent` | `planetCanvas` | **three.js** WebGL Earth — real day/night/specular/normal/cloud textures + custom shaders |
-| `ContentContainerComponent` | DOM (glass HUD) | The CV UI: nav, stack ticker, and the slide-in "dossier" popup |
+| `LandingComponent` | DOM (fixed Lenis scroller) | The whole CV as a long parallax landing: sticky hero, sections as cards sliding over it |
 
-All **canvas** components (nebula, star-field, asteroids) share one pattern:
+All **canvas** components (nebula, star-field) share one pattern:
 implement `AfterViewInit` + grab the canvas via `document.getElementById` (not
 `@ViewChild`), and implement `@HostListener('window:resize')` that resizes the
 canvas and re-initialises state. Devicepixel ratio is clamped to `≤ 2`.
@@ -46,14 +45,18 @@ typed there via the `CvData` interface. Edit the JSON to change page content; do
 not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
 `public/` and are referenced by relative path.
 
-### Routing drives the popup, not navigation
+### Landing + parallax
 
-`app.routes.ts` defines **componentless** routes — they exist only to reflect UI
-state in the URL. `ContentContainerComponent` subscribes to `NavigationEnd` and
-opens the dossier popup when the path is `/resume`, closes it otherwise
-(`openCv()`/`closeCv()` just `router.navigate`). `/cv` in older commit messages
-is the deploy sub-path, not this route — the route that opens the dossier is
-`/resume`.
+`LandingComponent` is a fixed `.scroller` (the document itself never scrolls)
+driven by **Lenis** (`wrapper`/`content` mode) and **GSAP ScrollTrigger**
+(`scroller` set to that element; Lenis feeds `ScrollTrigger.update`). All of it
+runs inside `NgZone.runOutsideAngular`. Parallax is declarative in the template:
+`data-speed="n"` = depth drift relative to its section, `data-reveal` = fade/rise
+on enter, `.work-img` = image moves inside its frame, `.marquee-row` = scrubbed
+sideways text. The hero is `position: sticky` so the following `.card` sections
+slide over it; the fixed star/planet canvases are also tweened with scroll.
+`prefers-reduced-motion` skips Lenis/GSAP entirely. Routing is just `''` —
+sections are reached by scrolling / `scrollTo(id)`.
 
 ### Planet (three.js) specifics
 

@@ -4,15 +4,12 @@ import { AnalyticsService } from './analytics.service';
 import { PlanetComponent } from "./planet/planet.component";
 import { StarFieldComponent } from "./star-field/star-field.component";
 import { NebulaComponent } from "./nebula/nebula.component";
-import { AsteroidsComponent } from "./asteroids/asteroids.component";
-import { ContentContainerComponent } from "./content-container/content-container.component";
-import { PortfolioComponent } from "./portfolio/portfolio.component";
-import { ContactComponent } from "./contact/contact.component";
+import { LandingComponent } from "./landing/landing.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, PlanetComponent, StarFieldComponent, NebulaComponent, AsteroidsComponent, ContentContainerComponent, PortfolioComponent, ContactComponent],
+  imports: [RouterOutlet, PlanetComponent, StarFieldComponent, NebulaComponent, LandingComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

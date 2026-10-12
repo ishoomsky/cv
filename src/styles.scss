@@ -38,7 +38,7 @@ body {
 
 // Honour the OS "reduce motion" setting: neutralise the decorative CSS
 // animations (scanline, pulses, marquee, entrance transitions). The canvas
-// layers (star field, planet, asteroids) check the same query in TypeScript
+// layers (star field, planet) check the same query in TypeScript
 // and paint a single static frame instead of animating.
 @media (prefers-reduced-motion: reduce) {
   *,

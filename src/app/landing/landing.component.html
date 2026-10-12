@@ -1,0 +1,169 @@
+<header class="topbar">
+  <a class="brand" href="#top" (click)="scrollTo('top', $event)">{{ cv.profile.firstName }}<span>.</span>{{ cv.profile.lastName }}</a>
+  <nav aria-label="Sections">
+    @for (n of cv.nav; track n.target) {
+      <a [href]="'#' + n.target" (click)="scrollTo(n.target, $event)">{{ n.label }}</a>
+    }
+  </nav>
+  <a class="cta" [href]="cv.contact.whatsappUrl" target="_blank" rel="noopener">WhatsApp</a>
+</header>
+
+<div class="scroller" #scroller>
+  <main class="content" #content id="top">
+
+    <!-- ── HERO (sticky: the next card slides over it) ─────────────────── -->
+    <section class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow fade-in"><span class="pulse" aria-hidden="true"></span>{{ cv.status }} · {{ cv.contacts.location }}</p>
+        <h1 class="name" [attr.aria-label]="cv.profile.fullName">
+          <span class="line" aria-hidden="true">@for (c of letters; track $index) {<span class="mask"><span class="ch">{{ c }}</span></span>}</span>
+          <span class="line" aria-hidden="true">@for (c of lastLetters; track $index) {<span class="mask"><span class="ch">{{ c }}</span></span>}</span>
+        </h1>
+        <p class="role fade-in">{{ cv.profile.panelRole }}</p>
+        <button class="scroll-hint fade-in" (click)="scrollTo('about')">Scroll <span aria-hidden="true">↓</span></button>
+      </div>
+
+      @for (t of tiles; track t.icon) {
+        <div class="tile" [style.left]="t.x" [style.top]="t.y" [style.width.px]="t.size" [style.height.px]="t.size" [attr.data-speed]="t.speed" aria-hidden="true">
+          <div class="tile-spin" [style.transform]="'rotate(' + t.rot + 'deg)'">
+            <img [src]="t.icon" alt="" />
+          </div>
+        </div>
+      }
+    </section>
+
+    <!-- ── ABOUT ───────────────────────────────────────────────────────── -->
+    <section class="card dark" id="about">
+      <div class="inner two-col">
+        <div>
+          <h2 class="kicker" data-reveal>About</h2>
+          <p class="lead" data-reveal>{{ cv.summary.split('\n\n')[0] }}</p>
+        </div>
+        <div class="stack-col">
+          @for (p of cv.summary.split('\n\n').slice(1); track $index) {
+            <p class="body" data-reveal>{{ p }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="inner skills">
+        @for (g of cv.skills; track g.label) {
+          <div class="skill-group" data-reveal>
+            <h3>{{ g.label }}</h3>
+            <div class="chips">
+              @for (s of g.items; track s) { <span class="chip">{{ s }}</span> }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-row">@for (t of ticker; track $index) {<span>{{ t }}</span><i>✦</i>}</div>
+      </div>
+    </section>
+
+    <!-- ── EXPERIENCE ──────────────────────────────────────────────────── -->
+    <section class="card dark alt" id="experience">
+      <div class="inner">
+        <h2 class="kicker" data-reveal>Experience</h2>
+        <div class="jobs">
+          @for (j of cv.experience; track j.company) {
+            <article class="job" data-reveal>
+              <div class="job-head">
+                <div>
+                  <h3 class="company">{{ j.company }}</h3>
+                  <p class="job-role">{{ j.role }}</p>
+                </div>
+                <span class="period">{{ j.period }}</span>
+              </div>
+              <ul>
+                @for (p of j.points; track p) { <li>{{ p }}</li> }
+              </ul>
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WORK (light paper card, like a contrast section) ───────────── -->
+    <section class="card light" id="work">
+      <div class="big-word" aria-hidden="true"><div class="marquee-row">SELECTED WORK — SELECTED WORK — SELECTED WORK —</div></div>
+      <div class="inner">
+        <h2 class="kicker" data-reveal>Work</h2>
+        <div class="works">
+          @for (w of work; track w.name; let i = $index) {
+            <article class="work" [class.flip]="i % 2">
+              <div class="work-frame" data-reveal>
+                <img class="work-img" [src]="w.images[0]" [alt]="w.name + ' screenshot'" loading="lazy" decoding="async" />
+              </div>
+              <div class="work-info" data-reveal>
+                <span class="work-co">{{ w.company }}</span>
+                <h3>{{ w.name }}</h3>
+                <p>{{ w.description }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PERSONAL PROJECTS ──────────────────────────────────────────── -->
+    <section class="card dark" id="projects">
+      <div class="inner">
+        <h2 class="kicker" data-reveal>Built on my own</h2>
+        <div class="projects">
+          @for (pr of cv.projects; track pr.name; let i = $index) {
+            <article class="project" data-reveal>
+              <span class="p-num">0{{ i + 1 }}</span>
+              <h3>{{ pr.name }}</h3>
+              <p class="p-tag">{{ pr.tagline }}</p>
+              <div class="flow">
+                @for (n of pr.flow; track n; let last = $last) {
+                  <span class="chip">{{ n }}</span>@if (!last) {<span class="arrow" aria-hidden="true">→</span>}
+                }
+              </div>
+              <ul>
+                @for (p of pr.points; track p) { <li>{{ p }}</li> }
+              </ul>
+              @if (pr.url) {
+                <a class="live" [href]="pr.url" target="_blank" rel="noopener">Open live ↗</a>
+              }
+            </article>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EDUCATION + CONTACT ────────────────────────────────────────── -->
+    <section class="card dark alt end" id="contact">
+      <div class="inner two-col">
+        <div>
+          <h2 class="kicker" data-reveal>Education</h2>
+          @for (e of cv.education; track e.title) {
+            <div class="edu" data-reveal>
+              <span class="year">{{ e.year }}</span>
+              <div><strong>{{ e.title }}</strong><small>{{ e.org }}</small></div>
+            </div>
+          }
+          <div class="chips langs" data-reveal>
+            @for (l of cv.languages; track l) { <span class="chip">{{ l }}</span> }
+          </div>
+        </div>
+        <div>
+          <h2 class="kicker" data-reveal>Contact</h2>
+          <p class="lead sm" data-reveal>{{ cv.contact.intro }}</p>
+        </div>
+      </div>
+
+      <div class="inner contact-links">
+        <a class="mega" data-speed="0.25" [href]="cv.contact.whatsappUrl" target="_blank" rel="noopener">Let's talk ↗</a>
+        <div class="links" data-reveal>
+          <a [href]="'mailto:' + cv.contacts.email">{{ cv.contacts.email }}</a>
+          <a [href]="cv.contact.phoneUrl">{{ cv.contact.phone }}</a>
+          <a [href]="cv.contacts.linkedin.url" target="_blank" rel="noopener">{{ cv.contacts.linkedin.label }}</a>
+          <a [href]="cv.contacts.github.url" target="_blank" rel="noopener">{{ cv.contacts.github.label }}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
