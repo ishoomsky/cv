@@ -4,6 +4,21 @@ $paper: #e9f3f9;
 $ink: #04121f;
 $gutter: clamp(20px, 5vw, 96px);
 
+// ── Type scale ────────────────────────────────────────────────────────────
+// Fluid between a 375px and 1440px viewport. The rem part keeps text growing
+// with browser zoom (pure-vw sizes ignore it); display sizes stay vw-driven.
+$fs-label:   0.8125rem;                                            // 13 — mono uppercase labels
+$fs-ui:      clamp(0.875rem, 0.853rem + 0.09vw, 0.9375rem);        // 14→15 — mono chips, meta, links
+$fs-body:    clamp(1rem, 0.956rem + 0.19vw, 1.125rem);             // 16→18
+$fs-lead-sm: clamp(1.125rem, 1.04rem + 0.38vw, 1.375rem);          // 18→22
+$fs-h3:      clamp(1.25rem, 1.03rem + 0.94vw, 1.875rem);           // 20→30
+$fs-h3-lg:   clamp(1.5rem, 1.15rem + 1.5vw, 2.5rem);               // 24→40
+$fs-lead:    clamp(1.375rem, 1.11rem + 1.13vw, 2.125rem);          // 22→34
+$fs-h2:      clamp(1.875rem, 0.95rem + 3.94vw, 4.5rem);            // 30→72
+
+$rail-tile: clamp(48px, 5vw, 72px);
+$rail-h: calc(#{$rail-tile} + clamp(20px, 5vh, 48px) + 24px);   // tile + bottom offset + breathing room
+
 :host {
   position: fixed;
   inset: 0;
@@ -41,7 +56,10 @@ $gutter: clamp(20px, 5vw, 96px);
     white-space: nowrap;
     span { color: t.$cyan; }
   }
-  nav { display: flex; gap: 18px; a { color: t.$text; text-decoration: none; transition: color .2s; &:hover { color: t.$cyan; } } }
+  nav { display: flex; gap: 18px; a { position: relative; color: t.$text; text-decoration: none; transition: color .2s;
+    &:hover, &.active { color: t.$text-bright; }
+    &::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px; border-radius: 2px; background: t.$cyan; transform: scaleX(0); transition: transform .3s t.$ease-out; }
+    &.active::after { transform: scaleX(1); } } }
   .cta {
     background: t.$cyan; color: $ink; font-weight: 700; text-decoration: none;
     padding: 10px 18px; border-radius: 999px; transition: transform .2s, box-shadow .2s;
@@ -80,11 +98,14 @@ $gutter: clamp(20px, 5vw, 96px);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  // Keep the copy clear of the tech rail pinned to the bottom of the hero.
+  padding-bottom: $rail-h;
+  box-sizing: border-box;
   will-change: transform, opacity;
 }
 .eyebrow {
   display: flex; align-items: center; gap: 10px; margin: 0 0 24px;
-  font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.14em; color: t.$status-green;
+  font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: 0.14em; color: t.$status-green;
 }
 .pulse {
   width: 8px; height: 8px; border-radius: 50%; background: t.$status-green;
@@ -97,42 +118,60 @@ $gutter: clamp(20px, 5vw, 96px);
   font-family: var(--font-display);
   font-weight: 900;
   line-height: 0.95;
-  font-size: clamp(54px, 12.5vw, 200px);
+  // "IVAN.SHUMSKI" measures ~8.15em in Orbitron 900; 10.4vw keeps it on one line
+  // inside the ~90vw content box at every width.
+  font-size: clamp(30px, 10.4vw, 150px);
   letter-spacing: -0.02em;
-  color: t.$text-bright;
-  text-shadow: 0 0 60px rgba(0, 212, 255, 0.25);
+  color: #f2fbff;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.55), 0 0 80px rgba(0, 212, 255, 0.18);
+  white-space: nowrap;
   .line { display: block; }
-  .line:last-child { color: t.$cyan; }
+  .accent { color: t.$cyan; }
   .mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; }
   .ch { display: inline-block; will-change: transform; }
 }
 .role {
   margin: 28px 0 0; font-family: var(--font-mono);
-  font-size: clamp(14px, 1.6vw, 20px); letter-spacing: 0.22em; color: t.$text;
+  font-size: clamp(0.9375rem, 0.79rem + 0.66vw, 1.25rem); letter-spacing: 0.22em; color: t.$text;
 }
-.scroll-hint {
-  margin-top: 44px; align-self: flex-start;
-  background: none; border: 1px solid t.$cyan-border; color: t.$cyan; cursor: pointer;
-  padding: 12px 20px; border-radius: 999px; font-family: var(--font-mono); letter-spacing: .16em;
-  transition: background .2s;
-  &:hover { background: t.$bg-raised; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: .08em; text-decoration: none;
+  transition: transform .25s t.$ease-out, box-shadow .25s, background .25s, color .25s;
+  &.primary { background: t.$cyan; color: $ink; font-weight: 700;
+    &:hover { transform: translateY(-2px); box-shadow: 0 10px 30px t.$cyan-glow; } }
+  &.ghost { color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 12, 26, .5);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    &:hover { border-color: t.$cyan; color: t.$cyan; } }
 }
 
-.tile {
-  position: absolute;
-  pointer-events: none;
-  will-change: transform;
-  .tile-spin {
-    width: 100%; height: 100%;
-    display: grid; place-items: center;
-    border-radius: 28%;
-    background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(214,236,248,.92));
-    box-shadow: 0 30px 60px -18px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.4) inset;
-  }
-  img { width: 52%; height: 52%; object-fit: contain; }
+// ── Tech rail: endless sideways slider of logo tiles ──────────────────────
+.rail {
+  position: absolute; left: 0; right: 0; bottom: clamp(20px, 5vh, 48px);
+  overflow: hidden;
+  // Fade the ends so tiles slide in/out instead of being cut at the edge.
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
+.rail-track {
+  // Looped by GSAP (xPercent -50, slows on hover) — see LandingComponent.
+  display: flex; width: max-content; will-change: transform;
+}
+.rail-item {
+  display: flex; align-items: center; gap: 14px; flex: none;
+  // Spacing as right padding (not gap) so both halves are identical and the loop has no seam.
+  padding-right: clamp(36px, 5vw, 72px);
+}
+.rail-icon {
+  display: grid; place-items: center; flex: none;
+  width: $rail-tile; height: $rail-tile; border-radius: 28%;
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(214,236,248,.92));
+  box-shadow: 0 18px 40px -16px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.4) inset;
+  img { width: 54%; height: 54%; object-fit: contain; }
+}
+.rail-label { font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: .14em; text-transform: uppercase; color: t.$text-bright; white-space: nowrap; }
 @media (max-width: 700px) {
-  .tile { transform-origin: center; width: 64px !important; height: 64px !important; }
   .hero-inner { justify-content: flex-start; padding-top: 22vh; }
 }
 
@@ -162,27 +201,30 @@ $gutter: clamp(20px, 5vw, 96px);
 @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
 .kicker {
-  margin: 0 0 32px; font-family: var(--font-mono); font-weight: 400;
-  font-size: 14px; letter-spacing: 0.24em; text-transform: uppercase; color: t.$cyan;
-  &::before { content: '◈ '; }
+  margin: 0 0 clamp(36px, 6vh, 64px); display: flex; align-items: baseline; gap: 18px;
+  font-family: var(--font-display); font-weight: 900; letter-spacing: -0.01em; line-height: 1;
+  font-size: $fs-h2; color: t.$text-bright;
+  span { font-family: var(--font-mono); font-weight: 400; font-size: $fs-label; letter-spacing: .2em; color: t.$cyan; transform: translateY(-0.2em); }
 }
-.light .kicker { color: #0a7ca0; }
+.sub-h { margin: 0 0 20px; font-family: var(--font-mono); font-weight: 400; font-size: $fs-label; letter-spacing: .22em; text-transform: uppercase; color: t.$cyan; }
+.light .kicker { color: $ink; span { color: #0a7ca0; } }
 .lead {
-  margin: 0; font-family: var(--font-display); font-weight: 700;
-  font-size: clamp(22px, 3vw, 44px); line-height: 1.25; color: t.$text-bright;
+  margin: 0; font-family: var(--font-body); font-weight: 600; letter-spacing: -0.02em;
+  font-size: $fs-lead; line-height: 1.22; color: t.$text-bright; max-width: 22ch;
 }
 .light .lead { color: $ink; }
-.lead.sm { font-size: clamp(18px, 1.8vw, 26px); font-weight: 400; font-family: var(--font-body); line-height: 1.55; }
-.body { margin: 0 0 24px; font-size: clamp(16px, 1.3vw, 19px); line-height: 1.7; }
+.lead.sm { font-size: $fs-lead-sm; font-weight: 400; letter-spacing: 0; line-height: 1.55; max-width: 34ch; }
+.body { margin: 0 0 24px; font-size: $fs-body; line-height: 1.7; max-width: 60ch; }
+.stack-col { padding-top: 6px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 10px; }
 .chip {
   padding: 8px 16px; border-radius: 999px; border: 1px solid t.$cyan-border;
-  background: t.$bg-raised; color: t.$text-bright; font-family: var(--font-mono); font-size: 14px;
+  background: t.$bg-raised; color: t.$text-bright; font-family: var(--font-mono); font-size: $fs-ui;
 }
 
 .skills { margin-top: clamp(48px, 8vh, 96px); display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 40px; }
-.skill-group h3 { margin: 0 0 14px; font-family: var(--font-mono); font-weight: 400; font-size: 12px; letter-spacing: .2em; color: t.$cyan-dim; }
+.skill-group h3 { margin: 0 0 14px; font-family: var(--font-mono); font-weight: 400; font-size: $fs-label; letter-spacing: .18em; color: t.$text; }
 
 .marquee { margin-top: clamp(56px, 10vh, 120px); overflow: hidden; white-space: nowrap; }
 .marquee-row {
@@ -200,11 +242,14 @@ $gutter: clamp(20px, 5vw, 96px);
   background: linear-gradient(160deg, rgba(0,160,220,.10), rgba(0,160,220,.03));
   border: 1px solid t.$cyan-border;
 }
-.job-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-.company { margin: 0; font-family: var(--font-display); font-size: clamp(22px, 2.6vw, 38px); color: t.$text-bright; }
-.job-role { margin: 6px 0 0; font-family: var(--font-mono); color: t.$cyan; letter-spacing: .08em; }
-.period { font-family: var(--font-mono); color: t.$text; padding: 6px 14px; border: 1px solid t.$cyan-border; border-radius: 999px; font-size: 13px; }
-.job ul, .project ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; line-height: 1.65; font-size: clamp(15px, 1.2vw, 17px); }
+.job { display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 16px clamp(32px, 5vw, 80px); }
+.job-head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.company { margin: 6px 0 0; font-family: var(--font-display); font-size: $fs-h3; line-height: 1.1; color: t.$text-bright; }
+.job-role { margin: 0; font-family: var(--font-mono); font-size: $fs-ui; color: t.$cyan; letter-spacing: .08em; }
+.period { font-family: var(--font-mono); color: t.$text; padding: 6px 14px; border: 1px solid t.$cyan-border; border-radius: 999px; font-size: $fs-label; }
+.job ul { max-width: 68ch; }
+@media (max-width: 900px) { .job { grid-template-columns: 1fr; } }
+.job ul, .project ul { margin: 0; padding-left: 20px; display: grid; gap: 10px; line-height: 1.65; font-size: $fs-body; }
 .job li::marker, .project li::marker { color: t.$cyan; }
 
 // ── Work ─────────────────────────────────────────────────────────────────
@@ -217,9 +262,9 @@ $gutter: clamp(20px, 5vw, 96px);
   aspect-ratio: 16 / 10; background: #cfe2ee; box-shadow: 0 30px 60px -30px rgba(4,18,31,.55);
 }
 .work-img { position: absolute; inset: -10% 0; width: 100%; height: 120%; object-fit: cover; will-change: transform; }
-.work-co { font-family: var(--font-mono); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #0a7ca0; }
-.work-info h3 { margin: 12px 0 16px; font-family: var(--font-display); font-size: clamp(24px, 3vw, 44px); line-height: 1.1; }
-.work-info p { margin: 0; font-size: clamp(15px, 1.2vw, 18px); line-height: 1.7; color: #27475c; }
+.work-co { font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .2em; text-transform: uppercase; color: #0a7ca0; }
+.work-info h3 { margin: 12px 0 16px; font-family: var(--font-display); font-size: $fs-h3-lg; line-height: 1.1; }
+.work-info p { margin: 0; font-size: $fs-body; line-height: 1.7; color: #27475c; }
 @media (max-width: 900px) {
   .work, .work.flip { grid-template-columns: 1fr; .work-frame { order: 0; } }
 }
@@ -229,25 +274,26 @@ $gutter: clamp(20px, 5vw, 96px);
 .project {
   display: flex; flex-direction: column; gap: 16px; padding: clamp(24px, 2.4vw, 36px); border-radius: 28px;
   border: 1px solid t.$cyan-border; background: linear-gradient(170deg, rgba(0,160,220,.12), rgba(0,160,220,.02));
-  h3 { margin: 0; font-family: var(--font-display); font-size: clamp(20px, 2vw, 28px); color: t.$text-bright; }
-  .p-num { font-family: var(--font-mono); color: t.$cyan; font-size: 14px; }
-  .p-tag { margin: 0; font-family: var(--font-mono); color: t.$text; }
+  h3 { margin: 0; font-family: var(--font-display); font-size: $fs-h3; line-height: 1.15; color: t.$text-bright; }
+  .p-num { font-family: var(--font-mono); color: t.$cyan; font-size: $fs-label; letter-spacing: .2em; }
+  .p-tag { margin: 0; font-family: var(--font-mono); font-size: $fs-ui; color: t.$text; }
   .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; .arrow { color: t.$cyan; } }
-  .live { margin-top: auto; align-self: flex-start; color: t.$cyan; font-family: var(--font-mono); letter-spacing: .1em; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; }
+  .live { margin-top: auto; align-self: flex-start; color: t.$cyan; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: .1em; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; }
 }
 
 // ── Education + contact ──────────────────────────────────────────────────
-.edu { display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid t.$cyan-border;
-  .year { font-family: var(--font-mono); color: t.$cyan; min-width: 56px; }
-  strong { display: block; color: t.$text-bright; font-weight: 600; margin-bottom: 4px; }
-  small { color: t.$text; font-size: 14px; } }
+.edu { display: flex; align-items: baseline; gap: clamp(16px, 2vw, 28px); padding: clamp(18px, 2.4vh, 26px) 0; border-bottom: 1px solid t.$cyan-border;
+  &:first-of-type { border-top: 1px solid t.$cyan-border; }
+  .year { flex: none; font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .14em; color: t.$cyan; min-width: 52px; }
+  strong { display: block; font-size: $fs-lead-sm; line-height: 1.3; letter-spacing: -0.01em; color: t.$text-bright; font-weight: 600; margin-bottom: 6px; }
+  small { display: block; color: t.$text; font-size: $fs-ui; line-height: 1.5; } }
 .langs { margin-top: 28px; }
 .contact-links { margin-top: clamp(56px, 10vh, 120px); }
 .mega {
   display: block; font-family: var(--font-display); font-weight: 900; text-decoration: none;
-  font-size: clamp(48px, 11vw, 190px); line-height: 1; color: t.$cyan; letter-spacing: -0.02em;
+  font-size: clamp(44px, 8.5vw, 136px); line-height: 1; color: t.$cyan; letter-spacing: -0.02em;
   transition: color .3s, text-shadow .3s;
   &:hover { color: t.$text-bright; text-shadow: 0 0 80px t.$cyan-glow; }
 }
-.links { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 14px 32px; font-family: var(--font-mono);
+.links { margin-top: 48px; display: flex; flex-wrap: wrap; gap: 14px 32px; font-family: var(--font-mono); font-size: $fs-ui;
   a { color: t.$text-bright; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; &:hover { color: t.$cyan; } } }

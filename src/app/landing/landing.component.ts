@@ -25,14 +25,15 @@ interface CvData {
   languages: string[];
 }
 
-// Floating tech tiles in the hero. `speed` is the parallax depth: bigger
-// numbers travel further as you scroll, so they read as closer to the camera.
-const TILES = [
-  { icon: 'icons/typescript.svg', x: '58%', y: '14%', size: 112, rot: -14, speed: 1.4 },
-  { icon: 'icons/angular.svg',    x: '78%', y: '30%', size: 150, rot: 12,  speed: 0.8 },
-  { icon: 'icons/nodedotjs.svg',  x: '64%', y: '58%', size: 124, rot: 18,  speed: 1.8 },
-  { icon: 'icons/anthropic.svg',  x: '88%', y: '70%', size: 96,  rot: -10, speed: 1.1 },
+// Tech logos for the hero rail (an endless sideways slider).
+const TECH_ICONS = [
+  { icon: 'icons/angular.svg',    label: 'Angular' },
+  { icon: 'icons/typescript.svg', label: 'TypeScript' },
+  { icon: 'icons/nodedotjs.svg',  label: 'Node.js' },
+  { icon: 'icons/anthropic.svg',  label: 'Claude API' },
 ];
+// Sets per half of the loop — enough to cover a wide desktop viewport.
+const RAIL_REPEAT = 3;
 
 @Component({
   selector: 'app-landing',
@@ -42,7 +43,7 @@ const TILES = [
 })
 export class LandingComponent implements AfterViewInit, OnDestroy {
   readonly cv = cvData as unknown as CvData;
-  readonly tiles = TILES;
+  readonly railItems = Array.from({ length: RAIL_REPEAT * 2 }, () => TECH_ICONS).flat();
   readonly ticker = [...this.cv.stackTicker, ...this.cv.stackTicker, ...this.cv.stackTicker];
   readonly work = this.cv.portfolio.projects.filter(p => p.images.length);
   readonly letters = this.cv.profile.firstName.split('');
@@ -92,10 +93,18 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
     const q = <T extends Element>(sel: string) => gsap.utils.toArray<T>(sel, root);
 
     this.ctx = gsap.context(() => {
-      // ── Intro: name letters rise in, tiles pop ───────────────────────────
+      // ── Intro: name letters rise in, rail slides up ─────────────────────
       gsap.from('.hero .ch', { yPercent: 110, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.04, delay: 0.4 });
       gsap.from('.hero .fade-in', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.12, delay: 0.9 });
-      gsap.from('.tile', { scale: 0.4, opacity: 0, duration: 1.2, ease: 'back.out(1.6)', stagger: 0.12, delay: 0.7 });
+      gsap.from('.rail', { y: 40, opacity: 0, duration: 1.2, ease: 'power3.out', delay: 1.1 });
+
+      // ── Tech rail: endless loop that eases down to a crawl on hover (never stops)
+      const rail = root.querySelector<HTMLElement>('.rail');
+      const loop = gsap.to('.rail-track', { xPercent: -50, duration: 36, ease: 'none', repeat: -1 });
+      const slow = () => gsap.to(loop, { timeScale: 0.25, duration: 0.6, ease: 'power2.out', overwrite: true });
+      const normal = () => gsap.to(loop, { timeScale: 1, duration: 0.6, ease: 'power2.in', overwrite: true });
+      rail?.addEventListener('pointerenter', slow);
+      rail?.addEventListener('pointerleave', normal);
 
       // ── Hero layer: pinned (sticky) and receding as the next card slides over it
       gsap.to('.hero-inner', {
@@ -110,14 +119,6 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
         gsap.fromTo(el, { y: () => speed * 120 }, {
           y: () => speed * -120, ease: 'none',
           scrollTrigger: { trigger, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true },
-        });
-      });
-
-      // ── Tiles also spin slowly with scroll ───────────────────────────────
-      q<HTMLElement>('.tile-spin').forEach((el, i) => {
-        gsap.to(el, {
-          rotation: (i % 2 ? -1 : 1) * 40, ease: 'none',
-          scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
         });
       });
 
@@ -140,8 +141,21 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       // ── Reveals ──────────────────────────────────────────────────────────
       q<HTMLElement>('[data-reveal]').forEach(el => {
         gsap.from(el, {
-          y: 56, opacity: 0, duration: 0.9, ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' },
+          y: 32, opacity: 0, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 94%', once: true },
+        });
+      });
+
+      // ── Scroll-spy: underline the nav link of the section in the middle of the viewport
+      // Cards overlap slightly, so make the highlight exclusive rather than per-link.
+      const links = Array.from(document.querySelectorAll<HTMLElement>('.topbar nav a[data-target]'));
+      const setActive = (link?: HTMLElement) => links.forEach(l => l.classList.toggle('active', l === link));
+      links.forEach(link => {
+        const section = document.getElementById(link.dataset['target']!);
+        if (!section) return;
+        ScrollTrigger.create({
+          trigger: section, start: 'top 50%', end: 'bottom 50%',
+          onToggle: self => { if (self.isActive) setActive(link); else if (link.classList.contains('active')) setActive(); },
         });
       });
 
@@ -152,6 +166,12 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       const bg = { trigger: root, start: 'top top', end: 'bottom bottom', scrub: true };
       if (stars) gsap.fromTo(stars, { scale: 1.2, y: 0 }, { y: -vh * 0.08, ease: 'none', scrollTrigger: bg });
       if (planet) gsap.to(planet, { y: -vh * 0.35, ease: 'none', scrollTrigger: bg });
+
+      // Runs on ctx.revert(): drop the rail hover listeners added above.
+      return () => {
+        rail?.removeEventListener('pointerenter', slow);
+        rail?.removeEventListener('pointerleave', normal);
+      };
     }, root);
   }
 }
