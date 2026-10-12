@@ -107,8 +107,14 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       rail?.addEventListener('pointerleave', normal);
 
       // ── Hero layer: pinned (sticky) and receding as the next card slides over it
+      // Fades out fully: the cards are translucent, so leftover hero copy would show through.
       gsap.to('.hero-inner', {
-        scale: 0.92, opacity: 0.15, yPercent: -8, ease: 'none',
+        scale: 0.92, opacity: 0, yPercent: -8, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+      });
+      // On the track, not .rail — .rail already has the intro opacity tween.
+      gsap.to('.rail-track', {
+        opacity: 0, ease: 'none',
         scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
       });
 
@@ -165,7 +171,14 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       const planet = document.getElementById('planetCanvas');
       const bg = { trigger: root, start: 'top top', end: 'bottom bottom', scrub: true };
       if (stars) gsap.fromTo(stars, { scale: 1.2, y: 0 }, { y: -vh * 0.08, ease: 'none', scrollTrigger: bg });
-      if (planet) gsap.to(planet, { y: -vh * 0.35, ease: 'none', scrollTrigger: bg });
+      // The globe overflows the canvas bottom (it sits lower-right), so it may only
+      // sink: lifting the canvas would expose that cut edge. The top is empty sky.
+      if (planet) gsap.to(planet, { y: vh * 0.2, ease: 'none', scrollTrigger: bg });
+      // The cards are translucent, so dim the bright globe once copy scrolls over it.
+      if (planet) gsap.to(planet, {
+        opacity: 0.45, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
+      });
 
       // Runs on ctx.revert(): drop the rail hover listeners added above.
       return () => {
