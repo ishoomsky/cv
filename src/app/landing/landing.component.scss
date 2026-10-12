@@ -114,12 +114,14 @@ $rail-h: calc(#{$rail-tile} + clamp(20px, 5vh, 48px) + 24px);   // tile + bottom
 
 .name {
   margin: 0;
+  width: fit-content;   // its box is the target width for .role (see fitRole)
   font-family: var(--font-display);
   font-weight: 900;
   line-height: 0.95;
-  // "IVAN.SHUMSKI" measures ~8.15em in Orbitron 900; 10.4vw keeps it on one line
-  // inside the ~90vw content box at every width.
-  font-size: clamp(30px, 10.4vw, 150px);
+  // "IVAN.SHUMSKI" measures ~8.15em in Orbitron 900. Sized to sit in the left half
+  // on desktop (clear of the globe) while staying large on phones; never wider
+  // than the ~90vw content box, so it always fits one line. px, not rem, on purpose.
+  font-size: clamp(32px, calc(5vw + 18px), 104px);
   letter-spacing: -0.02em;
   color: #f2fbff;
   text-shadow: 0 2px 40px rgba(0, 0, 0, 0.55), 0 0 80px rgba(0, 212, 255, 0.18);
@@ -130,8 +132,11 @@ $rail-h: calc(#{$rail-tile} + clamp(20px, 5vh, 48px) + 24px);   // tile + bottom
   .ch { display: inline-block; will-change: transform; }
 }
 .role {
-  margin: 28px 0 0; font-family: var(--font-mono);
-  font-size: clamp(0.9375rem, 0.79rem + 0.66vw, 1.25rem); letter-spacing: 0.22em; color: t.$text;
+  // Orbitron (variable 400–900), not Share Tech Mono: the mono face has no bold.
+  margin: 28px 0 0; font-family: var(--font-display); font-weight: 600; width: fit-content; white-space: nowrap;
+  // letter-spacing here is the no-JS fallback; fitRole() overrides it to match the name's width.
+  // Kept small (13→17) so the wide face still has room to spread out to the name's width.
+  font-size: clamp(0.8125rem, 0.72rem + 0.38vw, 1.0625rem); letter-spacing: 0.22em; color: t.$text;
 }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
 .btn {

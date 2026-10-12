@@ -101,8 +101,11 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.camera.position.set(0, 0, 3.4);
     this.camera.lookAt(0, 0, 0);
 
-    // Shift the globe to the lower-right so the HUD panel sits over empty space.
-    this.earthGroup.position.set(0.95, -0.55, 0);
+    // Large globe on the right, nudged just below centre. The visible half-height
+    // at z=3.4 / fov 40 is ~1.24, so the bottom still overflows the frame — the
+    // landing only ever moves this canvas down on scroll, never up.
+    this.earthGroup.position.set(1.45, -0.25, 0);
+    this.earthGroup.scale.setScalar(1.05);
     this.earthGroup.rotation.z = THREE.MathUtils.degToRad(23.5); // axial tilt
     this.scene.add(this.earthGroup);
   }

@@ -55,6 +55,7 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
   private zone = inject(NgZone);
   private lenis?: Lenis;
   private ctx?: gsap.Context;
+  private roleFit?: ResizeObserver;
   private tick = (t: number) => this.lenis?.raf(t * 1000);
 
   scrollTo(target: string, e?: Event) {
@@ -67,13 +68,43 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     // The scroll loop runs every frame — keep it out of Angular's change detection.
-    this.zone.runOutsideAngular(() => this.init());
+    this.zone.runOutsideAngular(() => {
+      this.fitRole();
+      this.init();
+    });
   }
 
   ngOnDestroy() {
+    this.roleFit?.disconnect();
     this.ctx?.revert();
     gsap.ticker.remove(this.tick);
     this.lenis?.destroy();
+  }
+
+  // Stretch the role line to exactly the width of the name above it by spreading
+  // its letters; if it can't fit even unspaced (narrow phones), shrink the font.
+  // Re-runs whenever the name's box changes: resize, rotation, web-font swap.
+  private fitRole() {
+    const root = this.content.nativeElement;
+    const name = root.querySelector<HTMLElement>('.hero .name');
+    const role = root.querySelector<HTMLElement>('.hero .role');
+    if (!name || !role) return;
+    const chars = role.textContent!.trim().length;
+    const fit = () => {
+      Object.assign(role.style, { letterSpacing: '0px', marginRight: '', fontSize: '' });
+      // offsetWidth, not getBoundingClientRect: the hero is scaled on scroll.
+      const target = name.offsetWidth, natural = role.offsetWidth;
+      if (natural > target) {
+        role.style.fontSize = `${parseFloat(getComputedStyle(role).fontSize) * target / natural}px`;
+        return;
+      }
+      const spacing = (target - natural) / (chars - 1);
+      // letter-spacing also trails the last glyph; cancel it so the right edges align.
+      Object.assign(role.style, { letterSpacing: `${spacing}px`, marginRight: `${-spacing}px` });
+    };
+    this.roleFit = new ResizeObserver(fit);
+    this.roleFit.observe(name);
+    document.fonts?.ready.then(fit);
   }
 
   private init() {
