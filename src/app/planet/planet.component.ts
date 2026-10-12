@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, HostListener, inject } from '@angular/core';
 import * as THREE from 'three';
+import { PlanetScroll } from './planet-scroll.service';
 
 // Relative so it resolves against <base href> on both dev (/) and Pages (/cv/).
 const TEX = 'textures/planet/';
@@ -24,6 +25,12 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private earth!: THREE.Mesh;
   private clouds!: THREE.Mesh;
   private earthGroup = new THREE.Group();
+  private scroll = inject(PlanetScroll);
+  private baseY = 0;        // resting height of the globe (see placeGlobe)
+  private riseSmooth = 0;   // eased scroll progress, so Lenis-driven steps don't jitter
+  // Total lift over the whole page, in scene units — enough to carry the globe fully
+  // off the top (half-height ~1.24 + globe radius ~1.1, from a resting y of ~-0.3).
+  private static readonly RISE = 3.2;
 
   private frameId = 0;
   private loaderHidden = false;
@@ -36,6 +43,9 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
   // Reduced-motion: hold the globe still and render on demand instead of spinning.
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  // Phones: the globe is hidden (display: none in the SCSS, same breakpoint), so
+  // skip the WebGL render too. Textures still load — they drive the intro loader.
+  private hiddenMq = window.matchMedia('(max-width: 700px)');
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
@@ -101,10 +111,7 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.camera.position.set(0, 0, 3.4);
     this.camera.lookAt(0, 0, 0);
 
-    // Large globe on the right, nudged just below centre. The visible half-height
-    // at z=3.4 / fov 40 is ~1.24, so the bottom still overflows the frame — the
-    // landing only ever moves this canvas down on scroll, never up.
-    this.earthGroup.position.set(1.45, -0.25, 0);
+    this.placeGlobe();
     this.earthGroup.scale.setScalar(1.05);
     this.earthGroup.rotation.z = THREE.MathUtils.degToRad(23.5); // axial tilt
     this.scene.add(this.earthGroup);
@@ -276,6 +283,7 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   private animate = (now = performance.now()) => {
     this.frameId = requestAnimationFrame(this.animate);
+    if (this.hiddenMq.matches) return;
     const elapsed = now - this.lastFrame;
     if (elapsed < PlanetComponent.FRAME_MS) return;
     this.lastFrame = now;
@@ -283,17 +291,33 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     const dt = Math.min(elapsed / (1000 / 60), 4);
     this.earth.rotation.y   += 0.00008 * dt;
     this.clouds.rotation.y  += 0.00012 * dt; // clouds drift slightly faster
+    // Rise with the page scroll (eased, dt-scaled so it's frame-rate independent).
+    this.riseSmooth += (this.scroll.progress - this.riseSmooth) * Math.min(1, 0.12 * dt);
+    this.earthGroup.position.y = this.baseY + this.riseSmooth * PlanetComponent.RISE;
     this.renderer.render(this.scene, this.camera);
   };
 
   // One-off render for reduced-motion mode (no spin, no rAF loop).
   private renderStill = () => this.renderer.render(this.scene, this.camera);
 
+  // Globe on the right beside the hero copy. The visible half-height at z=3.4 /
+  // fov 40 is ~1.24, so the bottom always overflows the frame — the landing only
+  // ever moves this canvas down on scroll, never up. On portrait screens the
+  // frame is too narrow for that offset (only a sliver showed), so pull the globe
+  // in towards the centre and drop it below the hero copy.
+  private placeGlobe() {
+    const aspect = window.innerWidth / window.innerHeight;
+    const halfWidth = 3.4 * Math.tan(THREE.MathUtils.degToRad(20)) * aspect;
+    if (aspect < 1) { this.baseY = -0.85; this.earthGroup.position.set(halfWidth * 0.5, this.baseY, 0); }
+    else { this.baseY = -0.25; this.earthGroup.position.set(1.45, this.baseY, 0); }
+  }
+
   @HostListener('window:resize')
   onResize() {
     const w = window.innerWidth, h = window.innerHeight;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.placeGlobe();
     this.renderer.setSize(w, h);
     if (this.reduceMotion) this.renderStill();
   }

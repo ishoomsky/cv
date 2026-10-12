@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import cvData from '../data/cv-data.json';
+import { PlanetScroll } from '../planet/planet-scroll.service';
 
 interface Link { label: string; url: string; }
 interface Job { role: string; company: string; period: string; points: string[]; }
@@ -53,6 +54,7 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
   @ViewChild('content', { static: true }) content!: ElementRef<HTMLElement>;
 
   private zone = inject(NgZone);
+  private planetScroll = inject(PlanetScroll);
   private lenis?: Lenis;
   private ctx?: gsap.Context;
   private roleFit?: ResizeObserver;
@@ -183,16 +185,20 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
         });
       });
 
-      // ── Scroll-spy: underline the nav link of the section in the middle of the viewport
-      // Cards overlap slightly, so make the highlight exclusive rather than per-link.
-      const links = Array.from(document.querySelectorAll<HTMLElement>('.topbar nav a[data-target]'));
-      const setActive = (link?: HTMLElement) => links.forEach(l => l.classList.toggle('active', l === link));
-      links.forEach(link => {
-        const section = document.getElementById(link.dataset['target']!);
+      // ── Scroll-spy: highlight the section in the middle of the viewport, in both the
+      // top bar and the mobile tab bar. Cards overlap slightly, so keep it exclusive.
+      const links = Array.from(document.querySelectorAll<HTMLElement>('nav a[data-target]'));
+      let active: string | undefined;
+      const setActive = (target?: string) => {
+        active = target;
+        links.forEach(l => l.classList.toggle('active', l.dataset['target'] === target));
+      };
+      this.cv.nav.forEach(({ target }) => {
+        const section = document.getElementById(target);
         if (!section) return;
         ScrollTrigger.create({
           trigger: section, start: 'top 50%', end: 'bottom 50%',
-          onToggle: self => { if (self.isActive) setActive(link); else if (link.classList.contains('active')) setActive(); },
+          onToggle: self => { if (self.isActive) setActive(target); else if (active === target) setActive(); },
         });
       });
 
@@ -202,9 +208,10 @@ export class LandingComponent implements AfterViewInit, OnDestroy {
       const planet = document.getElementById('planetCanvas');
       const bg = { trigger: root, start: 'top top', end: 'bottom bottom', scrub: true };
       if (stars) gsap.fromTo(stars, { scale: 1.2, y: 0 }, { y: -vh * 0.08, ease: 'none', scrollTrigger: bg });
-      // The globe overflows the canvas bottom (it sits lower-right), so it may only
-      // sink: lifting the canvas would expose that cut edge. The top is empty sky.
-      if (planet) gsap.to(planet, { y: vh * 0.2, ease: 'none', scrollTrigger: bg });
+      // The globe rises and leaves through the top of the screen. That happens inside
+      // the WebGL scene (PlanetComponent), not by moving the canvas: lifting the canvas
+      // would expose its bottom edge, which cuts the globe off.
+      ScrollTrigger.create({ ...bg, onUpdate: self => (this.planetScroll.progress = self.progress) });
       // The cards are translucent, so dim the bright globe once copy scrolls over it.
       if (planet) gsap.to(planet, {
         opacity: 0.45, ease: 'none',

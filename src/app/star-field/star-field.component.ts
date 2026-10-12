@@ -38,6 +38,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private start = performance.now();
   private nextMeteor = 1.5; // seconds until the first meteor
   private lastW = -1;       // last width — recreate stars only when it changes
+  private w = 0;            // canvas size in CSS px (the backing store is DPR-scaled)
+  private h = 0;
   // Decorative layer: capped at ~30fps — halves the loop's main-thread cost
   // and slow drift/twinkle can't tell the difference. Motion below is scaled
   // by dt (in 60fps-frame units) so the visual speed stays what it was tuned
@@ -76,8 +78,14 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   resizeCanvas() {
     const w = window.innerWidth, h = window.innerHeight;
-    this.canvas.width = w;
-    this.canvas.height = h;
+    // DPR-scaled backing store so sub-pixel stars stay crisp on retina instead of
+    // being upscaled into soft blobs. Resizing resets the transform, so reapply it.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.w = w;
+    this.h = h;
+    this.canvas.width = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     // Only repopulate on a real width change (orientation/desktop resize).
     // Mobile URL-bar show/hide changes height only — skip to avoid flicker.
     if (w !== this.lastW) {
@@ -90,7 +98,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
 
   // Single static frame: every star at its base brightness, no motion.
   private renderStatic() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.w, this.h);
     for (const s of this.stars) this.drawStar(s, s.baseAlpha);
   }
 
@@ -98,10 +106,11 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     this.stars = [];
     for (const layer of this.layers) {
       for (let i = 0; i < layer.count; i++) {
-        const size = Math.random() * 1.6 + 0.5 + layer.speed * 1.5;
+        // Radius ~0.35–1.3px: fine pin-points; nearer layers only slightly larger.
+        const size = Math.random() * 0.55 + 0.35 + layer.speed * 0.9;
         this.stars.push({
-          x: Math.random() * this.canvas.width,
-          y: Math.random() * this.canvas.height,
+          x: Math.random() * this.w,
+          y: Math.random() * this.h,
           size,
           baseAlpha: Math.random() * 0.45 + 0.45,
           twPhase: Math.random() * Math.PI * 2,
@@ -110,7 +119,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
           color: Math.random() < 0.035
             ? this.accentPalette[Math.floor(Math.random() * this.accentPalette.length)]
             : this.palette[Math.floor(Math.random() * this.palette.length)],
-          glow: size > 1.9 && Math.random() < 0.5,
+          glow: size > 1 && Math.random() < 0.4,
         });
       }
     }
@@ -125,13 +134,13 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     const dt = Math.min(elapsed / (1000 / 60), 4);
 
     const t = (now - this.start) / 1000;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.w, this.h);
 
     // Stars: drift + twinkle.
     for (const s of this.stars) {
       if (s.speed > 0) {
         s.x += s.speed * dt;
-        if (s.x > this.canvas.width + 4) s.x = -4;
+        if (s.x > this.w + 4) s.x = -4;
       }
       const tw = 0.45 + 0.55 * Math.abs(Math.sin(t * s.twSpeed + s.twPhase));
       this.drawStar(s, s.baseAlpha * tw);
@@ -148,7 +157,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private drawStar(s: Star, alpha: number) {
     const { ctx } = this;
     if (s.glow) {
-      const r = s.size * 4.5;
+      const r = s.size * 5;
       const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
       g.addColorStop(0, `rgba(${s.color},${alpha * 0.5})`);
       g.addColorStop(1, `rgba(${s.color},0)`);
@@ -159,8 +168,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
 
       // Faint diffraction spikes (cross), like bright stars through a lens.
       ctx.strokeStyle = `rgba(${s.color},${alpha * 0.35})`;
-      ctx.lineWidth = 0.6;
-      const spike = s.size * 5;
+      ctx.lineWidth = 0.5;
+      const spike = s.size * 6;
       ctx.beginPath();
       ctx.moveTo(s.x - spike, s.y); ctx.lineTo(s.x + spike, s.y);
       ctx.moveTo(s.x, s.y - spike); ctx.lineTo(s.x, s.y + spike);
@@ -173,7 +182,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   }
 
   private spawnMeteor() {
-    const w = this.canvas.width, h = this.canvas.height;
+    const { w, h } = this;
     const fromLeft = Math.random() < 0.5;
     const angle = Math.PI * (0.16 + Math.random() * 0.12); // shallow downward
     const speed = 7 + Math.random() * 5;
@@ -210,7 +219,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
       grad.addColorStop(0.3, `rgba(190,220,255,${0.4 * fade})`);
       grad.addColorStop(1, 'rgba(190,220,255,0)');
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.2;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(m.x, m.y);
@@ -219,7 +228,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
 
       // Bright head.
       ctx.beginPath();
-      ctx.arc(m.x, m.y, 1.8, 0, Math.PI * 2);
+      ctx.arc(m.x, m.y, 1.1, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(255,255,255,${fade})`;
       ctx.fill();
       return true;

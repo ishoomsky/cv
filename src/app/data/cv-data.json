@@ -40,6 +40,10 @@
       "target": "projects"
     },
     {
+      "label": "EDUCATION",
+      "target": "education"
+    },
+    {
       "label": "CONTACT",
       "target": "contact"
     }
