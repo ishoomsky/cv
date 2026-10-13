@@ -4,7 +4,7 @@
     "lastName": "SHUMSKI",
     "fullName": "IVAN SHUMSKI",
     "panelRole": "FULL STACK ENGINEER · FRONTEND FOCUS",
-    "resumeRole": "FRONTEND & FULL-STACK ENGINEER",
+    "resumeRole": "FRONTEND & FULL STACK ENGINEER",
     "dossierTitle": "◈ PERSONNEL DOSSIER // IVAN.SHUMSKI"
   },
   "contacts": {
@@ -140,14 +140,14 @@
   "projects": [
     {
       "name": "EXPENSE TRACKER",
-      "tagline": "Full-Stack Personal Finance App",
+      "tagline": "Full Stack Personal Finance App",
       "flow": [
         "Next.js",
         "NestJS",
         "PostgreSQL"
       ],
       "points": [
-        "Designed and built a full-stack personal-finance app end to end — Next.js 16 frontend, NestJS 11 backend, PostgreSQL with Prisma, self-hosted on a Linux VPS behind Docker Compose and Caddy.",
+        "Designed and built a full stack personal-finance app end to end — Next.js 16 frontend, NestJS 11 backend, PostgreSQL with Prisma, self-hosted on a Linux VPS behind Docker Compose and Caddy.",
         "Modeled money as derived balances with paired double-entry transfers, and built receipt-photo capture where Gemini 2.5 Flash extracts line items for review before saving."
       ],
       "url": "https://expenses.shumski.dev"
@@ -161,7 +161,7 @@
         "i18n"
       ],
       "points": [
-        "Built a full-stack meal-planning app end to end — Next.js 16 (App Router) frontend, NestJS backend, PostgreSQL with Prisma, with true RTL support across English, Hebrew, and Russian.",
+        "Built a full stack meal-planning app end to end — Next.js 16 (App Router) frontend, NestJS backend, PostgreSQL with Prisma, with true RTL support across English, Hebrew, and Russian.",
         "Used AI to generate full recipes — ingredients, steps, timing, nutrition — from a name or pasted text, and set up GitHub Actions CI/CD deploying over SSH on merge to main."
       ],
       "url": "https://food.shumski.dev"
