@@ -28,7 +28,7 @@ why several details below care about `<base href>`.
 
 | Component | Canvas / element | Role |
 |---|---|---|
-| `NebulaComponent` | `nebulaCanvas` | Static blurred nebula blobs, drawn once (redrawn on resize) |
+| `NebulaComponent` | `nebulaCanvas` | Blurred nebula blobs baked once (re-baked on width change); drift/breathe are CSS transform/opacity animations |
 | `StarFieldComponent` | `starCanvas` | Animated multi-layer parallax star field via `requestAnimationFrame` |
 | `PlanetComponent` | `planetCanvas` | **three.js** WebGL Earth — real day/night/specular/normal/cloud textures + custom shaders |
 | shell | `.topbar` | Glass top bar: name + links + WhatsApp on desktop; links only (pills) ≤820px; `routerLinkActive` |
@@ -44,7 +44,7 @@ canvas and re-initialises state. Devicepixel ratio is clamped to `≤ 2`.
 All CV text (profile, contacts, skills, experience, projects, education,
 languages, nav, stack ticker) lives in **`src/app/data/cv-data.json`** — the
 single source of truth, typed and exported as `CV` from `src/app/cv.ts`. The
-`nav` array drives the top bar, tab bar and each page's "Next" link. Edit the JSON to change page content; do
+`nav` array drives the top bar and each page's (hidden) "Next" link. Edit the JSON to change page content; do
 not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
 `public/` and are referenced by relative path.
 
@@ -64,7 +64,7 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
   `.scroller` (the document itself never scrolls) driven by **Lenis**, plus
   **GSAP ScrollTrigger** effects with `scroller` passed explicitly. Effects are
   declarative in page templates: `data-reveal` = fade/rise in, `data-speed="n"` =
-  depth drift, `.work-img` = image moves in its frame. It also renders the "Next" link. All of it runs outside the
+  depth drift, `.work-img` = image moves in its frame. It also renders a "Next" link, currently hidden via `SHOW_NEXT_LINK = false`. All of it runs outside the
   Angular zone; `prefers-reduced-motion` skips Lenis/GSAP.
 - **Page styles are global** (`src/app/pages/_pages.scss`, loaded from
   `styles.scss`); shared tokens (type scale, gutter, tab-bar size) live in
@@ -105,8 +105,25 @@ back-side atmosphere shell. Notes when editing:
 - The globe's position/scale/opacity come from the page pose (see above); it's
   tilted 23.5° and rotated so Israel's longitude (~35°E) faces the camera (see
   `ANCHOR_LON`). It's hidden (and not rendered) on phones ≤700px.
-- `planet.component.spec.ts` fails in headless Chrome: there is no WebGL context
-  there. That's environmental, not a regression.
+- **Currently disabled** via `PLANET_ENABLED = false` (top of
+  `planet.component.ts`): nothing is initialised or downloaded, the canvas is
+  hidden and the intro loader is dismissed immediately. Set it to `true` to
+  restore the globe (route poses / Home scroll logic are still wired).
+- With the planet enabled, `planet.component.spec.ts` fails in headless Chrome:
+  there is no WebGL context there. That's environmental, not a regression.
+
+### Performance rules (the space layers animate behind everything)
+
+- No `backdrop-filter` over the space layers (top bar, buttons): the blur is
+  recomputed on the GPU every frame because the canvases underneath never stop
+  changing — use a denser fill. (The confirm dialog's backdrop is the exception:
+  it only exists while open.)
+- Prefer compositor-only motion (CSS `transform`/`opacity`) over per-frame
+  canvas redraws for slow ambient effects (see the nebula).
+- `PlanetComponent` renders at pixel ratio ≤ 1.5 (MSAA only on 1x screens),
+  15fps at rest and 30fps while the globe moves (`flying()`); hidden ≤700px.
+- `StarFieldComponent` blits cached glow sprites — don't create gradients per
+  star per frame.
 
 ### Mobile / resize care
 

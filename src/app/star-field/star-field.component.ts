@@ -48,6 +48,10 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private static readonly FRAME_MS = 1000 / 30;
   private lastFrame = 0;
   private space = inject(SpaceService);
+  // Pre-rendered halo per star colour: a radial gradient drawn once and then
+  // blitted, instead of a new gradient object per glow star per frame.
+  private glowSprites = new Map<string, HTMLCanvasElement>();
+  private static readonly GLOW_SPRITE_R = 32;
   // Users who asked for less motion get a still starfield (no drift/twinkle/meteors).
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -194,13 +198,9 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     const { ctx } = this;
     if (s.glow) {
       const r = s.size * 5;
-      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
-      g.addColorStop(0, `rgba(${s.color},${alpha * 0.5})`);
-      g.addColorStop(1, `rgba(${s.color},0)`);
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(this.glowSprite(s.color), s.x - r, s.y - r, r * 2, r * 2);
+      ctx.globalAlpha = 1;
 
       // Faint diffraction spikes (cross), like bright stars through a lens.
       ctx.strokeStyle = `rgba(${s.color},${alpha * 0.35})`;
@@ -215,6 +215,23 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(${s.color},${alpha})`;
     ctx.fill();
+  }
+
+  private glowSprite(color: string) {
+    let c = this.glowSprites.get(color);
+    if (!c) {
+      const R = StarFieldComponent.GLOW_SPRITE_R;
+      c = document.createElement('canvas');
+      c.width = c.height = R * 2;
+      const g2 = c.getContext('2d')!;
+      const g = g2.createRadialGradient(R, R, 0, R, R, R);
+      g.addColorStop(0, `rgba(${color},0.5)`);
+      g.addColorStop(1, `rgba(${color},0)`);
+      g2.fillStyle = g;
+      g2.fillRect(0, 0, R * 2, R * 2);
+      this.glowSprites.set(color, c);
+    }
+    return c;
   }
 
   private spawnMeteor() {

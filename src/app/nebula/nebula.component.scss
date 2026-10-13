@@ -1,9 +1,25 @@
+// The canvas is baked once; drift + "breathe" are compositor-only animations
+// (transform / opacity), so the backdrop stays alive without per-frame drawing.
+// Oversized by 48px (see NebulaComponent.BLEED) and offset so the drift never
+// shows an edge. Reduced motion: the global rule in styles.scss stills these.
 canvas {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  top: -24px;
+  left: -24px;
+  width: calc(100vw + 48px);
+  height: calc(100vh + 48px);
+  height: calc(100dvh + 48px);
   background: black;
+  will-change: transform, opacity;
+  animation:
+    nebula-drift 105s ease-in-out infinite alternate,
+    nebula-breathe 21s ease-in-out infinite alternate;
+}
+@keyframes nebula-drift {
+  from { transform: translate(-18px, -12px); }
+  to   { transform: translate(18px, 12px); }
+}
+@keyframes nebula-breathe {
+  from { opacity: 0.76; }
+  to   { opacity: 1; }
 }

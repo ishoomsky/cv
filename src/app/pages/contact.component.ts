@@ -22,12 +22,8 @@ const METHODS: ContactMethod[] = [
     title: 'Message me', message: "Let's chat on WhatsApp — fastest way to reach me.", event: 'whatsapp-click' },
   { label: 'Email', value: cs.email, href: 'mailto:' + cs.email, icon: 'icons/mail.svg',
     title: 'Email me', message: 'Starts a new email to me. Say hi!', event: 'email-click' },
-  { label: 'Phone', value: c.phone, href: c.phoneUrl, icon: 'icons/phone.svg',
-    title: 'Call me', message: `Starts a call to ${c.phone} from your device.`, event: 'phone-click' },
   { label: 'LinkedIn', value: cs.linkedin.label, href: cs.linkedin.url, icon: 'icons/linkedin.svg', external: true,
     title: 'My LinkedIn', message: 'Opens my LinkedIn in a new tab.', event: 'linkedin-click' },
-  { label: 'GitHub', value: cs.github.label, href: cs.github.url, icon: 'icons/github.svg', external: true,
-    title: 'My GitHub', message: 'Opens my GitHub in a new tab.', event: 'github-click' },
 ];
 
 @Component({
@@ -39,6 +35,7 @@ const METHODS: ContactMethod[] = [
       <section class="section">
         <div class="inner">
           <h1 class="kicker" data-reveal>Contact</h1>
+          <p class="contact-intro" data-reveal>Feel free to contact me:</p>
 
           <div class="contact-list">
             @for (m of methods; track m.label) {

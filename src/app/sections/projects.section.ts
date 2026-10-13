@@ -7,7 +7,14 @@ import { CV } from '../cv';
   host: { class: 'section', id: 'projects' },
   template: `
     <div class="inner">
-      <h2 class="kicker" data-reveal>Built on my own</h2>
+      <!-- GitHub lives here, next to the projects whose code it holds. -->
+      <div class="section-head">
+        <h2 class="kicker" data-reveal>Built on my own</h2>
+        <a class="gh-link" data-reveal [href]="cv.contacts.github.url" target="_blank" rel="noopener">
+          <!-- Relative url() in an inline style resolves against <base href> (/cv/ on Pages). -->
+          <span class="gh-icon" aria-hidden="true" style="mask-image: url(icons/github.svg); -webkit-mask-image: url(icons/github.svg)"></span>{{ cv.contacts.github.label }} <span aria-hidden="true">↗</span>
+        </a>
+      </div>
       <div class="projects">
         @for (pr of cv.projects; track pr.name; let i = $index) {
           <article class="project" data-reveal>

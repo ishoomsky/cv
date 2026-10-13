@@ -25,7 +25,12 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
-.content { position: relative; }
+.content {
+  position: relative;
+  // At least one screen tall with the last section stretching to fill it, so a
+  // short page (Contact) has no un-veiled band under its content.
+  min-height: 100%; display: flex; flex-direction: column;
+}
 
 // ── Next-page link (footer of every section page) ─────────────────────────
 .next-page {
@@ -43,25 +48,34 @@
 }
 
 // ── Hero (Home) ───────────────────────────────────────────────────────────
+// Vertical rhythm: name + role + status are one tight signature; the other
+// blocks (greeting, stack, CTAs) are separated by height-aware gaps, so short
+// phones still fit the whole hero on the first screen.
+$hero-gap: clamp(20px, 3.6vh, 36px);
+$hero-gap-lg: clamp(26px, 5vh, 52px);
+// At least one screen tall, but grows with its content (large browser font,
+// short windows) instead of clipping under the top bar.
 .hero {
   position: relative;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-.hero-inner {
-  position: absolute;
-  inset: 0;
-  padding: 0 $gutter;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: 24px;
+}
+// Same container as every section's .inner (max 1440px + gutter), so the hero
+// and the section headings share one left edge down the whole page.
+.hero-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(96px, 14vh, 128px) $gutter clamp(32px, 6vh, 64px);
   box-sizing: border-box;
-  will-change: transform, opacity;
 }
 .eyebrow {
-  display: flex; align-items: center; gap: 10px; margin: 0 0 24px;
+  // Status line right under the role: part of the name/role signature, so the
+  // same tight gap.
+  display: flex; align-items: center; gap: 10px; margin: clamp(12px, 1.8vh, 20px) 0 0;
   font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: 0.14em; color: t.$status-green;
 }
 .pulse {
@@ -91,21 +105,24 @@
 }
 .role {
   // Orbitron (variable 400–900), not Share Tech Mono: the mono face has no bold.
-  margin: 28px 0 0; font-family: var(--font-display); font-weight: 800; width: fit-content; white-space: nowrap;
+  margin: clamp(12px, 1.8vh, 20px) 0 0; font-family: var(--font-display); font-weight: 800; width: fit-content; white-space: nowrap;
   // letter-spacing here is the no-JS fallback; fitRole() overrides it to match the name's width.
   // Kept small (13→17) so the wide face still has room to spread out to the name's width.
   font-size: clamp(0.8125rem, 0.72rem + 0.38vw, 1.0625rem); letter-spacing: 0.22em; color: t.$text-bright;
 }
 // Greeting + stack share one column as wide as the paragraph (34ch of its font).
-.intro { max-width: 34ch; font-size: $fs-lead-sm; margin-top: clamp(22px, 3.4vh, 34px); }
+.hero-col { width: fit-content; max-width: 100%; }
+// width: 0 + min-width: 100% — fills the column but adds nothing to its intrinsic
+// width, so the column stays exactly as wide as the name.
+.intro { width: 0; min-width: 100%; font-size: $fs-lead-sm; margin-top: $hero-gap-lg; }
 .greeting {
   margin: 0;
-  font-family: var(--font-body); font-weight: 500; font-size: 1em; line-height: 1.5;
+  font-family: var(--font-body); font-weight: 500; font-size: 1em; line-height: 1.55;
   color: t.$text-bright; text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
 }
-.stack { margin-top: clamp(16px, 2.6vh, 24px); }
-.stack-label { margin: 0 0 10px; font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .18em; text-transform: uppercase; color: t.$text; }
-.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(26px, 4vh, 40px); }
+.stack { margin-top: $hero-gap; }
+.stack-label { margin: 0 0 14px; font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .18em; text-transform: uppercase; color: t.$text; }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: $hero-gap-lg; }
 // Phones: keep both CTAs on one row — stacked they make the hero too tall.
 @media (max-width: 480px) {
   .hero-ctas { flex-wrap: nowrap; gap: 10px; }
@@ -118,8 +135,8 @@
   transition: transform .25s t.$ease-out, box-shadow .25s, background .25s, color .25s;
   &.primary { background: t.$cyan; color: $ink; font-weight: 700;
     &:hover { transform: translateY(-2px); box-shadow: 0 10px 30px t.$cyan-glow; } }
-  &.ghost { color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 12, 26, .5);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  // No backdrop-filter (re-blurs the animated space every frame) — denser fill instead.
+  &.ghost { color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 12, 26, .72);
     &:hover { border-color: t.$cyan; color: t.$cyan; } }
 }
 
@@ -137,7 +154,7 @@
 .rail-item {
   display: flex; align-items: center; gap: 10px; flex: none;
   // Spacing as right padding (not gap) so both halves are identical and the loop has no seam.
-  padding-right: 28px;
+  padding-right: 36px;
 }
 .rail-icon {
   display: grid; place-items: center; flex: none;
@@ -149,7 +166,7 @@
 .rail-label { font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .12em; text-transform: uppercase; color: t.$text-bright; white-space: nowrap; }
 @media (max-width: 700px) {
   // Centred below the top bar; the copy is too tall for a fixed top offset.
-  .hero-inner { padding-top: 72px; }
+  .hero-inner { padding-top: 84px; }
 }
 // Short phones (e.g. 320×568): no room for the decorative stack under the copy.
 @media (max-width: 700px) and (max-height: 600px) {
@@ -167,6 +184,12 @@
 }
 @media (max-width: 900px) { .section { background: rgba(2, 8, 20, 0.6); } }
 .inner { padding: 0 $gutter; max-width: 1440px; margin: 0 auto; box-sizing: border-box; }
+// Right after the hero there's no top bar to clear — just a normal section gap.
+.hero + .section { padding-top: clamp(40px, 8vh, 96px); }
+// The page ends with its last section (the "Next" link is hidden): give it the
+// bottom breathing room itself, so the readability veil runs to the very end
+// instead of leaving an un-veiled empty band.
+.section:last-of-type { flex-grow: 1; padding-bottom: clamp(48px, 9vh, 96px); }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 96px); }
 @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
@@ -221,6 +244,27 @@
   .work, .work.flip { grid-template-columns: 1fr; .work-frame { order: 0; } }
 }
 
+// Section heading with an action on the right (e.g. GitHub next to the projects).
+.section-head {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 16px 24px; margin: 0 0 clamp(36px, 6vh, 64px);
+  .kicker { margin: 0; }
+}
+// [data-reveal] atom: no transform transition here (it would fight GSAP).
+.gh-link {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: .06em; text-decoration: none;
+  color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 14, 30, 0.6);
+  transition: border-color .25s, color .25s, background .25s;
+  &:hover, &:focus-visible { border-color: t.$cyan; color: t.$cyan; background: rgba(0, 160, 220, 0.12); }
+}
+// The mask image is set inline in the template (see .c-icon for why).
+.gh-icon {
+  width: 20px; height: 20px; flex: none; background-color: currentColor;
+  -webkit-mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat;
+  mask-position: center; mask-size: contain; mask-repeat: no-repeat;
+}
+
 // ── Projects ─────────────────────────────────────────────────────────────
 .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 .project {
@@ -242,6 +286,7 @@
 // Five identical contact buttons in one column (an odd count leaves an orphan
 // in any grid). A card is a [data-reveal] atom, so it must not transition
 // `transform` itself (it would fight GSAP) — the hover motion lives on the arrow.
+.contact-intro { margin: calc(-1 * clamp(16px, 3vh, 36px)) 0 clamp(20px, 3vh, 28px); font-size: $fs-lead-sm; color: t.$text-bright; }
 .contact-list { display: grid; gap: clamp(10px, 1.2vw, 14px); max-width: 760px; }
 .c-card {
   display: flex; align-items: center; gap: clamp(14px, 2vw, 22px);

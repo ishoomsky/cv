@@ -8,9 +8,14 @@ import { LeavingPage, PageTransitionService } from './page-transition.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// The "Next →" link at the bottom of every page. Hidden for now (the top bar is
+// the navigation); flip to true to bring it back — markup and styles are kept.
+const SHOW_NEXT_LINK = false;
+
 /**
  * Wraps every routed page: a full-screen scroller with Lenis smooth scrolling and
- * the declarative scroll effects, plus a "next page" link at the bottom.
+ * the declarative scroll effects, plus a "next page" link at the bottom
+ * (currently hidden — see SHOW_NEXT_LINK).
  *
  *   [data-reveal]  an "atom": staggers in on arrival / when scrolled into view,
  *                  and staggers out when leaving the page
@@ -31,10 +36,12 @@ gsap.registerPlugin(ScrollTrigger);
     <div class="scroller" #scroller>
       <main class="content" #content>
         <ng-content />
-        <a class="next-page" data-reveal [routerLink]="next.path">
-          <span class="next-label">Next</span>
-          <span class="next-title">{{ next.label }} <span aria-hidden="true">→</span></span>
-        </a>
+        @if (showNext) {
+          <a class="next-page" data-reveal [routerLink]="next.path">
+            <span class="next-label">Next</span>
+            <span class="next-title">{{ next.label }} <span aria-hidden="true">→</span></span>
+          </a>
+        }
       </main>
     </div>
   `,
@@ -52,6 +59,7 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
   private tick = (t: number) => this.lenis?.raf(t * 1000);
 
   /** The page after this one in nav order; Contact wraps back to Home. */
+  readonly showNext = SHOW_NEXT_LINK;
   readonly next = (() => {
     const path = this.route.snapshot.routeConfig?.path ?? '';
     const i = CV.nav.findIndex(n => n.target === path);

@@ -34,39 +34,42 @@ const RAIL_REPEAT = 3;
     <app-page>
       <section class="hero">
         <div class="hero-inner">
-          <p class="eyebrow fade-in" data-exit><span class="pulse" aria-hidden="true"></span>{{ cv.status }} · {{ cv.contacts.location }}</p>
-          <h1 class="name" [attr.aria-label]="cv.profile.fullName">
-            <span class="line" aria-hidden="true">@for (c of letters; track $index) {<span class="mask"><span class="ch" data-exit>{{ c }}</span></span>}<span class="accent"><span class="mask"><span class="ch" data-exit>.</span></span>@for (c of lastLetters; track $index) {<span class="mask"><span class="ch" data-exit>{{ c }}</span></span>}</span></span>
-          </h1>
-          <p class="role fade-in" data-exit>{{ cv.profile.panelRole }}</p>
-          <!-- Greeting (first summary paragraph) + the stack under it, so "who I am"
-               is on the first screen. .intro is as wide as the paragraph; the rail
-               fills that width. -->
-          <div class="intro">
-            <p class="greeting fade-in" data-exit>{{ greeting }}</p>
+          <!-- One column exactly as wide as the name: the role is spaced to it, and
+               the greeting + stack fill it without widening it (see .intro). -->
+          <div class="hero-col">
+            <h1 class="name" [attr.aria-label]="cv.profile.fullName">
+              <span class="line" aria-hidden="true">@for (c of letters; track $index) {<span class="mask"><span class="ch" data-exit>{{ c }}</span></span>}<span class="accent"><span class="mask"><span class="ch" data-exit>.</span></span>@for (c of lastLetters; track $index) {<span class="mask"><span class="ch" data-exit>{{ c }}</span></span>}</span></span>
+            </h1>
+            <p class="role fade-in" data-exit>{{ cv.profile.panelRole }}</p>
+            <p class="eyebrow fade-in" data-exit><span class="pulse" aria-hidden="true"></span>{{ cv.status }} · {{ cv.contacts.location }}</p>
+            <!-- Greeting (first summary paragraph) + the stack under it, so "who I am"
+                 is on the first screen. Both span the name's width. -->
+            <div class="intro">
+              <p class="greeting fade-in" data-exit>{{ greeting }}</p>
 
-            <!-- Decorative — the same stack is listed as chips in About below. The
-                 track repeats the set to fill the width, then doubles the run so a
-                 -50% translate loops seamlessly. -->
-            <div class="stack fade-in" data-exit aria-hidden="true">
-              <p class="stack-label">My everyday stack:</p>
-              <div class="rail">
-                <div class="rail-track">
-                  @for (t of railItems; track $index) {
-                    <div class="rail-item">
-                      <span class="rail-icon"><img [src]="t.icon" alt="" /></span>
-                      <span class="rail-label">{{ t.label }}</span>
-                    </div>
-                  }
+              <!-- Decorative — the same stack is listed as chips in About below. The
+                   track repeats the set to fill the width, then doubles the run so a
+                   -50% translate loops seamlessly. -->
+              <div class="stack fade-in" data-exit aria-hidden="true">
+                <p class="stack-label">My everyday stack:</p>
+                <div class="rail">
+                  <div class="rail-track">
+                    @for (t of railItems; track $index) {
+                      <div class="rail-item">
+                        <span class="rail-icon"><img [src]="t.icon" alt="" /></span>
+                        <span class="rail-label">{{ t.label }}</span>
+                      </div>
+                    }
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <!-- Atoms are the wrappers: .btn's own transform transition (hover lift)
-               would otherwise fight the GSAP slide. -->
-          <div class="hero-ctas fade-in">
-            <span class="btn-atom" data-exit><a class="btn primary" routerLink="/contact">Let's talk <span aria-hidden="true">→</span></a></span>
-            <span class="btn-atom" data-exit><a class="btn ghost" routerLink="/portfolio">View portfolio</a></span>
+            <!-- Atoms are the wrappers: .btn's own transform transition (hover lift)
+                 would otherwise fight the GSAP slide. -->
+            <div class="hero-ctas fade-in">
+              <span class="btn-atom" data-exit><a class="btn primary" routerLink="/contact">Let's talk <span aria-hidden="true">→</span></a></span>
+              <span class="btn-atom" data-exit><a class="btn ghost" routerLink="/portfolio">View portfolio</a></span>
+            </div>
           </div>
         </div>
       </section>
