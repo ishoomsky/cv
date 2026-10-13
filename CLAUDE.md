@@ -21,8 +21,8 @@ Angular 18 standalone-component app (no NgModules) — a space-themed CV split i
 three routed pages over a shared, always-live space background, with a
 directional, atom-by-atom transition between them:
 `/` (hero + About + Experience + Education), `/portfolio` (portfolio projects +
-Built on my own) and `/contact`. It deploys to GitHub Pages under a sub-path (`/cv/`), which is
-why several details below care about `<base href>`.
+Built on my own) and `/contact`. It is served at the root of https://shumski.dev (Hetzner VPS: nginx container
+behind the shared Caddy, see *Deploy*), so `<base href>` is `/`; asset paths stay relative anyway.
 
 ### Layer stack (bottom → top, in `app.component.html`)
 
@@ -97,8 +97,7 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
   navigation starts on `pointerdown` (its click is swallowed); touch and
   keyboard use the normal click. The nav's active state moves on
   `NavigationStart` (`highlightNav`).
-- **Deep links on Pages** work via the `404.html` SPA fallback in
-  `.github/workflows/deploy.yml`.
+- **Deep links** work via the SPA fallback in `deploy/nginx.conf` (unknown paths → `index.html`).
 
 ### Planet (three.js) specifics
 
@@ -112,7 +111,7 @@ back-side atmosphere shell. Notes when editing:
   intact so a slow/failed asset can never trap the user. `hideLoader()` also
   calls `SpaceService.markIntroReady()`, which starts the first-load intro.
 - Texture paths are **relative** (`textures/planet/…`) on purpose so they resolve
-  against `<base href>` on both dev (`/`) and Pages (`/cv/`). Don't make them
+  against `<base href>` on any base (dev `/`, prod `/`). Don't make them
   absolute.
 - The globe's position/scale/opacity come from the page pose (see above); it's
   tilted 23.5° and rotated so Israel's longitude (~35°E) faces the camera (see
@@ -162,3 +161,14 @@ copies the values for pasting into the config.
 Recent work targeted mobile scroll/resize jank (planet crop, star-field redraw)
 and keeping the CV popup inside the iOS safe area. When touching layout or resize
 handlers, re-check behaviour on mobile viewports and across orientation changes.
+
+### Deploy
+
+Push to `main` → `.github/workflows/deploy.yml`: builds with `--base-href=/`,
+`rsync`s `dist/cv/browser` to `~/cv-site/site/` on the Hetzner server (secrets
+`SSH_HOST`, `SSH_USER`, `SSH_KEY`) and reloads the `cv-web` nginx container
+(`deploy/docker-compose.prod.yml`, on the shared `expense-tracker_default` network).
+The shared Caddy (`~/expense-tracker/Caddyfile`) proxies `shumski.dev` / `www.` to
+`cv-web:80`. The old GitHub Pages site (`ishoomsky.github.io/cv/`) only serves a
+redirect stub to shumski.dev (`deploy/pages-redirect/`). Server architecture:
+`../hosted-on-hetzner/CLAUDE.md`.
