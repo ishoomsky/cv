@@ -25,23 +25,11 @@
   "nav": [
     {
       "label": "ABOUT",
-      "target": "about"
+      "target": ""
     },
     {
-      "label": "EXPERIENCE",
-      "target": "experience"
-    },
-    {
-      "label": "WORK",
-      "target": "work"
-    },
-    {
-      "label": "PROJECTS",
-      "target": "projects"
-    },
-    {
-      "label": "EDUCATION",
-      "target": "education"
+      "label": "PORTFOLIO",
+      "target": "portfolio"
     },
     {
       "label": "CONTACT",
@@ -49,8 +37,6 @@
     }
   ],
   "contact": {
-    "title": "ESTABLISH CONTACT",
-    "intro": "Channel open. WhatsApp is the fastest way to reach me; email for anything longer-form. Usually reply within a few hours.",
     "whatsapp": "+972 55 771 0044",
     "whatsappUrl": "https://wa.me/972557710044",
     "phone": "+972 55 771 0044",
@@ -59,16 +45,7 @@
     "linkedin": "linkedin/ivanshumski",
     "linkedinUrl": "https://www.linkedin.com/in/ivanshumski/"
   },
-  "stackTicker": [
-    "ANGULAR",
-    "TS",
-    "NODE",
-    "AI TOOLS",
-    "RXJS",
-    "NESTJS",
-    "GCP"
-  ],
-  "summary": "I'm a frontend developer with 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
+  "summary": "Hello there! I'm a frontend developer with 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
   "skills": [
     {
       "label": "FRAMEWORKS & LIBRARIES",

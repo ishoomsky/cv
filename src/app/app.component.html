@@ -1,4 +1,15 @@
 <app-nebula></app-nebula>
 <app-star-field></app-star-field>
 <app-planet></app-planet>
-<app-landing></app-landing>
+
+<header class="topbar">
+  <a class="brand" routerLink="/">{{ cv.profile.firstName }}<span>.</span>{{ cv.profile.lastName }}</a>
+  <nav aria-label="Sections">
+    @for (n of cv.nav; track n.target) {
+      <a [routerLink]="'/' + n.target" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ n.label }}</a>
+    }
+  </nav>
+  <a class="cta" [href]="cv.contact.whatsappUrl" target="_blank" rel="noopener">WhatsApp</a>
+</header>
+
+<router-outlet></router-outlet>

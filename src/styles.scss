@@ -1,3 +1,6 @@
+// Global page styles (routed pages share one vocabulary — see the file header).
+@use 'app/pages/pages';
+
 :root {
   --font-display: 'Orbitron', monospace;
   --font-mono: 'Share Tech Mono', monospace;

@@ -1,0 +1,19 @@
+// Layout tokens shared by the app shell (top bar, tab bar) and the global page
+// styles. Variables only — @use it anywhere without emitting CSS.
+
+$ink: #04121f;
+$gutter: clamp(20px, 5vw, 96px);
+
+// ── Type scale ────────────────────────────────────────────────────────────
+// Fluid between a 375px and 1440px viewport. The rem part keeps text growing
+// with browser zoom (pure-vw sizes ignore it); display sizes stay vw-driven.
+$fs-label:   0.8125rem;                                            // 13 — mono uppercase labels
+$fs-ui:      clamp(0.875rem, 0.853rem + 0.09vw, 0.9375rem);        // 14→15 — mono chips, meta, links
+$fs-body:    clamp(1rem, 0.956rem + 0.19vw, 1.125rem);             // 16→18
+$fs-lead-sm: clamp(1.125rem, 1.04rem + 0.38vw, 1.375rem);          // 18→22
+$fs-h3:      clamp(1.25rem, 1.03rem + 0.94vw, 1.875rem);           // 20→30
+$fs-h3-lg:   clamp(1.5rem, 1.15rem + 1.5vw, 2.5rem);               // 24→40
+$fs-lead:    clamp(1.375rem, 1.11rem + 1.13vw, 2.125rem);          // 22→34
+$fs-h2:      clamp(1.875rem, 0.95rem + 3.94vw, 4.5rem);            // 30→72
+
+$rail-tile: clamp(32px, 2.6vw, 40px);

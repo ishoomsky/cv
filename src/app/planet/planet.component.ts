@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, HostListener, inject } from '@angular/core';
 import * as THREE from 'three';
-import { PlanetScroll } from './planet-scroll.service';
+import { SpaceService } from '../space.service';
 
 // Relative so it resolves against <base href> on both dev (/) and Pages (/cv/).
 const TEX = 'textures/planet/';
@@ -25,12 +25,10 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private earth!: THREE.Mesh;
   private clouds!: THREE.Mesh;
   private earthGroup = new THREE.Group();
-  private scroll = inject(PlanetScroll);
-  private baseY = 0;        // resting height of the globe (see placeGlobe)
-  private riseSmooth = 0;   // eased scroll progress, so Lenis-driven steps don't jitter
-  // Total lift over the whole page, in scene units — enough to carry the globe fully
-  // off the top (half-height ~1.24 + globe radius ~1.1, from a resting y of ~-0.3).
-  private static readonly RISE = 3.2;
+  private space = inject(SpaceService);
+  // Current (eased) pose. Starts at the default (Home) pose, so a deep link to
+  // another page flies the globe into place on load.
+  private pose = { ...this.space.planet };
 
   private frameId = 0;
   private loaderHidden = false;
@@ -51,8 +49,10 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
     this.initThree();
     this.buildEarth();
+    this.applyPose();
     if (this.reduceMotion) this.renderStill();
-    else this.animate();
+    // Runs in reduced-motion too (no spin) so page changes can still move the globe.
+    this.animate();
     // Safety net: never let a failed/slow asset trap the user on the loader.
     this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
   }
@@ -111,8 +111,6 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.camera.position.set(0, 0, 3.4);
     this.camera.lookAt(0, 0, 0);
 
-    this.placeGlobe();
-    this.earthGroup.scale.setScalar(1.05);
     this.earthGroup.rotation.z = THREE.MathUtils.degToRad(23.5); // axial tilt
     this.scene.add(this.earthGroup);
   }
@@ -289,27 +287,47 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.lastFrame = now;
     // dt in 60fps-frame units, clamped so a background-tab pause doesn't jump.
     const dt = Math.min(elapsed / (1000 / 60), 4);
+    const moved = this.easePose(dt);
+    if (this.reduceMotion) {
+      // Still globe: only repaint when a page change actually moved it.
+      if (moved) this.renderStill();
+      return;
+    }
     this.earth.rotation.y   += 0.00008 * dt;
     this.clouds.rotation.y  += 0.00012 * dt; // clouds drift slightly faster
-    // Rise with the page scroll (eased, dt-scaled so it's frame-rate independent).
-    this.riseSmooth += (this.scroll.progress - this.riseSmooth) * Math.min(1, 0.12 * dt);
-    this.earthGroup.position.y = this.baseY + this.riseSmooth * PlanetComponent.RISE;
     this.renderer.render(this.scene, this.camera);
   };
 
-  // One-off render for reduced-motion mode (no spin, no rAF loop).
+  // One-off render for reduced-motion mode (no spin).
   private renderStill = () => this.renderer.render(this.scene, this.camera);
 
-  // Globe on the right beside the hero copy. The visible half-height at z=3.4 /
-  // fov 40 is ~1.24, so the bottom always overflows the frame — the landing only
-  // ever moves this canvas down on scroll, never up. On portrait screens the
-  // frame is too narrow for that offset (only a sliver showed), so pull the globe
-  // in towards the centre and drop it below the hero copy.
-  private placeGlobe() {
+  // Ease the current pose towards the page's target pose (SpaceService.planet),
+  // dt-scaled so the ~1s flight is frame-rate independent. Reduced motion snaps.
+  // Returns whether anything changed.
+  private easePose(dt: number) {
+    const target = this.space.planet, pose = this.pose;
+    const k = this.reduceMotion ? 1 : Math.min(1, 0.055 * dt);
+    let moved = false;
+    for (const key of ['x', 'y', 'scale', 'opacity'] as const) {
+      const d = target[key] - pose[key];
+      if (Math.abs(d) < 1e-4) continue;
+      pose[key] += d * k;
+      moved = true;
+    }
+    if (moved) this.applyPose();
+    return moved;
+  }
+
+  // x is a fraction of the visible half-width, so poses hold across aspect ratios.
+  // The visible half-height at z=3.4 / fov 40 is ~1.24. Portrait screens are too
+  // narrow to park the globe beside the copy, so drop it lower instead.
+  private applyPose() {
     const aspect = window.innerWidth / window.innerHeight;
     const halfWidth = 3.4 * Math.tan(THREE.MathUtils.degToRad(20)) * aspect;
-    if (aspect < 1) { this.baseY = -0.85; this.earthGroup.position.set(halfWidth * 0.5, this.baseY, 0); }
-    else { this.baseY = -0.25; this.earthGroup.position.set(1.45, this.baseY, 0); }
+    const { x, y, scale, opacity } = this.pose;
+    this.earthGroup.position.set(halfWidth * x, aspect < 1 ? y - 0.6 : y, 0);
+    this.earthGroup.scale.setScalar(scale);
+    this.canvas.style.opacity = String(opacity);
   }
 
   @HostListener('window:resize')
@@ -317,7 +335,7 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     const w = window.innerWidth, h = window.innerHeight;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.placeGlobe();
+    this.applyPose();
     this.renderer.setSize(w, h);
     if (this.reduceMotion) this.renderStill();
   }

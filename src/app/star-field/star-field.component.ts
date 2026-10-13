@@ -1,4 +1,5 @@
-import { Component, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, HostListener, inject } from '@angular/core';
+import { SpaceService } from '../space.service';
 
 interface Star {
   x: number;
@@ -46,6 +47,7 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   // to at 60fps.
   private static readonly FRAME_MS = 1000 / 30;
   private lastFrame = 0;
+  private space = inject(SpaceService);
   // Users who asked for less motion get a still starfield (no drift/twinkle/meteors).
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
@@ -127,14 +129,21 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
 
   private animate = (now = performance.now()) => {
     this.frameId = requestAnimationFrame(this.animate);
+    const warp = this.space.warp;
     const elapsed = now - this.lastFrame;
-    if (elapsed < StarFieldComponent.FRAME_MS) return;
+    // Full frame rate while warping — streaks stutter visibly at 30fps.
+    if (elapsed < (warp > 0 ? 1000 / 60 : StarFieldComponent.FRAME_MS)) return;
     this.lastFrame = now;
     // Clamped so a background-tab pause doesn't teleport everything on return.
     const dt = Math.min(elapsed / (1000 / 60), 4);
 
     const t = (now - this.start) / 1000;
     this.ctx.clearRect(0, 0, this.w, this.h);
+
+    if (warp > 0.02) {
+      this.drawWarp(warp, dt);
+      return;
+    }
 
     // Stars: drift + twinkle.
     for (const s of this.stars) {
@@ -153,6 +162,33 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     }
     this.updateMeteors(dt);
   };
+
+  // Page-change "hyperspace": the view flies sideways in the direction of travel
+  // (SpaceService.warpDir), so every star streams the opposite way — nearer
+  // (bigger) ones faster — drawn as a streak whose length tracks its speed. Stars
+  // that leave the frame re-enter at the leading edge at a random height, so the
+  // field is still evenly spread when the warp settles back to a drift.
+  private drawWarp(warp: number, dt: number) {
+    const { ctx, w, h } = this;
+    const dir = this.space.warpDir;
+    ctx.lineCap = 'round';
+    for (const s of this.stars) {
+      const v = warp * (0.4 + s.size) * 26 * dt;
+      s.x -= dir * v;
+      if (s.x < -40 || s.x > w + 40) {
+        s.x = dir > 0 ? w + Math.random() * 40 : -Math.random() * 40;
+        s.y = Math.random() * h;
+        continue;
+      }
+      const len = v * 3.2;
+      ctx.strokeStyle = `rgba(${s.color},${Math.min(1, s.baseAlpha * (0.6 + warp))})`;
+      ctx.lineWidth = s.size * (1 + warp * 0.6);
+      ctx.beginPath();
+      ctx.moveTo(s.x + dir * len, s.y);  // tail trails behind the motion
+      ctx.lineTo(s.x, s.y);
+      ctx.stroke();
+    }
+  }
 
   private drawStar(s: Star, alpha: number) {
     const { ctx } = this;
