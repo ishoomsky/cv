@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ivan Shumski — moved to shumski.dev</title>
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://shumski.dev/">
+  <meta http-equiv="refresh" content="0; url=https://shumski.dev/">
+  <script>
+    // /cv/portfolio?x#y  →  https://shumski.dev/portfolio?x#y
+    var p = location.pathname.replace(/^\/cv(\/|$)/, '/');
+    location.replace('https://shumski.dev' + p + location.search + location.hash);
+  </script>
+</head>
+<body><p>This page has moved to <a href="https://shumski.dev/">shumski.dev</a>.</p></body>
+</html>

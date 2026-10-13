@@ -1,0 +1,16 @@
+# Статический сайт shumski.dev: nginx отдаёт готовую сборку из ./site.
+# Публичный HTTPS обеспечивает ОБЩИЙ Caddy (сеть expense-tracker_default).
+services:
+  cv-web:
+    image: nginx:alpine
+    restart: unless-stopped
+    expose: ['80']
+    networks: [edge]
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+networks:
+  edge:
+    external: true
+    name: expense-tracker_default
