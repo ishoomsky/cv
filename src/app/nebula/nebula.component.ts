@@ -49,23 +49,34 @@ export class NebulaComponent implements AfterViewInit {
       'rgba(34, 197, 94, 0.3)',
     ];
 
+    // No `ctx.filter = 'blur()'`: Safari ignores it and the blobs come out as
+    // hard-edged ellipses. Each blob is a unit radial gradient that falls off
+    // smoothly to 0 at its edge, stretched into an ellipse with a transform.
     c.clearRect(0, 0, w, h);
-    c.filter = 'blur(80px)';
     for (let i = 0; i < 5; i++) {
       const x = Math.random() * w;
       const y = Math.random() * h;
       const radiusX = Math.random() * 700 + 500;
       const radiusY = radiusX * 0.5;
       const color = colors[Math.floor(Math.random() * colors.length)];
+      const [r, g, b, a] = color.match(/[\d.]+/g)!.map(Number);
+      const rgba = (k: number) => `rgba(${r}, ${g}, ${b}, ${(a * k).toFixed(3)})`;
 
-      const grad = c.createRadialGradient(x, y, 0, x, y, radiusX);
-      grad.addColorStop(0, color);
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      // Smooth, gaussian-like falloff instead of a linear one.
+      const grad = c.createRadialGradient(0, 0, 0, 0, 0, 1);
+      grad.addColorStop(0, rgba(1));
+      grad.addColorStop(0.25, rgba(0.8));
+      grad.addColorStop(0.5, rgba(0.42));
+      grad.addColorStop(0.75, rgba(0.12));
+      grad.addColorStop(1, rgba(0));
+
+      c.save();
+      c.translate(x, y);
+      c.rotate(Math.random() * Math.PI);
+      c.scale(radiusX * 0.9, radiusY * 0.9);
       c.fillStyle = grad;
-      c.beginPath();
-      c.ellipse(x, y, radiusX * 0.6, radiusY * 0.6, Math.random() * Math.PI, 0, Math.PI * 2);
-      c.fill();
+      c.fillRect(-1, -1, 2, 2);
+      c.restore();
     }
-    c.filter = 'none';
   }
 }
