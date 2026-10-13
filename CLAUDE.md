@@ -127,8 +127,10 @@ back-side atmosphere shell. Notes when editing:
 ### Motion tuning
 
 `src/app/motion.config.ts` holds the global knobs for page transitions and the
-first-load intro: `MOTION.speed` (time scale) and `MOTION.strength` (travel
-distance, warp intensity). Use `dur()` / `dist()` for any new transition
+first-load intro: `MOTION.speed` (time scale), `MOTION.strength` (travel
+distance, warp intensity) and `MOTION.pageEnterDelay` (how long a new page
+waits before its elements fly in after a page change — the route switches at
+once regardless). Use `dur()` / `dist()` for any new transition
 timing/distance so the knobs apply. First load: spinner only, no star warp; the
 content intro (hero letters rise, blocks fade up) starts when the spinner lifts
 (`SpaceService.introReady`). In dev builds a **Motion** panel (currently hidden via `SHOW_MOTION_TUNER = false` in `app.component.ts`) (bottom-left,

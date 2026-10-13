@@ -10,6 +10,10 @@ export const MOTION = {
   /** Intensity: how far elements travel and how hard the stars streak.
    *  0 = none, 1 = default, 2 = double. */
   strength: 1,
+  /** Page change: seconds the new page waits before its elements fly in, so the
+   *  old page has mostly left first (scaled by speed). The route itself still
+   *  switches at once, so clicks stay responsive and retargetable. */
+  pageEnterDelay: 0.35,
 };
 
 /** A duration / delay / stagger (seconds) at the current speed. */

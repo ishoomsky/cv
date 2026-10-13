@@ -147,6 +147,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
           // lazy: false applies the start pose now, not on the next tick — no
           // one-frame flash of the hero in its final position.
           x: dir * dist(64), opacity: 0, duration: dur(0.55), ease: 'power3.out', lazy: false,
+          delay: dur(MOTION.pageEnterDelay),  // let the old page mostly leave first
           stagger: cappedStagger(0.035),
         });
       } else {

@@ -26,6 +26,9 @@ const STORE_KEY = 'cv-motion';
         <label>Strength <output>{{ m.strength.toFixed(2) }}</output>
           <input type="range" min="0" max="2" step="0.05" [value]="m.strength" (input)="set('strength', $event)" />
         </label>
+        <label>Page enter delay <output>{{ m.pageEnterDelay.toFixed(2) }}s</output>
+          <input type="range" min="0" max="1" step="0.05" [value]="m.pageEnterDelay" (input)="set('pageEnterDelay', $event)" />
+        </label>
         <div class="row">
           <button type="button" (click)="space.pulseWarp(-1)">← Warp</button>
           <button type="button" (click)="space.pulseWarp(1)">Warp →</button>
@@ -74,7 +77,7 @@ export class MotionTunerComponent {
     } catch {}
   }
 
-  set(key: 'speed' | 'strength', e: Event) {
+  set(key: 'speed' | 'strength' | 'pageEnterDelay', e: Event) {
     MOTION[key] = +(e.target as HTMLInputElement).value;
     this.save();
   }

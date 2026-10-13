@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { CV } from '../cv';
 import { LeavingPage, PageTransitionService } from './page-transition.service';
-import { dist, dur } from '../motion.config';
+import { MOTION, dist, dur } from '../motion.config';
 import { SpaceService } from '../space.service';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -119,7 +119,9 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
           stagger: cappedStagger(0.04),
         }),
       });
-      if (dir) reveals(); else this.atIntro(reveals);
+      // After a page change, wait for the old page to mostly leave first.
+      if (dir) gsap.delayedCall(dur(MOTION.pageEnterDelay), reveals);
+      else this.atIntro(reveals);
 
       // ── Depth drift ──────────────────────────────────────────────────────
       q<HTMLElement>('[data-speed]').forEach(el => {

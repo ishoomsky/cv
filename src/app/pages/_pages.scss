@@ -354,11 +354,12 @@ $hero-gap-lg: clamp(26px, 5vh, 52px);
   -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
 }
 .c-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.c-label { @include label(t.$text); }
+.c-label { @include label(t.$text); white-space: nowrap; }
 .c-value {
-  // Mono, not the wide display face: emails/handles must fit without mid-word breaks.
+  // Mono, not the wide display face, so emails/handles fit. Never wraps: if a
+  // value is still too long (narrow phones) it's cut with an ellipsis.
   font-family: var(--font-mono); font-size: $fs-lead-sm; color: t.$text-bright;
-  overflow-wrap: anywhere;  // last resort only, on the narrowest phones
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .c-arrow { margin-left: auto; color: t.$text; transition: transform .25s t.$ease-out, color .25s; }
 
