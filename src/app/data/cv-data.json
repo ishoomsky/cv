@@ -3,7 +3,7 @@
     "firstName": "IVAN",
     "lastName": "SHUMSKI",
     "fullName": "IVAN SHUMSKI",
-    "panelRole": "FRONTEND & FULL-STACK ENGINEER",
+    "panelRole": "FULL STACK ENGINEER · FRONTEND FOCUS",
     "resumeRole": "FRONTEND & FULL-STACK ENGINEER",
     "dossierTitle": "◈ PERSONNEL DOSSIER // IVAN.SHUMSKI"
   },
@@ -45,7 +45,7 @@
     "linkedin": "linkedin/ivanshumski",
     "linkedinUrl": "https://www.linkedin.com/in/ivanshumski/"
   },
-  "summary": "Hello there! I'm a frontend developer with 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
+  "summary": "Hello there! I'm a full stack developer with a frontend focus and 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
   "skills": [
     {
       "label": "FRAMEWORKS & LIBRARIES",
