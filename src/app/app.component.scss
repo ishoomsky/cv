@@ -37,8 +37,8 @@ canvas {
   background: rgba(2, 12, 26, 0.88);
   border: 1px solid t.$cyan-border;
   font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  font-size: $fs-label;
+  letter-spacing: $ls-ui;
 
   .brand {
     font-family: var(--font-display);

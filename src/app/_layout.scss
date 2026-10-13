@@ -12,8 +12,39 @@ $fs-ui:      clamp(0.875rem, 0.853rem + 0.09vw, 0.9375rem);        // 14→15 �
 $fs-body:    clamp(1rem, 0.956rem + 0.19vw, 1.125rem);             // 16→18
 $fs-lead-sm: clamp(1.125rem, 1.04rem + 0.38vw, 1.375rem);          // 18→22
 $fs-h3:      clamp(1.25rem, 1.03rem + 0.94vw, 1.875rem);           // 20→30
-$fs-h3-lg:   clamp(1.5rem, 1.15rem + 1.5vw, 2.5rem);               // 24→40
-$fs-lead:    clamp(1.375rem, 1.11rem + 1.13vw, 2.125rem);          // 22→34
 $fs-h2:      clamp(1.875rem, 0.95rem + 3.94vw, 4.5rem);            // 30→72
 
 $rail-tile: clamp(32px, 2.6vw, 40px);
+
+// ── Typography roles ──────────────────────────────────────────────────────
+// Every text on the site is one of: display heading (Orbitron: kicker h2 / h3
+// at 700, line-height 1.15), body copy ($fs-body, $lh-body), lead line
+// ($fs-lead-sm), mono UI text ($fs-ui or $fs-label, $ls-ui) or a label (below).
+$ls-label: 0.2em;    // mono uppercase micro-labels
+$ls-ui: 0.06em;      // mono UI text: chips, buttons, links, dates, roles
+$lh-body: 1.65;
+$lh-lead: 1.5;
+$lh-heading: 1.15;
+
+// Mono uppercase micro-label: company / year / number (accent colour) or a
+// group heading such as "Languages" or a skill group (muted colour).
+@mixin label($color) {
+  font-family: var(--font-mono); font-weight: 400; font-size: $fs-label;
+  letter-spacing: $ls-label; text-transform: uppercase; color: $color;
+}
+
+// ── Spacing scale ─────────────────────────────────────────────────────────
+$space-xs: 10px;                          // inside tight groups (chips, label → value)
+$space-s: 14px;                           // label → its content
+$space-m: clamp(18px, 2.4vw, 26px);       // between paragraphs / items
+$space-l: clamp(36px, 6vh, 64px);         // heading → content, block → block
+$col-gap: clamp(32px, 5vw, 80px);         // between columns
+$section-gap: clamp(72px, 12vh, 140px);   // between stacked sections
+$page-top: clamp(110px, 18vh, 180px);     // first section: clears the top bar
+
+// Cards (experience, portfolio, projects, dialog)
+$card-pad: clamp(20px, 3vw, 40px);
+$card-radius: 28px;
+$card-gap: clamp(16px, 2vw, 24px);
+$inner-radius: 18px;                      // images inside cards, button rows
+

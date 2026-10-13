@@ -78,23 +78,16 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   // ── Intro loader ──────────────────────────────────────────────────────────
 
-  private updateLoader(progress: number) {
-    const pct = Math.round(Math.min(1, progress) * 100);
-    const fill = document.getElementById('ldr-fill');
-    const label = document.getElementById('ldr-pct');
-    if (fill) fill.style.width = pct + '%';
-    if (label) label.textContent = pct + '%';
-  }
-
+  // Fade the spinner out (after the first Earth frame has painted) and signal
+  // SpaceService.introReady, which starts the first-load entrance.
   private hideLoader() {
     if (this.loaderHidden) return;
     this.loaderHidden = true;
     clearTimeout(this.loaderTimeout);
     const el = document.getElementById('app-loader');
-    if (!el) return;
-    this.updateLoader(1);
-    // Let the first Earth frame paint, then fade the loader out and remove it.
     requestAnimationFrame(() => {
+      this.space.markIntroReady();
+      if (!el) return;
       el.classList.add('hidden');
       el.addEventListener('transitionend', () => el.remove(), { once: true });
     });
@@ -131,9 +124,8 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   // ── Earth, clouds, atmosphere ─────────────────────────────────────────────
 
   private buildEarth() {
-    // Drive the intro loader from real texture-download progress.
+    // The intro spinner stays up until the textures are in.
     const manager = new THREE.LoadingManager();
-    manager.onProgress = (_url, loaded, total) => this.updateLoader(loaded / total);
     manager.onLoad  = () => { this.hideLoader(); if (this.reduceMotion) this.renderStill(); };
     manager.onError = () => this.hideLoader(); // never leave the loader stuck
 

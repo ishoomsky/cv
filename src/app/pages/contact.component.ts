@@ -9,9 +9,10 @@ interface ContactMethod {
   href: string;
   icon: string;       // monochrome SVG under public/, painted via CSS mask
   external?: boolean; // opens in a new tab; tel:/mailto: navigate in place
-  // Confirm dialog: spells out what happens before the channel opens.
+  // Confirm dialog: says exactly what happens next, before the channel opens.
   title: string;
   message: string;
+  action: string;     // the confirm button's label
   event: string;      // analytics event, fired on confirm
 }
 
@@ -19,11 +20,17 @@ const c = CV.contact, cs = CV.contacts;
 
 const METHODS: ContactMethod[] = [
   { label: 'WhatsApp', value: c.whatsapp, href: c.whatsappUrl, icon: 'icons/chat.svg', external: true,
-    title: 'Message me', message: "Let's chat on WhatsApp — fastest way to reach me.", event: 'whatsapp-click' },
+    title: 'Open WhatsApp?',
+    message: `WhatsApp will open in a new tab (the app, if you have it) with a chat to ${c.whatsapp}, ready for your message.`,
+    action: 'Open WhatsApp', event: 'whatsapp-click' },
   { label: 'Email', value: cs.email, href: 'mailto:' + cs.email, icon: 'icons/mail.svg',
-    title: 'Email me', message: 'Starts a new email to me. Say hi!', event: 'email-click' },
+    title: 'Write an email?',
+    message: `Your email app will open with a new message to ${cs.email}.`,
+    action: 'Write email', event: 'email-click' },
   { label: 'LinkedIn', value: cs.linkedin.label, href: cs.linkedin.url, icon: 'icons/linkedin.svg', external: true,
-    title: 'My LinkedIn', message: 'Opens my LinkedIn in a new tab.', event: 'linkedin-click' },
+    title: 'Open LinkedIn?',
+    message: 'My LinkedIn profile will open in a new tab.',
+    action: 'Open LinkedIn', event: 'linkedin-click' },
 ];
 
 @Component({
@@ -64,7 +71,7 @@ const METHODS: ContactMethod[] = [
       <p class="cf-msg">{{ pending?.message }}</p>
       <div class="cf-actions">
         <button type="button" class="btn ghost" (click)="cancel()">Cancel</button>
-        <button type="button" class="btn primary" autofocus (click)="confirm()">Continue <span aria-hidden="true">→</span></button>
+        <button type="button" class="btn primary" autofocus (click)="confirm()">{{ pending?.action }} <span aria-hidden="true">→</span></button>
       </div>
     </dialog>
   `,

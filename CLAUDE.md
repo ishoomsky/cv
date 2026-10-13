@@ -67,8 +67,16 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
   depth drift, `.work-img` = image moves in its frame. It also renders a "Next" link, currently hidden via `SHOW_NEXT_LINK = false`. All of it runs outside the
   Angular zone; `prefers-reduced-motion` skips Lenis/GSAP.
 - **Page styles are global** (`src/app/pages/_pages.scss`, loaded from
-  `styles.scss`); shared tokens (type scale, gutter, tab-bar size) live in
-  `src/app/_layout.scss`. Shell styles are in `app.component.scss`.
+  `styles.scss`); shared tokens live in `src/app/_layout.scss`. Shell styles are
+  in `app.component.scss`.
+- **One type & spacing system** (`_layout.scss`) — use it, don't invent values:
+  every text is a display heading (`.kicker` h2, or `%heading-3`: Orbitron 700,
+  `$fs-h3`, `$lh-heading`), body copy (`$fs-body`, `$lh-body`), a lead line
+  (`$fs-lead-sm`, `$lh-lead`), mono UI text (`$fs-ui`/`$fs-label`, `$ls-ui`) or
+  a label (`@include label($color)` — cyan for company/year/number, `$text` for
+  group headings). Spacing comes from `$space-xs/s/m/l`, `$col-gap`; cards use
+  `%card` (`$card-pad`, `$card-radius`, `$card-gap`); sections are separated
+  by `$section-gap`, and only a page's first section adds `$page-top`.
 - **Page transition (atom by atom, directional)**. Every `[data-reveal]` element
   is an "atom" — keep them fine-grained (single chips, list items, links), not
   whole blocks. On `NavigationStart` `AppComponent` compares `pageIndex()` (route
@@ -95,10 +103,11 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
 custom `ShaderMaterial` that blends a daytime map with a night-lights map based
 on the sun direction, plus a separate cloud sphere and an additive-blended
 back-side atmosphere shell. Notes when editing:
-- Textures load through a `THREE.LoadingManager` that drives the intro loader
-  (`#app-loader`, `#ldr-fill`, `#ldr-pct` in `index.html`) from real download
-  progress. A 9 s `setTimeout` safety-net hides the loader even if assets fail —
-  keep that fallback intact so a slow/failed asset can never trap the user.
+- The intro loader is just a spinner (`#app-loader` in `index.html`). It stays
+  up until the textures finish loading (`THREE.LoadingManager`); a 9 s
+  `setTimeout` safety-net hides it even if assets fail — keep that fallback
+  intact so a slow/failed asset can never trap the user. `hideLoader()` also
+  calls `SpaceService.markIntroReady()`, which starts the first-load intro.
 - Texture paths are **relative** (`textures/planet/…`) on purpose so they resolve
   against `<base href>` on both dev (`/`) and Pages (`/cv/`). Don't make them
   absolute.
@@ -111,6 +120,18 @@ back-side atmosphere shell. Notes when editing:
   restore the globe (route poses / Home scroll logic are still wired).
 - With the planet enabled, `planet.component.spec.ts` fails in headless Chrome:
   there is no WebGL context there. That's environmental, not a regression.
+
+### Motion tuning
+
+`src/app/motion.config.ts` holds the global knobs for page transitions and the
+first-load intro: `MOTION.speed` (time scale) and `MOTION.strength` (travel
+distance, warp intensity). Use `dur()` / `dist()` for any new transition
+timing/distance so the knobs apply. First load: spinner only, no star warp; the
+content intro (hero letters rise, blocks fade up) starts when the spinner lifts
+(`SpaceService.introReady`). In dev builds a **Motion** panel (currently hidden via `SHOW_MOTION_TUNER = false` in `app.component.ts`) (bottom-left,
+`MotionTunerComponent`, `isDevMode()` only) edits the knobs live, persists them
+to localStorage, test-fires the sideways warp, replays the first load and
+copies the values for pasting into the config.
 
 ### Performance rules (the space layers animate behind everything)
 

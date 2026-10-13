@@ -21,14 +21,10 @@ import { CV } from '../cv';
             <span class="p-num" data-reveal>0{{ i + 1 }}</span>
             <h3 data-reveal>{{ pr.name }}</h3>
             <p class="p-tag" data-reveal>{{ pr.tagline }}</p>
-            <div class="flow">
-              @for (n of pr.flow; track n; let last = $last) {
-                <span class="chip" data-reveal>{{ n }}</span>@if (!last) {<span class="arrow" data-reveal aria-hidden="true">→</span>}
-              }
-            </div>
-            <ul>
-              @for (p of pr.points; track p) { <li data-reveal>{{ p }}</li> }
-            </ul>
+            <!-- Stack as plain text: tagline style, title colour. -->
+            <p class="p-tag p-stack" data-reveal>{{ pr.flow.join(', ') }}</p>
+            <!-- Plain paragraphs (no bullets) so everything lines up on the card's left edge. -->
+            @for (p of pr.points; track p) { <p class="p-desc" data-reveal>{{ p }}</p> }
             @if (pr.url) {
               <a class="live" data-reveal [href]="pr.url" target="_blank" rel="noopener">Open live ↗</a>
             }

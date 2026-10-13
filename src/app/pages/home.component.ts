@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CV } from '../cv';
 import { PageComponent } from '../page/page.component';
 import { PlanetPose, SpaceService } from '../space.service';
+import { MOTION, dist, dur } from '../motion.config';
 import { PageTransitionService } from '../page/page-transition.service';
 import { AboutSection } from '../sections/about.section';
 import { ExperienceSection } from '../sections/experience.section';
@@ -145,13 +146,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         gsap.from(atoms, {
           // lazy: false applies the start pose now, not on the next tick — no
           // one-frame flash of the hero in its final position.
-          x: dir * 64, opacity: 0, duration: 0.7, ease: 'power3.out', lazy: false,
-          stagger: Math.min(0.05, 0.6 / atoms.length),
+          x: dir * dist(64), opacity: 0, duration: dur(0.7), ease: 'power3.out', lazy: false,
+          stagger: dur(Math.min(0.05, 0.6 / atoms.length)),
         });
       } else {
         // ── First load intro: name letters rise in, then the rest fades up ───
-        gsap.from('.ch', { yPercent: 110, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.04, delay: 0.4 });
-        gsap.from('.fade-in', { y: 24, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.12, delay: 0.9 });
+        // Built paused (the from-states hide everything right away) and played
+        // once the spinner lifts.
+        const intro = gsap.timeline({ paused: true })
+          .from('.ch', { yPercent: 110 * MOTION.strength, opacity: 0, duration: dur(1.1), ease: 'expo.out', stagger: dur(0.04) }, dur(0.4))
+          .from('.fade-in', { y: dist(24), opacity: 0, duration: dur(1), ease: 'power3.out', stagger: dur(0.12) }, dur(0.9));
+        this.space.introReady.then(() => intro.play());
       }
 
       // ── Tech rail: endless loop that eases down to a crawl on hover (never stops)

@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { CV } from '../cv';
 import { LeavingPage, PageTransitionService } from './page-transition.service';
+import { dist, dur } from '../motion.config';
+import { SpaceService } from '../space.service';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,7 +55,9 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
   private zone = inject(NgZone);
   private route = inject(ActivatedRoute);
   private transitions = inject(PageTransitionService);
+  private space = inject(SpaceService);
   private reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  private destroyed = false;
   private lenis?: Lenis;
   private ctx?: gsap.Context;
   private tick = (t: number) => this.lenis?.raf(t * 1000);
@@ -76,6 +80,7 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
   }
 
   ngOnDestroy() {
+    this.destroyed = true;
     if (this.transitions.current === this) this.transitions.current = undefined;
     this.ctx?.revert();
     gsap.ticker.remove(this.tick);
@@ -97,18 +102,20 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
       // ── Atoms. Hidden up front; ScrollTrigger.batch then staggers in whatever
       // enters together. The first batch is what's on screen on arrival: after a
       // page change those slide in sideways from the direction of travel,
-      // otherwise everything rises in.
+      // otherwise everything rises in (on the first load, once the spinner
+      // lifts). Speed/strength come from MOTION.
       const atoms = q<HTMLElement>('[data-reveal]');
       const dir = this.transitions.dir;
-      gsap.set(atoms, { opacity: 0, y: 28 });
-      if (dir) gsap.set(atoms.filter(onScreen), { y: 0, x: dir * 64 });
-      ScrollTrigger.batch(atoms, {
+      gsap.set(atoms, { opacity: 0, y: dist(28) });
+      if (dir) gsap.set(atoms.filter(onScreen), { y: 0, x: dir * dist(64) });
+      const reveals = () => ScrollTrigger.batch(atoms, {
         scroller, start: 'top 94%', once: true,
         onEnter: batch => gsap.to(batch, {
-          opacity: 1, x: 0, y: 0, duration: 0.7, ease: 'power3.out', overwrite: true,
-          stagger: Math.min(0.06, 0.6 / batch.length),
+          opacity: 1, x: 0, y: 0, duration: dur(0.7), ease: 'power3.out', overwrite: true,
+          stagger: dur(Math.min(0.06, 0.6 / batch.length)),
         }),
       });
+      if (dir) reveals(); else this.atIntro(reveals);
 
       // ── Depth drift ──────────────────────────────────────────────────────
       q<HTMLElement>('[data-speed]').forEach(el => {
@@ -130,18 +137,25 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
     }, root);
   }
 
+  /** Run `fn` (in this page's GSAP context) once the intro spinner lifts. */
+  private atIntro(fn: () => void) {
+    this.space.introReady.then(() => {
+      if (!this.destroyed) this.ctx?.add(fn);
+    });
+  }
+
   /** Staggered exit, top to bottom: each visible atom flies off against the
-   *  direction of travel. Resolves when the last one is gone — or after 1s
+   *  direction of travel. Resolves when the last one is gone — or after ~1s
    *  regardless, so a stalled animation (hidden tab: no rAF) can't block routing. */
   leave(dir: 1 | -1): Promise<void> {
     const atoms = gsap.utils.toArray<HTMLElement>('[data-reveal], [data-exit]', this.content.nativeElement)
       .filter(el => onScreen(el) && +getComputedStyle(el).opacity > 0);
     if (!atoms.length) return Promise.resolve();
     return new Promise(resolve => this.zone.runOutsideAngular(() => {
-      setTimeout(resolve, 1000);
+      setTimeout(resolve, dur(1) * 1000);
       gsap.to(atoms, {
-        x: -dir * 64, opacity: 0, duration: 0.32, ease: 'power2.in', overwrite: true,
-        stagger: Math.min(0.035, 0.4 / atoms.length),
+        x: -dir * dist(64), opacity: 0, duration: dur(0.32), ease: 'power2.in', overwrite: true,
+        stagger: dur(Math.min(0.035, 0.4 / atoms.length)),
         onComplete: () => resolve(),
       });
     }));
