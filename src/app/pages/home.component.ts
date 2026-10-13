@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CV } from '../cv';
-import { PageComponent } from '../page/page.component';
+import { PageComponent, cappedStagger } from '../page/page.component';
 import { PlanetPose, SpaceService } from '../space.service';
 import { MOTION, dist, dur } from '../motion.config';
 import { PageTransitionService } from '../page/page-transition.service';
@@ -146,8 +146,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy {
         gsap.from(atoms, {
           // lazy: false applies the start pose now, not on the next tick — no
           // one-frame flash of the hero in its final position.
-          x: dir * dist(64), opacity: 0, duration: dur(0.7), ease: 'power3.out', lazy: false,
-          stagger: dur(Math.min(0.05, 0.6 / atoms.length)),
+          x: dir * dist(64), opacity: 0, duration: dur(0.55), ease: 'power3.out', lazy: false,
+          stagger: cappedStagger(0.035),
         });
       } else {
         // ── First load intro: name letters rise in, then the rest fades up ───

@@ -1,5 +1,5 @@
-import { Component, inject, isDevMode } from '@angular/core';
-import { ActivationEnd, NavigationCancel, NavigationEnd, NavigationError, NavigationSkipped, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, NgZone, inject, isDevMode } from '@angular/core';
+import { ActivationEnd, NavigationEnd, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AnalyticsService } from './analytics.service';
 import { PlanetComponent } from './planet/planet.component';
 import { StarFieldComponent } from './star-field/star-field.component';
@@ -9,7 +9,6 @@ import { SpaceService } from './space.service';
 import { PageData, pageIndex } from './app.routes';
 import { PageTransitionService } from './page/page-transition.service';
 import { MotionTunerComponent } from './motion-tuner.component';
-import { dur } from './motion.config';
 
 // Dev-only Motion tuning panel (MotionTunerComponent); hidden for now.
 const SHOW_MOTION_TUNER = false;
@@ -31,52 +30,55 @@ export class AppComponent {
   private space = inject(SpaceService);
   private transitions = inject(PageTransitionService);
 
-  /** A page change is playing (exit → swap → entrance): in-app link clicks
-   *  are swallowed until it settles, so repeated clicks can't stack
-   *  navigations, exits and warps on top of each other. */
-  private transitioning = false;
-  private settleTimer = 0;
-  private transitionId = -1;   // the navigation that owns the lock
+  /** Route path of the page on screen — or being flown to mid-transition. */
+  private target = '';
+  /** The link a mouse pointerdown already navigated: swallow its click. */
+  private pressed: HTMLAnchorElement | null = null;
 
   constructor() {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const router = inject(Router);
+    const zone = inject(NgZone);
     let first = true;
 
-    // Capture phase on the document: runs before RouterLink's own click handler.
+    // Transitions never block: the exiting page becomes a ghost (PageComponent
+    // .leave), so a click on another page mid-transition simply retargets.
+    // Clicks on the page we're already on / flying to are swallowed.
+    // Capture phase on the document runs before RouterLink's own click handler.
     document.addEventListener('click', e => {
-      if (!this.transitioning) return;
-      const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
-      if (!a || a.target === '_blank' || a.origin !== location.origin) return;  // external: let it through
-      e.preventDefault();
-      e.stopPropagation();
+      const a = internalLink(e.target);
+      if (!a) return;
+      if (a === this.pressed || linkPath(a) === this.target) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      this.pressed = null;
+    }, true);
+
+    // Mouse: start on press, not release (~100ms sooner). Touch keeps tap/click
+    // semantics so a scroll gesture can't trigger a page change.
+    document.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = internalLink(e.target);
+      if (!a || linkPath(a) === this.target) return;
+      this.pressed = a;
+      zone.run(() => router.navigateByUrl('/' + linkPath(a)));
     }, true);
 
     router.events.subscribe(e => {
-      // Every in-app navigation to another page (not the initial load, not a
-      // click on the current page) gets a direction from reading order — the
-      // page atoms fly out/in along it — and a sideways warp pulse while the
-      // pages swap.
-      if (e instanceof NavigationStart && !first && pathOf(e.url) !== pathOf(router.url)) {
-        this.transitioning = true;
-        this.transitionId = e.id;
-        clearTimeout(this.settleTimer);
+      // Every in-app navigation to another page (not the initial load) gets a
+      // direction from reading order — relative to the page being shown or flown
+      // to — and a sideways warp pulse while the pages swap.
+      if (e instanceof NavigationStart && !first && pathOf(e.url) !== this.target) {
+        const dir = pageIndex(e.url) >= pageIndex('/' + this.target) ? 1 : -1;
+        this.target = pathOf(e.url);
+        highlightNav(this.target);  // instant feedback, before the swap
         if (!reduce) {
-          const dir = pageIndex(e.url) >= pageIndex(router.url) ? 1 : -1;
           this.transitions.dir = dir;
           this.space.pulseWarp(dir);
         }
       }
-      // Unlock once the new page's entrance has played (or right away if the
-      // navigation didn't go through).
-      // Only the navigation that took the lock releases it — e.g. a browser Back
-      // mid-transition cancels the old one but starts its own.
-      if (e instanceof NavigationEnd && e.id === this.transitionId) {
-        this.settleTimer = window.setTimeout(() => (this.transitioning = false), reduce ? 0 : dur(0.9) * 1000);
-      }
-      if ((e instanceof NavigationCancel || e instanceof NavigationError || e instanceof NavigationSkipped) && e.id === this.transitionId) {
-        this.transitioning = false;
-      }
+      if (e instanceof NavigationEnd) this.target = pathOf(router.url);
       // The leaf route carries the planet pose for the page being entered.
       if (e instanceof ActivationEnd && !e.snapshot.firstChild) {
         const data = e.snapshot.data as Partial<PageData>;
@@ -90,4 +92,23 @@ export class AppComponent {
 /** The route path of a router URL, without query, fragment or leading slash. */
 function pathOf(url: string) {
   return url.split(/[?#]/)[0].replace(/^\//, '');
+}
+
+/** The in-app link (same origin, same tab) an event landed on, if any. */
+function internalLink(target: EventTarget | null): HTMLAnchorElement | null {
+  const a = (target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+  return a && !a.target && a.origin === location.origin ? a : null;
+}
+
+/** An in-app link's route path, relative to <base href> (/ on dev, /cv/ on Pages). */
+function linkPath(a: HTMLAnchorElement) {
+  const base = new URL(document.baseURI).pathname;
+  const path = a.pathname.startsWith(base) ? a.pathname.slice(base.length) : a.pathname.replace(/^\//, '');
+  return path.replace(/\/$/, '');
+}
+
+/** Move the nav's active state to `path` right away (RouterLinkActive catches
+ *  up when the navigation ends). */
+function highlightNav(path: string) {
+  document.querySelectorAll<HTMLAnchorElement>('.topbar nav a').forEach(a => a.classList.toggle('active', linkPath(a) === path));
 }

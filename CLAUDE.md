@@ -77,28 +77,26 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
   group headings). Spacing comes from `$space-xs/s/m/l`, `$col-gap`; cards use
   `%card` (`$card-pad`, `$card-radius`, `$card-gap`); sections are separated
   by `$section-gap`, and only a page's first section adds `$page-top`.
-- **Page transition (atom by atom, directional)**. Every `[data-reveal]` element
-  is an "atom" — keep them fine-grained (single chips, list items, links), not
-  whole blocks. On `NavigationStart` `AppComponent` compares `pageIndex()` (route
-  order) of target vs current and stores the direction (1 forward / -1 back) in
-  `PageTransitionService.dir` and `SpaceService.warpDir`. Every route has
-  `canDeactivate: [leavePage]`: the guard awaits the current page's `leave()`,
-  which staggers the on-screen atoms (plus `[data-exit]`, used by Home) off
-  against the direction of travel (1 s timeout so routing can never hang). The
-  new `PageComponent` then staggers its on-screen atoms in from the other side
-  (`ScrollTrigger.batch`); later atoms rise in on scroll. Home's hero uses
-  `[data-exit]` atoms: on navigation they slide in directionally, on first load
-  the letter-rise intro plays instead. Don't put `[data-reveal]`/`[data-exit]`
-  on an element with a CSS `transition` on `transform` (wrap it, see
-  `.btn-atom`) — the transition fights GSAP. Meanwhile
-  `SpaceService.warp` pulses 0→1→0 — `StarFieldComponent` streaks the stars
-  sideways — and `ActivationEnd` sets `SpaceService.planet` from route data;
-  `PlanetComponent` eases towards it every frame. No View Transitions API.
-- **Transition lock**: while a page change plays (from `NavigationStart` until
-  the new page's entrance settles, tied to that navigation's id) `AppComponent`
-  swallows in-app link clicks in a capture-phase document listener, so rapid or
-  overlapping clicks can't stack navigations/exits/warps. Clicking the current
-  page's link is a no-op (no warp).
+- **Page transition (atom by atom, directional, never blocking)**. Every
+  `[data-reveal]` element is an "atom" — keep them fine-grained (single chips,
+  list items, links), not whole blocks. On `NavigationStart` `AppComponent`
+  compares `pageIndex()` of the target vs the page on screen / being flown to
+  and stores the direction (1 forward / -1 back) in `PageTransitionService.dir`
+  and `SpaceService.warpDir`. Every route has `canDeactivate: [leavePage]`,
+  which calls the current page's `leave()`: it clones the page as it looks now
+  into an inert `.page-ghost` overlay, hides the real one and resolves at once.
+  The router swaps immediately, the new `PageComponent` staggers its on-screen
+  atoms in from the other side while the ghost's atoms fly off — overlapping.
+  Staggers are capped (`cappedStagger`: only the first 8 atoms cascade).
+  Meanwhile `SpaceService.warp` pulses — `StarFieldComponent` streaks the stars
+  sideways — and `ActivationEnd` sets `SpaceService.planet` from route data.
+  No View Transitions API.
+- **Clicks**: a click on another page mid-transition just retargets (the
+  current state is ghosted); clicks on the page on screen / being flown to are
+  swallowed (capture-phase document listener in `AppComponent`). With a mouse,
+  navigation starts on `pointerdown` (its click is swallowed); touch and
+  keyboard use the normal click. The nav's active state moves on
+  `NavigationStart` (`highlightNav`).
 - **Deep links on Pages** work via the `404.html` SPA fallback in
   `.github/workflows/deploy.yml`.
 

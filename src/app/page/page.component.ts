@@ -53,6 +53,7 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
   @ViewChild('content', { static: true }) content!: ElementRef<HTMLElement>;
 
   private zone = inject(NgZone);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
   private route = inject(ActivatedRoute);
   private transitions = inject(PageTransitionService);
   private space = inject(SpaceService);
@@ -114,8 +115,8 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
       const reveals = () => ScrollTrigger.batch(atoms, {
         scroller, start: 'top 94%', once: true,
         onEnter: batch => gsap.to(batch, {
-          opacity: 1, x: 0, y: 0, duration: dur(0.7), ease: 'power3.out', overwrite: true,
-          stagger: dur(Math.min(0.06, 0.6 / batch.length)),
+          opacity: 1, x: 0, y: 0, duration: dur(0.55), ease: 'power3.out', overwrite: true,
+          stagger: cappedStagger(0.04),
         }),
       });
       if (dir) reveals(); else this.atIntro(reveals);
@@ -147,22 +148,50 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
     });
   }
 
-  /** Staggered exit, top to bottom: each visible atom flies off against the
-   *  direction of travel. Resolves when the last one is gone — or after ~1s
-   *  regardless, so a stalled animation (hidden tab: no rAF) can't block routing. */
+  /** Exit without holding up the route change: the page is cloned as it looks
+   *  right now (mid-animation included, same scroll position) into an inert
+   *  "ghost" overlay, the real page is hidden, and the guard resolves at once —
+   *  so the next page starts flying in immediately while the ghost's on-screen
+   *  atoms fly off against the direction of travel, overlapping. A click on
+   *  another page mid-transition just ghosts whatever is on screen at that
+   *  moment, so transitions can be interrupted and retargeted freely. */
   leave(dir: 1 | -1): Promise<void> {
-    const atoms = gsap.utils.toArray<HTMLElement>('[data-reveal], [data-exit]', this.content.nativeElement)
-      .filter(el => onScreen(el) && +getComputedStyle(el).opacity > 0);
-    if (!atoms.length) return Promise.resolve();
-    return new Promise(resolve => this.zone.runOutsideAngular(() => {
-      setTimeout(resolve, dur(1) * 1000);
-      gsap.to(atoms, {
-        x: -dir * dist(64), opacity: 0, duration: dur(0.32), ease: 'power2.in', overwrite: true,
-        stagger: dur(Math.min(0.035, 0.4 / atoms.length)),
-        onComplete: () => resolve(),
+    const page = this.host.nativeElement;
+    const atomSel = '[data-reveal], [data-exit]';
+    const live = Array.from(page.querySelectorAll<HTMLElement>(atomSel));
+    const leaving = new Set(live.filter(el => onScreen(el) && +getComputedStyle(el).opacity > 0));
+    const scrollTop = this.scroller.nativeElement.scrollTop;
+
+    const ghost = page.cloneNode(true) as HTMLElement;
+    ghost.classList.add('page-ghost');
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.inert = true;
+    document.body.appendChild(ghost);
+    ghost.querySelector<HTMLElement>('.scroller')!.scrollTop = scrollTop;
+    page.style.visibility = 'hidden';
+    // If the navigation didn't go through after all, bring the page back.
+    setTimeout(() => { if (!this.destroyed) page.style.visibility = ''; }, 600);
+
+    // Clone order matches the live order, so indices map atom → ghost atom.
+    const ghostAtoms = Array.from(ghost.querySelectorAll<HTMLElement>(atomSel)).filter((_, i) => leaving.has(live[i]));
+    this.zone.runOutsideAngular(() => {
+      const remove = () => ghost.remove();
+      setTimeout(remove, 1500);  // never leave a ghost behind (hidden tab: no rAF)
+      if (!ghostAtoms.length) return remove();
+      gsap.to(ghostAtoms, {
+        x: -dir * dist(64), opacity: 0, duration: dur(0.3), ease: 'power2.in',
+        stagger: cappedStagger(0.025),
+        onComplete: remove,
       });
-    }));
+    });
+    return Promise.resolve();
   }
+}
+
+/** Stagger only the first few elements, then let the rest go together, so a
+ *  long page doesn't turn into a slow cascade. */
+export function cappedStagger(each: number, first = 8) {
+  return (i: number) => Math.min(i, first) * dur(each);
 }
 
 function onScreen(el: Element) {

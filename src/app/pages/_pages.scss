@@ -15,6 +15,14 @@
   color: t.$text-body;
 }
 
+// The exiting page's inert clone (PageComponent.leave): sits on top while its
+// atoms fly off, without its readability veils so the incoming page shows
+// through, and never takes input.
+.page-ghost {
+  pointer-events: none;
+  .section { background: none; }
+}
+
 // ── Scroll container (Lenis wrapper) ──────────────────────────────────────
 .scroller {
   position: absolute;
