@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, HostListener, inject } from '@angular/core';
 import * as THREE from 'three';
+import { SpaceService } from '../space.service';
 
 // Relative so it resolves against <base href> on both dev (/) and Pages (/cv/).
 const TEX = 'textures/planet/';
@@ -8,6 +9,12 @@ const TEX = 'textures/planet/';
 // SphereGeometry maps longitude λ so that rotating the globe by (270° − λ)
 // about Y brings that meridian to face the camera (+z).
 const ANCHOR_LON = 35;
+
+// Temporarily off: the globe is the heaviest layer (WebGL + ~MBs of textures).
+// While false nothing is initialised or downloaded, the canvas is hidden and the
+// intro loader is dismissed straight away (it's normally driven by the texture
+// download). Flip back to true to bring the planet back.
+export const PLANET_ENABLED = false;
 
 @Component({
   selector: 'app-planet',
@@ -24,25 +31,41 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private earth!: THREE.Mesh;
   private clouds!: THREE.Mesh;
   private earthGroup = new THREE.Group();
+  private space = inject(SpaceService);
+  // Current (eased) pose. Starts at the default (Home) pose, so a deep link to
+  // another page flies the globe into place on load.
+  private pose = { ...this.space.planet };
 
   private frameId = 0;
   private loaderHidden = false;
   private loaderTimeout = 0;
-  // The WebGL render is the most expensive per-frame work on the page, and the
-  // globe spin is far too slow for 60fps to matter — cap the loop at ~30fps
-  // (rotation is dt-scaled below so the spin rate is unchanged).
-  private static readonly FRAME_MS = 1000 / 30;
+  // The WebGL render is the most expensive per-frame work on the page. At rest
+  // the globe turns ~2px a second, so 15fps is visually identical; while it
+  // moves (page change, Home scroll) it renders at 30fps. Rotation and easing
+  // are dt-scaled, so speeds don't depend on the frame rate.
+  private static readonly IDLE_FRAME_MS = 1000 / 15;
+  private static readonly MOVING_FRAME_MS = 1000 / 30;
   private lastFrame = 0;
   private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
   // Reduced-motion: hold the globe still and render on demand instead of spinning.
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  // Phones: the globe is hidden (display: none in the SCSS, same breakpoint), so
+  // skip the WebGL render too. Textures still load — they drive the intro loader.
+  private hiddenMq = window.matchMedia('(max-width: 700px)');
 
   ngAfterViewInit() {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
+    if (!PLANET_ENABLED) {
+      this.canvas.style.display = 'none';
+      this.hideLoader();
+      return;
+    }
     this.initThree();
     this.buildEarth();
+    this.applyPose();
     if (this.reduceMotion) this.renderStill();
-    else this.animate();
+    // Runs in reduced-motion too (no spin) so page changes can still move the globe.
+    this.animate();
     // Safety net: never let a failed/slow asset trap the user on the loader.
     this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
   }
@@ -55,23 +78,16 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   // ── Intro loader ──────────────────────────────────────────────────────────
 
-  private updateLoader(progress: number) {
-    const pct = Math.round(Math.min(1, progress) * 100);
-    const fill = document.getElementById('ldr-fill');
-    const label = document.getElementById('ldr-pct');
-    if (fill) fill.style.width = pct + '%';
-    if (label) label.textContent = pct + '%';
-  }
-
+  // Fade the spinner out (after the first Earth frame has painted) and signal
+  // SpaceService.introReady, which starts the first-load entrance.
   private hideLoader() {
     if (this.loaderHidden) return;
     this.loaderHidden = true;
     clearTimeout(this.loaderTimeout);
     const el = document.getElementById('app-loader');
-    if (!el) return;
-    this.updateLoader(1);
-    // Let the first Earth frame paint, then fade the loader out and remove it.
     requestAnimationFrame(() => {
+      this.space.markIntroReady();
+      if (!el) return;
       el.classList.add('hidden');
       el.addEventListener('transitionend', () => el.remove(), { once: true });
     });
@@ -80,17 +96,17 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   // ── Scene setup ───────────────────────────────────────────────────────────
 
   private initThree() {
+    // A soft, dimmed full-screen globe doesn't need full retina resolution: cap
+    // the pixel ratio at 1.5 (~44% fewer pixels than 2x per frame). At that
+    // density MSAA buys nothing visible, so it's only kept on 1x screens.
+    const dpr = Math.min(window.devicePixelRatio, 1.5);
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       alpha: true,        // let nebula + stars show through
-      antialias: true,
+      antialias: dpr < 1.5,
+      powerPreference: 'high-performance',
     });
-    // A full-screen WebGL background doesn't need full retina resolution on
-    // small screens: on mobile viewports (below the 1200px desktop breakpoint —
-    // keep in sync with the `desktop` mixin in _design-tokens.scss) cap DPR at
-    // 1.5 instead of 2, which renders ~44% fewer pixels per frame.
-    const mobile = window.matchMedia('(max-width: 1199px)').matches;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
+    this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
     this.scene = new THREE.Scene();
@@ -101,8 +117,6 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     this.camera.position.set(0, 0, 3.4);
     this.camera.lookAt(0, 0, 0);
 
-    // Shift the globe to the lower-right so the HUD panel sits over empty space.
-    this.earthGroup.position.set(0.95, -0.55, 0);
     this.earthGroup.rotation.z = THREE.MathUtils.degToRad(23.5); // axial tilt
     this.scene.add(this.earthGroup);
   }
@@ -110,9 +124,8 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   // ── Earth, clouds, atmosphere ─────────────────────────────────────────────
 
   private buildEarth() {
-    // Drive the intro loader from real texture-download progress.
+    // The intro spinner stays up until the textures are in.
     const manager = new THREE.LoadingManager();
-    manager.onProgress = (_url, loaded, total) => this.updateLoader(loaded / total);
     manager.onLoad  = () => { this.hideLoader(); if (this.reduceMotion) this.renderStill(); };
     manager.onError = () => this.hideLoader(); // never leave the loader stuck
 
@@ -273,24 +286,68 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   private animate = (now = performance.now()) => {
     this.frameId = requestAnimationFrame(this.animate);
+    if (this.hiddenMq.matches) return;
     const elapsed = now - this.lastFrame;
-    if (elapsed < PlanetComponent.FRAME_MS) return;
+    if (elapsed < (this.flying() ? PlanetComponent.MOVING_FRAME_MS : PlanetComponent.IDLE_FRAME_MS)) return;
     this.lastFrame = now;
     // dt in 60fps-frame units, clamped so a background-tab pause doesn't jump.
     const dt = Math.min(elapsed / (1000 / 60), 4);
+    const moved = this.easePose(dt);
+    if (this.reduceMotion) {
+      // Still globe: only repaint when a page change actually moved it.
+      if (moved) this.renderStill();
+      return;
+    }
     this.earth.rotation.y   += 0.00008 * dt;
     this.clouds.rotation.y  += 0.00012 * dt; // clouds drift slightly faster
     this.renderer.render(this.scene, this.camera);
   };
 
-  // One-off render for reduced-motion mode (no spin, no rAF loop).
+  // One-off render for reduced-motion mode (no spin).
   private renderStill = () => this.renderer.render(this.scene, this.camera);
+
+  /** Whether the globe is still easing towards its page's pose. */
+  private flying() {
+    const t = this.space.planet, p = this.pose;
+    return Math.abs(t.x - p.x) + Math.abs(t.y - p.y) + Math.abs(t.scale - p.scale) + Math.abs(t.opacity - p.opacity) > 4e-4;
+  }
+
+  // Ease the current pose towards the page's target pose (SpaceService.planet),
+  // dt-scaled so the ~1s flight is frame-rate independent. Reduced motion snaps.
+  // Returns whether anything changed.
+  private easePose(dt: number) {
+    const target = this.space.planet, pose = this.pose;
+    const k = this.reduceMotion ? 1 : Math.min(1, 0.055 * dt);
+    let moved = false;
+    for (const key of ['x', 'y', 'scale', 'opacity'] as const) {
+      const d = target[key] - pose[key];
+      if (Math.abs(d) < 1e-4) continue;
+      pose[key] += d * k;
+      moved = true;
+    }
+    if (moved) this.applyPose();
+    return moved;
+  }
+
+  // x is a fraction of the visible half-width, so poses hold across aspect ratios.
+  // The visible half-height at z=3.4 / fov 40 is ~1.24. Portrait screens are too
+  // narrow to park the globe beside the copy, so drop it lower instead.
+  private applyPose() {
+    const aspect = window.innerWidth / window.innerHeight;
+    const halfWidth = 3.4 * Math.tan(THREE.MathUtils.degToRad(20)) * aspect;
+    const { x, y, scale, opacity } = this.pose;
+    this.earthGroup.position.set(halfWidth * x, aspect < 1 ? y - 0.6 : y, 0);
+    this.earthGroup.scale.setScalar(scale);
+    this.canvas.style.opacity = String(opacity);
+  }
 
   @HostListener('window:resize')
   onResize() {
+    if (!PLANET_ENABLED) return;
     const w = window.innerWidth, h = window.innerHeight;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.applyPose();
     this.renderer.setSize(w, h);
     if (this.reduceMotion) this.renderStill();
   }

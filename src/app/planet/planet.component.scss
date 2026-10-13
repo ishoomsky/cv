@@ -13,6 +13,11 @@
   z-index: 1;
 }
 
+// Phones: no globe — just stars and nebula. Keep in sync with hiddenMq in the TS.
+@media (max-width: 700px) {
+  #planetCanvas { display: none; }
+}
+
 svg {
   display: none; // Скрываем SVG
 }

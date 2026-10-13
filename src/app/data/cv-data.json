@@ -3,27 +3,40 @@
     "firstName": "IVAN",
     "lastName": "SHUMSKI",
     "fullName": "IVAN SHUMSKI",
-    "panelRole": "FRONTEND & FULL-STACK ENGINEER",
-    "resumeRole": "FRONTEND & FULL-STACK ENGINEER",
+    "panelRole": "FULL STACK ENGINEER · FRONTEND FOCUS",
+    "resumeRole": "FRONTEND & FULL STACK ENGINEER",
     "dossierTitle": "◈ PERSONNEL DOSSIER // IVAN.SHUMSKI"
   },
   "contacts": {
     "location": "ISRAEL",
     "email": "ishoomsky@gmail.com",
     "phone": "+972 55 771 0044",
-    "linkedin": { "label": "linkedin/ivanshumski", "url": "https://www.linkedin.com/in/ivanshumski/" },
-    "github": { "label": "github/ishoomsky", "url": "https://github.com/ishoomsky" }
+    "linkedin": {
+      "label": "linkedin/ivanshumski",
+      "url": "https://www.linkedin.com/in/ivanshumski/"
+    },
+    "github": {
+      "label": "github/ishoomsky",
+      "url": "https://github.com/ishoomsky"
+    }
   },
   "status": "#OPENTOWORK",
   "pdf": "assets/cv-ivan-shumski.pdf",
   "nav": [
-    { "label": "CV", "action": "cv" },
-    { "label": "PORTFOLIO", "action": "portfolio" },
-    { "label": "CONTACT", "action": "contact" }
+    {
+      "label": "ABOUT",
+      "target": ""
+    },
+    {
+      "label": "PORTFOLIO",
+      "target": "portfolio"
+    },
+    {
+      "label": "CONTACT",
+      "target": "contact"
+    }
   ],
   "contact": {
-    "title": "ESTABLISH CONTACT",
-    "intro": "Channel open. WhatsApp is the fastest way to reach me; email for anything longer-form. Usually reply within a few hours.",
     "whatsapp": "+972 55 771 0044",
     "whatsappUrl": "https://wa.me/972557710044",
     "phone": "+972 55 771 0044",
@@ -32,24 +45,47 @@
     "linkedin": "linkedin/ivanshumski",
     "linkedinUrl": "https://www.linkedin.com/in/ivanshumski/"
   },
-  "stackTicker": ["ANGULAR", "TS", "NODE", "AI TOOLS", "RXJS", "NESTJS", "GCP"],
-  "summary": "I'm a frontend developer with 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
+  "summary": "Hello there! I'm a full stack developer with a frontend focus and 6+ years building high-performance, reactive web apps in Angular, React and TypeScript.\n\nI focus on clean architecture, rendering performance, and UIs that hold up under real traffic. I use modern AI tooling (Claude Code, GitHub Copilot) to move faster without trading off quality.\n\nThe products I build on my own I take all the way - data model, API, infrastructure, deployment. They are running now: NestJS and PostgreSQL behind Next.js and React Native, on my own VPS and Cloud Run.",
   "skills": [
     {
       "label": "FRAMEWORKS & LIBRARIES",
-      "items": ["Angular", "Signals", "RxJS", "React", "React Native", "Vue.js"]
+      "items": [
+        "Angular",
+        "Signals",
+        "RxJS",
+        "React",
+        "React Native",
+        "Vue.js"
+      ]
     },
     {
       "label": "LANGUAGES",
-      "items": ["TypeScript", "JavaScript", "HTML5", "CSS3"]
+      "items": [
+        "TypeScript",
+        "JavaScript",
+        "HTML5",
+        "CSS3"
+      ]
     },
     {
       "label": "BACKEND & DATA",
-      "items": ["Node.js", "NestJS", "Express", "PostgreSQL", "MongoDB", "RESTful APIs"]
+      "items": [
+        "Node.js",
+        "NestJS",
+        "Express",
+        "PostgreSQL",
+        "MongoDB",
+        "RESTful APIs"
+      ]
     },
     {
       "label": "AI TOOLS & CLOUD",
-      "items": ["Claude Code", "GitHub Copilot", "Gemini API", "Google Cloud Platform"]
+      "items": [
+        "Claude Code",
+        "GitHub Copilot",
+        "Gemini API",
+        "Google Cloud Platform"
+      ]
     }
   ],
   "experience": [
@@ -104,30 +140,46 @@
   "projects": [
     {
       "name": "EXPENSE TRACKER",
-      "tagline": "Full-Stack Personal Finance App",
-      "flow": ["Next.js", "NestJS", "PostgreSQL"],
+      "tagline": "Full Stack Personal Finance App",
+      "flow": [
+        "Next.js",
+        "NestJS",
+        "PostgreSQL"
+      ],
       "points": [
-        "Designed and built a full-stack personal-finance app end to end — Next.js 16 frontend, NestJS 11 backend, PostgreSQL with Prisma, self-hosted on a Linux VPS behind Docker Compose and Caddy.",
+        "Designed and built a full stack personal-finance app end to end — Next.js 16 frontend, NestJS 11 backend, PostgreSQL with Prisma, self-hosted on a Linux VPS behind Docker Compose and Caddy.",
         "Modeled money as derived balances with paired double-entry transfers, and built receipt-photo capture where Gemini 2.5 Flash extracts line items for review before saving."
-      ]
+      ],
+      "url": "https://expenses.shumski.dev"
     },
     {
       "name": "FOOD PLANNER",
       "tagline": "Multilingual Meal-Planning App",
-      "flow": ["Next.js", "NestJS", "i18n"],
+      "flow": [
+        "Next.js",
+        "NestJS",
+        "i18n"
+      ],
       "points": [
-        "Built a full-stack meal-planning app end to end — Next.js 16 (App Router) frontend, NestJS backend, PostgreSQL with Prisma, with true RTL support across English, Hebrew, and Russian.",
+        "Built a full stack meal-planning app end to end — Next.js 16 (App Router) frontend, NestJS backend, PostgreSQL with Prisma, with true RTL support across English, Hebrew, and Russian.",
         "Used AI to generate full recipes — ingredients, steps, timing, nutrition — from a name or pasted text, and set up GitHub Actions CI/CD deploying over SSH on merge to main."
-      ]
+      ],
+      "url": "https://food.shumski.dev"
     },
     {
       "name": "HEBREW VOCABULARY TRAINER",
       "tagline": "AI-Powered Language-Learning App",
-      "flow": ["React Native", "NestJS", "GCP", "Gemini API"],
+      "flow": [
+        "React Native",
+        "NestJS",
+        "GCP",
+        "Gemini API"
+      ],
       "points": [
         "Built a cross-platform Hebrew learning app end to end — Expo / React Native client and a NestJS API deployed on Google Cloud Run via GitHub Actions, with Firestore and Firebase Auth.",
         "Integrated Google Gemini, with a runtime model fallback chain, to generate and correct word morphology, and built spaced-repetition study sessions using the SM-2 algorithm."
-      ]
+      ],
+      "url": "https://hebrew.shumski.dev"
     }
   ],
   "portfolio": {
@@ -190,8 +242,20 @@
     ]
   },
   "education": [
-    { "title": "Web Design & Computer Graphics", "org": "School of Business and Management of Technology, BSU, Minsk", "year": "2017" },
-    { "title": "Web Development with React and Angular", "org": "IT Academy, Minsk", "year": "2020" }
+    {
+      "title": "Web Design & Computer Graphics",
+      "org": "School of Business and Management of Technology, BSU, Minsk",
+      "year": "2017"
+    },
+    {
+      "title": "Web Development with React and Angular",
+      "org": "IT Academy, Minsk",
+      "year": "2020"
+    }
   ],
-  "languages": ["ENGLISH", "HEBREW", "RUSSIAN"]
+  "languages": [
+    "ENGLISH",
+    "HEBREW",
+    "RUSSIAN"
+  ]
 }

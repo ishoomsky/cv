@@ -1,0 +1,354 @@
+@use '../design-tokens' as t;
+@use '../layout' as *;
+
+// Global styles for routed pages (each page is <app-page> wrapping its sections).
+// Global rather than per-component: every page shares the same vocabulary of
+// kicker / lead / chips / cards, and the reveal/parallax hooks live in PageComponent.
+
+// ── Page shell ────────────────────────────────────────────────────────────
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: t.$z-hud;
+  display: block;
+  font-family: var(--font-body);
+  color: t.$text-body;
+}
+
+// ── Scroll container (Lenis wrapper) ──────────────────────────────────────
+.scroller {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+.content {
+  position: relative;
+  // At least one screen tall with the last section stretching to fill it, so a
+  // short page (Contact) has no un-veiled band under its content.
+  min-height: 100%; display: flex; flex-direction: column;
+}
+
+// ── Next-page link (footer of every section page) ─────────────────────────
+.next-page {
+  display: flex; flex-direction: column; gap: 10px;
+  max-width: 1440px; margin: 0 auto; box-sizing: border-box;
+  padding: clamp(48px, 10vh, 120px) $gutter clamp(56px, 10vh, 110px);
+  text-decoration: none; border-top: 1px solid t.$cyan-border;
+  .next-label { @include label(t.$text); }
+  .next-title {
+    display: flex; align-items: baseline; gap: 18px;
+    font-family: var(--font-display); font-weight: 900; line-height: 1; letter-spacing: -0.01em;
+    font-size: $fs-h2; color: t.$text-bright; transition: color .3s, transform .4s t.$ease-out;
+  }
+  &:hover .next-title { color: t.$cyan; transform: translateX(12px); }
+}
+
+// ── Hero (Home) ───────────────────────────────────────────────────────────
+// Vertical rhythm: name + role + status are one tight signature; the other
+// blocks (greeting, stack, CTAs) are separated by height-aware gaps, so short
+// phones still fit the whole hero on the first screen.
+$hero-gap: clamp(20px, 3.6vh, 36px);
+$hero-gap-lg: clamp(26px, 5vh, 52px);
+// At least one screen tall, but grows with its content (large browser font,
+// short windows) instead of clipping under the top bar.
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+// Same container as every section's .inner (max 1440px + gutter), so the hero
+// and the section headings share one left edge down the whole page.
+.hero-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(96px, 14vh, 128px) $gutter clamp(32px, 6vh, 64px);
+  box-sizing: border-box;
+}
+.eyebrow {
+  // Status line right under the role: part of the name/role signature, so the
+  // same tight gap.
+  display: flex; align-items: center; gap: $space-xs; margin: clamp(12px, 1.8vh, 20px) 0 0;
+  @include label(t.$status-green); font-size: $fs-ui;
+}
+.pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: t.$status-green;
+  box-shadow: 0 0 10px t.$status-green; animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 50% { opacity: .35; transform: scale(.7); } }
+
+.name {
+  margin: 0;
+  width: fit-content;   // its box is the target width for .role (see fitRole)
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.95;
+  // "IVAN.SHUMSKI" measures ~8.15em in Orbitron 900. Sized to sit in the left half
+  // on desktop (clear of the globe) while staying large on phones; never wider
+  // than the ~90vw content box, so it always fits one line. px, not rem, on purpose.
+  font-size: clamp(32px, calc(5vw + 18px), 104px);
+  letter-spacing: -0.02em;
+  color: #f2fbff;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.55), 0 0 80px rgba(0, 212, 255, 0.18);
+  white-space: nowrap;
+  .line { display: block; }
+  .accent { color: t.$cyan; }
+  .mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; }
+  .ch { display: inline-block; will-change: transform; }
+}
+.role {
+  // Orbitron (variable 400–900), not Share Tech Mono: the mono face has no bold.
+  margin: clamp(12px, 1.8vh, 20px) 0 0; font-family: var(--font-display); font-weight: 800; width: fit-content; white-space: nowrap;
+  // letter-spacing here is the no-JS fallback; fitRole() overrides it to match the name's width.
+  // Kept small (13→17) so the wide face still has room to spread out to the name's width.
+  font-size: clamp(0.8125rem, 0.72rem + 0.38vw, 1.0625rem); letter-spacing: 0.22em; color: t.$text-bright;
+}
+// Greeting + stack share one column as wide as the paragraph (34ch of its font).
+.hero-col { width: fit-content; max-width: 100%; }
+// width: 0 + min-width: 100% — fills the column but adds nothing to its intrinsic
+// width, so the column stays exactly as wide as the name.
+.intro { width: 0; min-width: 100%; font-size: $fs-lead-sm; margin-top: $hero-gap-lg; }
+.greeting {
+  margin: 0;
+  font-family: var(--font-body); font-weight: 500; font-size: 1em; line-height: $lh-lead;
+  color: t.$text-bright; text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+}
+.stack { margin-top: $hero-gap; }
+.stack-label { margin: 0 0 $space-s; @include label(t.$text); }
+.hero-ctas { display: flex; flex-wrap: wrap; gap: $space-xs; margin-top: $hero-gap-lg; }
+// Phones: keep both CTAs on one row — stacked they make the hero too tall.
+@media (max-width: 480px) {
+  .hero-ctas { flex-wrap: nowrap; }
+  // Compact on phones so both fit one row.
+  .hero-ctas .btn { padding: 13px 18px; font-size: $fs-label; letter-spacing: 0.04em; }
+}
+.btn-atom { display: inline-flex; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; text-decoration: none;
+  transition: transform .25s t.$ease-out, box-shadow .25s, background .25s, color .25s;
+  &.primary { background: t.$cyan; color: $ink; font-weight: 700;
+    &:hover { transform: translateY(-2px); box-shadow: 0 10px 30px t.$cyan-glow; } }
+  // No backdrop-filter (re-blurs the animated space every frame) — denser fill instead.
+  &.ghost { color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 12, 26, .72);
+    &:hover { border-color: t.$cyan; color: t.$cyan; } }
+}
+
+// ── Tech rail: endless sideways slider of logo tiles ──────────────────────
+.rail {
+  overflow: hidden;
+  // Fade the ends so tiles slide in/out instead of being cut at the edge.
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.rail-track {
+  // Looped by GSAP (xPercent -50, slows on hover) — see HomeComponent.
+  display: flex; width: max-content; will-change: transform;
+}
+.rail-item {
+  display: flex; align-items: center; gap: 10px; flex: none;
+  // Spacing as right padding (not gap) so both halves are identical and the loop has no seam.
+  padding-right: 36px;
+}
+.rail-icon {
+  display: grid; place-items: center; flex: none;
+  width: $rail-tile; height: $rail-tile; border-radius: 28%;
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(214,236,248,.92));
+  box-shadow: 0 10px 24px -12px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.4) inset;
+  img { width: 54%; height: 54%; object-fit: contain; }
+}
+.rail-label { @include label(t.$text-bright); white-space: nowrap; }
+@media (max-width: 700px) {
+  // Centred below the top bar; the copy is too tall for a fixed top offset.
+  .hero-inner { padding-top: 84px; }
+}
+// Short phones (e.g. 320×568): no room for the decorative stack under the copy.
+@media (max-width: 700px) and (max-height: 600px) {
+  .stack { display: none; }
+}
+
+// ── Section pages ─────────────────────────────────────────────────────────
+// Stacked sections are separated by one even gap; only a page's first section
+// adds the top-bar clearance. The veil keeps copy readable: darker on the left
+// where the text sits, clearing to the right so the globe and the stars still
+// read. The hero has none.
+.section {
+  display: block;
+  padding: $section-gap 0 0;
+  background: linear-gradient(90deg, rgba(2, 8, 20, 0.78) 0%, rgba(2, 8, 20, 0.55) 55%, rgba(2, 8, 20, 0.15) 100%);
+}
+@media (max-width: 900px) { .section { background: rgba(2, 8, 20, 0.6); } }
+.inner { padding: 0 $gutter; max-width: 1440px; margin: 0 auto; box-sizing: border-box; }
+// A page that starts with a section (not the hero) clears the top bar.
+.section:first-child { padding-top: $page-top; }
+// The page ends with its last section (the "Next" link is hidden): give it the
+// bottom breathing room itself, so the readability veil runs to the very end
+// instead of leaving an un-veiled empty band.
+.section:last-of-type { flex-grow: 1; padding-bottom: $section-gap; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: $space-m $col-gap; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+.kicker {
+  margin: 0 0 $space-l;
+  font-family: var(--font-display); font-weight: 900; letter-spacing: -0.01em; line-height: 1;
+  font-size: $fs-h2; color: t.$text-bright;
+}
+.sub-h { margin: 0 0 $space-s; @include label(t.$text); }
+.body { margin: 0; font-size: $fs-body; line-height: $lh-body; max-width: 60ch; }
+
+.chips { display: flex; flex-wrap: wrap; gap: $space-xs; }
+.chip {
+  padding: 8px 16px; border-radius: 999px; border: 1px solid t.$cyan-border;
+  background: t.$bg-raised; color: t.$text-bright; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui;
+}
+
+.skills { margin-top: $space-l; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: $space-l $col-gap; }
+.skill-group h3 { margin: 0 0 $space-s; @include label(t.$text); }
+
+// Display headings below the section title (job, project, portfolio item,
+// dialog) all share one style.
+%heading-3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: $fs-h3; line-height: $lh-heading; color: t.$text-bright; }
+// Every card: experience, portfolio, projects.
+%card {
+  padding: $card-pad; border-radius: $card-radius; border: 1px solid t.$cyan-border;
+  background: linear-gradient(160deg, rgba(0,160,220,.10), rgba(0,160,220,.03));
+}
+
+// ── Experience ───────────────────────────────────────────────────────────
+.jobs { display: grid; gap: $card-gap; }
+.job { @extend %card; display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: $space-m $col-gap; }
+.job-head { display: flex; flex-direction: column; align-items: flex-start; gap: $space-xs; }
+.company { @extend %heading-3; margin-top: 4px; }
+.job-role { margin: 0; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; color: t.$cyan; }
+.period { font-family: var(--font-mono); font-size: $fs-label; letter-spacing: $ls-ui; color: t.$text; padding: 6px 14px; border: 1px solid t.$cyan-border; border-radius: 999px; }
+.job ul { max-width: 68ch; }
+@media (max-width: 900px) { .job { grid-template-columns: 1fr; } }
+.job ul { margin: 0; padding-left: 20px; display: grid; gap: $space-xs; line-height: $lh-body; font-size: $fs-body; }
+.job li::marker { color: t.$cyan; }
+
+// ── Work ─────────────────────────────────────────────────────────────────
+.works { display: grid; gap: $card-gap; }
+.work {
+  // Each project is a card (same look as the Experience / Built-on-my-own cards)
+  // so it's clear where one ends and the next begins.
+  @extend %card;
+  // Desktop: text column on the left, vertically centred against the photo on
+  // the right (the 1fr rows above/below absorb the slack).
+  display: grid; column-gap: $col-gap;
+  grid-template-columns: 1fr 1.3fr;
+  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-areas: ". frame" "co frame" "title frame" "desc frame" ". frame";
+}
+.work-co { grid-area: co; }
+.work-frame { grid-area: frame; }
+.work-title { grid-area: title; }
+.work-desc { grid-area: desc; }
+.work-frame {
+  position: relative; overflow: hidden; border-radius: $inner-radius;
+  aspect-ratio: 16 / 10; background: t.$bg-raised; border: 1px solid t.$cyan-border; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8);
+}
+.work-img { position: absolute; inset: -10% 0; width: 100%; height: 120%; object-fit: cover; will-change: transform; }
+.work-co { @include label(t.$cyan); }
+.work-title { @extend %heading-3; margin: $space-xs 0 $space-s; overflow-wrap: anywhere; }
+.work-desc { margin: 0; font-size: $fs-body; line-height: $lh-body; }
+// Mobile: company, title, photo, description.
+@media (max-width: 900px) {
+  .work {
+    grid-template-columns: 1fr; grid-template-rows: none;
+    grid-template-areas: "co" "title" "frame" "desc";
+  }
+  .work-title { margin: $space-xs 0 $space-m; }
+  .work-desc { margin-top: $space-m; }
+}
+
+// Section heading with an action on the right (e.g. GitHub next to the projects).
+.section-head {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: $space-s $space-m; margin: 0 0 $space-l;
+  .kicker { margin: 0; }
+}
+// [data-reveal] atom: no transform transition here (it would fight GSAP).
+.gh-link {
+  display: inline-flex; align-items: center; gap: $space-xs; padding: 12px 20px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; text-decoration: none;
+  color: t.$text-bright; border: 1px solid t.$cyan-border; background: rgba(2, 14, 30, 0.6);
+  transition: border-color .25s, color .25s, background .25s;
+  &:hover, &:focus-visible { border-color: t.$cyan; color: t.$cyan; background: rgba(0, 160, 220, 0.12); }
+}
+// The mask image is set inline in the template (see .c-icon for why).
+.gh-icon {
+  width: 20px; height: 20px; flex: none; background-color: currentColor;
+  -webkit-mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat;
+  mask-position: center; mask-size: contain; mask-repeat: no-repeat;
+}
+
+// ── Projects ─────────────────────────────────────────────────────────────
+.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: $card-gap; }
+.project {
+  @extend %card;
+  display: flex; flex-direction: column; gap: $space-s;
+  h3 { @extend %heading-3; }
+  .p-num { @include label(t.$cyan); }
+  .p-tag { margin: 0; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; color: t.$text; }
+  .p-stack { color: t.$text-bright; }
+  .p-desc { margin: 0; font-size: $fs-body; line-height: $lh-body; }
+  .live { margin-top: auto; align-self: flex-start; color: t.$cyan; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; }
+}
+
+// ── Education / Contact ──────────────────────────────────────────────────
+.edu { display: flex; align-items: baseline; gap: $space-m; padding: $space-m 0; border-bottom: 1px solid t.$cyan-border;
+  &:first-of-type { border-top: 1px solid t.$cyan-border; }
+  .year { flex: none; @include label(t.$cyan); min-width: 52px; }
+  strong { display: block; font-size: $fs-lead-sm; line-height: 1.3; letter-spacing: -0.01em; color: t.$text-bright; font-weight: 600; margin-bottom: 6px; }
+  small { display: block; color: t.$text; font-size: $fs-ui; line-height: $lh-lead; } }
+// Five identical contact buttons in one column (an odd count leaves an orphan
+// in any grid). A card is a [data-reveal] atom, so it must not transition
+// `transform` itself (it would fight GSAP) — the hover motion lives on the arrow.
+// A lead line straight under a section title sits closer to it.
+.kicker:has(+ .contact-intro) { margin-bottom: $space-s; }
+.contact-intro { margin: 0 0 $space-m; font-size: $fs-lead-sm; line-height: $lh-lead; color: t.$text-bright; }
+.contact-list { display: grid; gap: $space-xs; max-width: 760px; }
+.c-card {
+  display: flex; align-items: center; gap: $space-m;
+  padding: $space-m clamp(18px, 2.4vw, 28px); border-radius: $inner-radius; text-decoration: none;
+  border: 1px solid t.$cyan-border; background: rgba(2, 14, 30, 0.6);
+  transition: border-color .25s, background .25s, box-shadow .25s;
+  &:hover, &:focus-visible { border-color: t.$cyan; background: rgba(0, 160, 220, 0.12); box-shadow: 0 16px 40px -20px t.$cyan-glow; }
+  &:hover .c-arrow, &:focus-visible .c-arrow { transform: translate(4px, -4px); color: t.$cyan; }
+}
+.c-icon {
+  flex: none; width: 28px; height: 28px; background-color: t.$cyan;
+  -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+}
+.c-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.c-label { @include label(t.$text); }
+.c-value {
+  // Mono, not the wide display face: emails/handles must fit without mid-word breaks.
+  font-family: var(--font-mono); font-size: $fs-lead-sm; color: t.$text-bright;
+  overflow-wrap: anywhere;  // last resort only, on the narrowest phones
+}
+.c-arrow { margin-left: auto; color: t.$text; transition: transform .25s t.$ease-out, color .25s; }
+
+// Confirm dialog (native <dialog>, shown with showModal()).
+dialog.confirm {
+  width: min(440px, calc(100vw - 32px)); box-sizing: border-box; margin: auto;
+  padding: $card-pad; border-radius: $card-radius;
+  border: 1px solid t.$cyan-border; background: rgba(4, 16, 32, 0.94); color: t.$text-body;
+  font-family: var(--font-body); // lives outside .page, so nothing to inherit
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 212, 255, 0.06) inset;
+  &[open] { animation: cf-in .28s t.$ease-out; }
+  &::backdrop { background: rgba(0, 4, 12, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: cf-fade .28s ease-out; }
+}
+@keyframes cf-in { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+@keyframes cf-fade { from { opacity: 0; } }
+.cf-title { @extend %heading-3; }
+.cf-msg { margin: $space-s 0 0; font-size: $fs-body; line-height: $lh-body; }
+.cf-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: $space-xs; margin-top: $space-m; }
+
