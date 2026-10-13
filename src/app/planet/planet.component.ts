@@ -1,5 +1,9 @@
 import { Component, AfterViewInit, OnDestroy, HostListener, inject } from '@angular/core';
-import * as THREE from 'three';
+import type * as T from 'three';
+
+// three.js is loaded on demand (dynamic import → its own chunk) only when the
+// planet is enabled, so it never weighs on the initial bundle.
+let THREE: typeof import('three');
 import { SpaceService } from '../space.service';
 
 // Relative so it resolves against <base href> on both dev (/) and Pages (/cv/).
@@ -24,13 +28,13 @@ export const PLANET_ENABLED = false;
 })
 export class PlanetComponent implements AfterViewInit, OnDestroy {
   private canvas!: HTMLCanvasElement;
-  private renderer!: THREE.WebGLRenderer;
-  private scene!: THREE.Scene;
-  private camera!: THREE.PerspectiveCamera;
+  private renderer?: T.WebGLRenderer;
+  private scene!: T.Scene;
+  private camera!: T.PerspectiveCamera;
 
-  private earth!: THREE.Mesh;
-  private clouds!: THREE.Mesh;
-  private earthGroup = new THREE.Group();
+  private earth!: T.Mesh;
+  private clouds!: T.Mesh;
+  private earthGroup!: T.Group;
   private space = inject(SpaceService);
   // Current (eased) pose. Starts at the default (Home) pose, so a deep link to
   // another page flies the globe into place on load.
@@ -46,31 +50,43 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
   private static readonly IDLE_FRAME_MS = 1000 / 15;
   private static readonly MOVING_FRAME_MS = 1000 / 30;
   private lastFrame = 0;
-  private readonly sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
+  private sunDir!: T.Vector3;
+  private destroyed = false;
   // Reduced-motion: hold the globe still and render on demand instead of spinning.
   private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   // Phones: the globe is hidden (display: none in the SCSS, same breakpoint), so
   // skip the WebGL render too. Textures still load — they drive the intro loader.
   private hiddenMq = window.matchMedia('(max-width: 700px)');
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     this.canvas = document.getElementById('planetCanvas') as HTMLCanvasElement;
     if (!PLANET_ENABLED) {
       this.canvas.style.display = 'none';
       this.hideLoader();
       return;
     }
+    // Safety net: never let a failed/slow asset (three.js chunk or textures)
+    // trap the user on the loader.
+    this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
+    try {
+      THREE = await import('three');
+    } catch {
+      this.hideLoader();
+      return;
+    }
+    if (this.destroyed) return;
+    this.earthGroup = new THREE.Group();
+    this.sunDir = new THREE.Vector3(-0.7, 0.35, 0.6).normalize();
     this.initThree();
     this.buildEarth();
     this.applyPose();
     if (this.reduceMotion) this.renderStill();
     // Runs in reduced-motion too (no spin) so page changes can still move the globe.
     this.animate();
-    // Safety net: never let a failed/slow asset trap the user on the loader.
-    this.loaderTimeout = window.setTimeout(() => this.hideLoader(), 9000);
   }
 
   ngOnDestroy() {
+    this.destroyed = true;
     cancelAnimationFrame(this.frameId);
     clearTimeout(this.loaderTimeout);
     this.renderer?.dispose();
@@ -106,8 +122,8 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
       antialias: dpr < 1.5,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(dpr);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer!.setPixelRatio(dpr);
+    this.renderer!.setSize(window.innerWidth, window.innerHeight);
 
     this.scene = new THREE.Scene();
 
@@ -300,11 +316,11 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
     }
     this.earth.rotation.y   += 0.00008 * dt;
     this.clouds.rotation.y  += 0.00012 * dt; // clouds drift slightly faster
-    this.renderer.render(this.scene, this.camera);
+    this.renderer!.render(this.scene, this.camera);
   };
 
   // One-off render for reduced-motion mode (no spin).
-  private renderStill = () => this.renderer.render(this.scene, this.camera);
+  private renderStill = () => this.renderer!.render(this.scene, this.camera);
 
   /** Whether the globe is still easing towards its page's pose. */
   private flying() {
@@ -343,12 +359,12 @@ export class PlanetComponent implements AfterViewInit, OnDestroy {
 
   @HostListener('window:resize')
   onResize() {
-    if (!PLANET_ENABLED) return;
+    if (!this.renderer) return;  // disabled, or three.js not loaded yet
     const w = window.innerWidth, h = window.innerHeight;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.applyPose();
-    this.renderer.setSize(w, h);
+    this.renderer!.setSize(w, h);
     if (this.reduceMotion) this.renderStill();
   }
 }

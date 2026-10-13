@@ -41,11 +41,11 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private lastW = -1;       // last width — recreate stars only when it changes
   private w = 0;            // canvas size in CSS px (the backing store is DPR-scaled)
   private h = 0;
-  // Decorative layer: capped at ~30fps — halves the loop's main-thread cost
+  // Decorative layer: capped at ~24fps — a fraction of the loop's main-thread cost
   // and slow drift/twinkle can't tell the difference. Motion below is scaled
   // by dt (in 60fps-frame units) so the visual speed stays what it was tuned
   // to at 60fps.
-  private static readonly FRAME_MS = 1000 / 30;
+  private static readonly FRAME_MS = 1000 / 24;
   private lastFrame = 0;
   private space = inject(SpaceService);
   // Pre-rendered halo per star colour: a radial gradient drawn once and then
@@ -86,7 +86,9 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
     const w = window.innerWidth, h = window.innerHeight;
     // DPR-scaled backing store so sub-pixel stars stay crisp on retina instead of
     // being upscaled into soft blobs. Resizing resets the transform, so reapply it.
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // ≤1.5: a full-screen canvas is re-uploaded to the GPU every frame, and 2x
+    // costs ~78% more pixels for sub-pixel stars that look the same at 1.5x.
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     this.w = w;
     this.h = h;
     this.canvas.width = Math.round(w * dpr);
@@ -134,6 +136,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
   private animate = (now = performance.now()) => {
     this.frameId = requestAnimationFrame(this.animate);
     const warp = this.space.warp;
+    // Hold the last frame while a page scrolls (see SpaceService.scrolling).
+    if (this.space.scrolling && warp === 0) return;
     const elapsed = now - this.lastFrame;
     // Full frame rate while warping — streaks stutter visibly at 30fps.
     if (elapsed < (warp > 0 ? 1000 / 60 : StarFieldComponent.FRAME_MS)) return;
@@ -193,6 +197,8 @@ export class StarFieldComponent implements AfterViewInit, OnDestroy {
       ctx.stroke();
     }
   }
+
+
 
   private drawStar(s: Star, alpha: number) {
     const { ctx } = this;

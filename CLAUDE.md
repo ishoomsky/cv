@@ -31,7 +31,7 @@ why several details below care about `<base href>`.
 | `NebulaComponent` | `nebulaCanvas` | Blurred nebula blobs baked once (re-baked on width change); drift/breathe are CSS transform/opacity animations |
 | `StarFieldComponent` | `starCanvas` | Animated multi-layer parallax star field via `requestAnimationFrame` |
 | `PlanetComponent` | `planetCanvas` | **three.js** WebGL Earth — real day/night/specular/normal/cloud textures + custom shaders |
-| shell | `.topbar` | Glass top bar: name + links + WhatsApp on desktop; links only (pills) ≤820px; `routerLinkActive` |
+| shell | `.topbar` | Glass top bar: name + links on desktop; links only (pills) ≤820px; `routerLinkActive` |
 | `<router-outlet>` | `app-page` (`src/app/pages/*`) | The current page, wrapped in `PageComponent`, composed of section components (`src/app/sections/*`) |
 
 All **canvas** components (nebula, star-field) share one pattern:
@@ -94,6 +94,11 @@ not hard-code copy in templates. The résumé PDF and tech-logo SVGs live under
   `SpaceService.warp` pulses 0→1→0 — `StarFieldComponent` streaks the stars
   sideways — and `ActivationEnd` sets `SpaceService.planet` from route data;
   `PlanetComponent` eases towards it every frame. No View Transitions API.
+- **Transition lock**: while a page change plays (from `NavigationStart` until
+  the new page's entrance settles, tied to that navigation's id) `AppComponent`
+  swallows in-app link clicks in a capture-phase document listener, so rapid or
+  overlapping clicks can't stack navigations/exits/warps. Clicking the current
+  page's link is a no-op (no warp).
 - **Deep links on Pages** work via the `404.html` SPA fallback in
   `.github/workflows/deploy.yml`.
 
@@ -144,7 +149,13 @@ copies the values for pasting into the config.
 - `PlanetComponent` renders at pixel ratio ≤ 1.5 (MSAA only on 1x screens),
   15fps at rest and 30fps while the globe moves (`flying()`); hidden ≤700px.
 - `StarFieldComponent` blits cached glow sprites — don't create gradients per
-  star per frame.
+  star per frame. Its canvas is DPR ≤ 1.5 and ~24fps at rest (a full-screen
+  canvas is re-uploaded to the GPU every frame — the biggest cost on the page),
+  and it holds its last frame while a page scrolls (`SpaceService.scrolling`,
+  set from Lenis in `PageComponent`). Batching the warp strokes into one path
+  per colour was measured slower — keep one short stroke per star.
+- three.js is dynamically imported by `PlanetComponent` (its own lazy chunk)
+  and only when `PLANET_ENABLED`; keep it out of the initial bundle.
 
 ### Mobile / resize care
 

@@ -22,6 +22,11 @@ html, body {
   // popup's entrance and reads as a stray "click animation" over the popup.
   // (Inherited, so setting it here covers every tappable element.)
   -webkit-tap-highlight-color: transparent;
+  // The space colour, not the default white: with viewport-fit=cover Android
+  // Chrome draws the page edge-to-edge and tints the gesture/navigation bar area
+  // from the document background — left white it showed as a pale band.
+  background: #00040c;
+  color-scheme: dark;
 }
 
 body {

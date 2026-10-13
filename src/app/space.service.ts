@@ -24,6 +24,18 @@ export class SpaceService {
    *  first-load content intro should play. */
   readonly introReady = new Promise<void>(r => (this.resolveIntro = r));
   markIntroReady() { this.resolveIntro(); }
+  /** True while a page is being scrolled (and ~150ms after). The star field
+   *  holds its last frame meanwhile: its twinkle is imperceptible during a
+   *  scroll, and not re-uploading a full-screen canvas leaves the GPU to the
+   *  scroll itself. */
+  scrolling = false;
+  private scrollIdle = 0;
+  markScrolling() {
+    this.scrolling = true;
+    clearTimeout(this.scrollIdle);
+    this.scrollIdle = window.setTimeout(() => (this.scrolling = false), 150);
+  }
+
   /** Target pose; the planet eases towards it. */
   planet: PlanetPose = { x: 0.63, y: -0.25, scale: 1.05, opacity: 1 };
 

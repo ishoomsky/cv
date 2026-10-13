@@ -92,7 +92,10 @@ export class PageComponent implements AfterViewInit, OnDestroy, LeavingPage {
     const root = this.content.nativeElement;
 
     this.lenis = new Lenis({ wrapper: scroller, content: root, lerp: 0.09 });
-    this.lenis.on('scroll', ScrollTrigger.update);
+    this.lenis.on('scroll', () => {
+      ScrollTrigger.update();
+      this.space.markScrolling();
+    });
     gsap.ticker.add(this.tick);
     gsap.ticker.lagSmoothing(0);
 

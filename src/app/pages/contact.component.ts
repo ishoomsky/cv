@@ -21,15 +21,15 @@ const c = CV.contact, cs = CV.contacts;
 const METHODS: ContactMethod[] = [
   { label: 'WhatsApp', value: c.whatsapp, href: c.whatsappUrl, icon: 'icons/chat.svg', external: true,
     title: 'Open WhatsApp?',
-    message: `WhatsApp will open in a new tab (the app, if you have it) with a chat to ${c.whatsapp}, ready for your message.`,
+    message: 'WhatsApp will open in a new tab.',
     action: 'Open WhatsApp', event: 'whatsapp-click' },
   { label: 'Email', value: cs.email, href: 'mailto:' + cs.email, icon: 'icons/mail.svg',
     title: 'Write an email?',
-    message: `Your email app will open with a new message to ${cs.email}.`,
+    message: 'Your email app will open.',
     action: 'Write email', event: 'email-click' },
   { label: 'LinkedIn', value: cs.linkedin.label, href: cs.linkedin.url, icon: 'icons/linkedin.svg', external: true,
     title: 'Open LinkedIn?',
-    message: 'My LinkedIn profile will open in a new tab.',
+    message: 'LinkedIn will open in a new tab.',
     action: 'Open LinkedIn', event: 'linkedin-click' },
 ];
 
