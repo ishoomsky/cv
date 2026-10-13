@@ -229,19 +229,40 @@ $hero-gap-lg: clamp(26px, 5vh, 52px);
 .job li::marker, .project li::marker { color: t.$cyan; }
 
 // ── Work ─────────────────────────────────────────────────────────────────
-.works { display: grid; gap: clamp(64px, 10vh, 120px); }
-.work { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(24px, 5vw, 80px); align-items: center; }
-.work.flip { grid-template-columns: 1fr 1.3fr; .work-frame { order: 2; } }
+.works { display: grid; gap: clamp(20px, 3vh, 32px); }
+.work {
+  // Each project is a card (same look as the Experience / Built-on-my-own cards)
+  // so it's clear where one ends and the next begins.
+  padding: clamp(20px, 3vw, 44px); border-radius: 28px;
+  background: linear-gradient(160deg, rgba(0,160,220,.10), rgba(0,160,220,.03));
+  border: 1px solid t.$cyan-border;
+  // Desktop: text column on the left, vertically centred against the photo on
+  // the right (the 1fr rows above/below absorb the slack).
+  display: grid; column-gap: clamp(24px, 5vw, 64px);
+  grid-template-columns: 1fr 1.3fr;
+  grid-template-rows: 1fr auto auto auto 1fr;
+  grid-template-areas: ". frame" "co frame" "title frame" "desc frame" ". frame";
+}
+.work-co { grid-area: co; }
+.work-frame { grid-area: frame; }
+.work-title { grid-area: title; }
+.work-desc { grid-area: desc; }
 .work-frame {
   position: relative; overflow: hidden; border-radius: clamp(20px, 2.4vw, 36px);
   aspect-ratio: 16 / 10; background: t.$bg-raised; border: 1px solid t.$cyan-border; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8);
 }
 .work-img { position: absolute; inset: -10% 0; width: 100%; height: 120%; object-fit: cover; will-change: transform; }
 .work-co { font-family: var(--font-mono); font-size: $fs-label; letter-spacing: .2em; text-transform: uppercase; color: t.$cyan; }
-.work-info h3 { margin: 12px 0 16px; font-family: var(--font-display); color: t.$text-bright; font-size: $fs-h3-lg; line-height: 1.1; }
-.work-info p { margin: 0; font-size: $fs-body; line-height: 1.7; }
+.work-title { margin: 12px 0 16px; font-family: var(--font-display); color: t.$text-bright; font-size: $fs-h3; line-height: 1.15; overflow-wrap: anywhere; }
+.work-desc { margin: 0; font-size: $fs-body; line-height: 1.7; }
+// Mobile: company, title, photo, description.
 @media (max-width: 900px) {
-  .work, .work.flip { grid-template-columns: 1fr; .work-frame { order: 0; } }
+  .work {
+    grid-template-columns: 1fr; grid-template-rows: none;
+    grid-template-areas: "co" "title" "frame" "desc";
+  }
+  .work-title { margin: 8px 0 18px; }
+  .work-desc { margin-top: 18px; }
 }
 
 // Section heading with an action on the right (e.g. GitHub next to the projects).
