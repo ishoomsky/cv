@@ -2,7 +2,7 @@ import cvData from './data/cv-data.json';
 
 interface Link { label: string; url: string; }
 interface Job { role: string; company: string; period: string; points: string[]; }
-interface Project { name: string; tagline: string; flow: string[]; points: string[]; url?: string; }
+interface Project { name: string; tagline: string; flow: string[]; points: string[]; url?: string; images: string[]; }
 interface Work { name: string; company: string; description: string; url?: string; images: string[]; }
 
 export interface CvData {

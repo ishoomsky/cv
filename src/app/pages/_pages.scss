@@ -316,16 +316,30 @@ $hero-gap-lg: clamp(26px, 5vh, 52px);
 }
 
 // ── Projects ─────────────────────────────────────────────────────────────
-.projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: $card-gap; }
+.projects { display: grid; gap: $card-gap; }
 .project {
   @extend %card;
-  display: flex; flex-direction: column; gap: $space-s;
+  // Desktop: text on the left, phone screenshots on the right, centred against each other.
+  display: grid; column-gap: $col-gap; align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  > * { min-width: 0; }
+  .p-text { display: flex; flex-direction: column; align-items: flex-start; gap: $space-s; }
   h3 { @extend %heading-3; }
   .p-num { @include label(t.$cyan); }
   .p-tag { margin: 0; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; color: t.$text; }
   .p-stack { color: t.$text-bright; }
   .p-desc { margin: 0; font-size: $fs-body; line-height: $lh-body; }
-  .live { margin-top: auto; align-self: flex-start; color: t.$cyan; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; }
+  .live { color: t.$cyan; font-family: var(--font-mono); font-size: $fs-ui; letter-spacing: $ls-ui; text-decoration: none; border-bottom: 1px solid t.$cyan-border; padding-bottom: 2px; }
+}
+.p-shots {
+  display: flex; gap: $space-s; align-items: flex-start;
+  img { flex: 1 1 0; min-width: 0; height: auto; aspect-ratio: 9 / 16; object-fit: cover; border-radius: $inner-radius; border: 1px solid t.$cyan-border; background: t.$bg-raised; box-shadow: 0 20px 40px -24px rgba(0,0,0,.8); }
+}
+// Mobile: text first, then a swipeable strip of phones.
+@media (max-width: 900px) {
+  .project { grid-template-columns: minmax(0, 1fr); }
+  .project > .p-shots { overflow-x: auto; scroll-snap-type: x mandatory; margin-top: $space-s; padding-bottom: $space-xs; scrollbar-width: none;
+    img { flex: none; width: min(62%, 240px); scroll-snap-align: start; } }
 }
 
 // ── Education / Contact ──────────────────────────────────────────────────

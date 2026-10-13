@@ -18,6 +18,7 @@ import { CV } from '../cv';
       <div class="projects">
         @for (pr of cv.projects; track pr.name; let i = $index) {
           <article class="project" data-reveal>
+            <div class="p-text">
             <span class="p-num" data-reveal>0{{ i + 1 }}</span>
             <h3 data-reveal>{{ pr.name }}</h3>
             <p class="p-tag" data-reveal>{{ pr.tagline }}</p>
@@ -28,6 +29,13 @@ import { CV } from '../cv';
             @if (pr.url) {
               <a class="live" data-reveal [href]="pr.url" target="_blank" rel="noopener">Open live ↗</a>
             }
+            </div>
+            <!-- Phone screenshots: own column on desktop, a swipeable strip on mobile. -->
+            <div class="p-shots">
+              @for (src of pr.images; track src; let n = $index) {
+                <img data-reveal [src]="src" [alt]="pr.name + ' screenshot ' + (n + 1)" width="380" height="676" loading="lazy" decoding="async" />
+              }
+            </div>
           </article>
         }
       </div>

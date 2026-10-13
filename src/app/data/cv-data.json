@@ -150,7 +150,12 @@
         "Designed and built a full stack personal-finance app end to end — Next.js 16 frontend, NestJS 11 backend, PostgreSQL with Prisma, self-hosted on a Linux VPS behind Docker Compose and Caddy.",
         "Modeled money as derived balances with paired double-entry transfers, and built receipt-photo capture where Gemini 2.5 Flash extracts line items for review before saving."
       ],
-      "url": "https://expenses.shumski.dev"
+      "url": "https://expenses.shumski.dev",
+      "images": [
+        "projects/personal/expenses-1.webp",
+        "projects/personal/expenses-2.webp",
+        "projects/personal/expenses-3.webp"
+      ]
     },
     {
       "name": "FOOD PLANNER",
@@ -164,7 +169,12 @@
         "Built a full stack meal-planning app end to end — Next.js 16 (App Router) frontend, NestJS backend, PostgreSQL with Prisma, with true RTL support across English, Hebrew, and Russian.",
         "Used AI to generate full recipes — ingredients, steps, timing, nutrition — from a name or pasted text, and set up GitHub Actions CI/CD deploying over SSH on merge to main."
       ],
-      "url": "https://food.shumski.dev"
+      "url": "https://food.shumski.dev",
+      "images": [
+        "projects/personal/food-1.webp",
+        "projects/personal/food-2.webp",
+        "projects/personal/food-3.webp"
+      ]
     },
     {
       "name": "HEBREW VOCABULARY TRAINER",
@@ -179,7 +189,12 @@
         "Built a cross-platform Hebrew learning app end to end — Expo / React Native client and a NestJS API deployed on Google Cloud Run via GitHub Actions, with Firestore and Firebase Auth.",
         "Integrated Google Gemini, with a runtime model fallback chain, to generate and correct word morphology, and built spaced-repetition study sessions using the SM-2 algorithm."
       ],
-      "url": "https://hebrew.shumski.dev"
+      "url": "https://hebrew.shumski.dev",
+      "images": [
+        "projects/personal/hebrew-1.webp",
+        "projects/personal/hebrew-2.webp",
+        "projects/personal/hebrew-3.webp"
+      ]
     }
   ],
   "portfolio": {
@@ -217,27 +232,6 @@
         "images": [
           "projects/vysnova/vsnv-16-9.webp"
         ]
-      },
-      {
-        "name": "HEBREW LEARNING APP",
-        "company": "Personal project",
-        "description": "A Hebrew learning app with AI-generated vocabulary and morphology, a personal dictionary, and spaced-repetition practice, built with Expo, NestJS and Google Cloud.",
-        "url": "https://hebrew.shumski.dev",
-        "images": []
-      },
-      {
-        "name": "PERSONAL FINANCE TRACKER",
-        "company": "Personal project",
-        "description": "A personal finance app with account and transaction tracking, budgets, financial reports, and AI-assisted receipt scanning.",
-        "url": "https://expenses.shumski.dev",
-        "images": []
-      },
-      {
-        "name": "MEAL PLANNER",
-        "company": "Personal project",
-        "description": "A multilingual meal planner with Hebrew RTL support, AI-generated recipes, weekly meal planning, shopping lists, and food tracking.",
-        "url": "https://food.shumski.dev",
-        "images": []
       }
     ]
   },
